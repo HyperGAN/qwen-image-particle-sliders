@@ -11,7 +11,7 @@ from .contracts import file_digest, lock, validate_shape
 
 GIB = 2**30
 # Conservative policy for this initial unquantized loader; not a measured fit guarantee.
-MIN_HOST_BYTES = 40 * GIB
+MIN_HOST_BYTES = 16 * GIB
 MIN_GPU_BYTES = 38 * GIB
 MIN_DOWNLOAD_BYTES = 45 * GIB
 
@@ -27,6 +27,9 @@ def preflight(cache_dir=None, device="cpu"):
         "policy_gpu_bytes": MIN_GPU_BYTES,
         "policy_download_free_bytes": MIN_DOWNLOAD_BYTES,
         "policy_is_unmeasured": True,
+        "load_strategy": "native-direct-cuda-low-cpu-memory"
+        if str(device).startswith("cuda")
+        else "cpu-fp32",
     }
     try:
         import psutil
@@ -115,11 +118,18 @@ class Runtime:
 
         self.device = torch.device(device)
         dtype = torch.bfloat16 if self.device.type == "cuda" else torch.float32
-        self.pipe = QwenImage21Pipeline.from_pretrained(
-            str(directory),
-            torch_dtype=dtype,
-            local_files_only=True,
-        ).to(self.device)
+        load_options = {"torch_dtype": dtype, "local_files_only": True, "low_cpu_mem_usage": True}
+        if self.device.type == "cuda":
+            # Native device placement streams verified shards to the selected GPU.
+            # Do not first materialize the entire 30.84 GiB pipeline on CPU.
+            with torch.cuda.device(self.device):
+                self.pipe = QwenImage21Pipeline.from_pretrained(
+                    str(directory),
+                    device_map="cuda",
+                    **load_options,
+                )
+        else:
+            self.pipe = QwenImage21Pipeline.from_pretrained(str(directory), **load_options).to(self.device)
         if self.pipe.config.sample_sigmas is not None:
             raise ValueError("this backend targets the base 2.1 checkpoint, not a Turbo sampling schedule")
         self.pipe.set_progress_bar_config(disable=True)

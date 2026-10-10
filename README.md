@@ -11,9 +11,11 @@ EMA safetensors export, and exact CPU resume. Strength zero bypasses the hooks e
 The generator/critic update, noise, cap regularization and particle VIC come from
 `winning_formulation()` and `FormulationGame`; there is no copied training engine.
 
-**Status:** tiny native CPU tests and synthetic-text training/inference are supported.
-Full pretrained-model loading, image quality, convergence, VRAM fit and RGBA decoding
-have not been validated. No pretrained slider weights are released. See [VALIDATION.md](VALIDATION.md).
+**Status:** 21 CPU tests pass, and a bounded official-weight CUDA smoke passed at
+128×128: two training updates, EMA reload, exact strength-zero latent equivalence,
+and native RGBA PNG output. Full-resolution memory use, CUDA resume, image quality
+and convergence remain unvalidated. No pretrained slider weights are released.
+See [VALIDATION.md](VALIDATION.md).
 This product targets base 2.1, not older Qwen-Image, Edit/Layered, or 2.1 Turbo.
 Image-conditioned training, other CFG values, ComfyUI and ordinary-LoRA distillation
 are outside this initial release.
@@ -30,19 +32,23 @@ when distributing trained adapters. No base model weights are included.
 
 ## Install
 
-Python 3.11 or 3.12. Install a suitable PyTorch **>=2.6** build for your machine first,
-then install the package (including exact core, ParticleGAN and Diffusers source pins):
+Python 3.11 or 3.12. Install compatible PyTorch **>=2.6** and torchvision builds for
+your machine first, then install the package (including exact core, ParticleGAN and
+Diffusers source pins):
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 # CPU validation; use your selected CUDA wheel index for real model work.
-python -m pip install 'torch>=2.6,<3' --index-url https://download.pytorch.org/whl/cpu
+python -m pip install 'torch==2.14.1' 'torchvision==0.29.1' --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -e '.[dev]'
 ```
 
 The official model documents Transformers >=5.17 and Diffusers source support.
-This product tests Transformers 5.17.0 and pins Diffusers to `1d5d056…`.
+Qwen3-VL processor loading also requires torchvision, including its video processor
+even for text-to-image use. Install torch/torchvision together from the same wheel
+index for your CPU or CUDA runtime. This product tests Transformers 5.17.0 and pins
+Diffusers to `1d5d056…`.
 Source/model identities, weight sizes, file hashes and licenses are in
 [backend.lock.json](backend.lock.json) and [PROVENANCE.md](PROVENANCE.md).
 
@@ -60,8 +66,10 @@ python -m pytest -q
 `--dummy` uses the actual two-block `QwenImage21Transformer2DModel`, native
 block-causal attention and native pipeline/Euler scheduler, with random weights and
 synthetic masked text embeddings. Its processor is a minimal initialization stub;
-real tokenization, Qwen3-VL encoding and VAE decoding are not tested. It downloads
-nothing, runs on CPU, and caps CLI training/inference to four steps at 32×32.
+real tokenization and Qwen3-VL encoding are not tested. A separate test adds an
+actual tiny randomly initialized VAE and verifies the native RGBA/PNG output path.
+The dummy CLI downloads nothing, runs on CPU, and caps training/inference to four
+steps at 32×32.
 Every export records `tiny-native-random-weights-synthetic-text`; real inference
 rejects these artifacts. The `.pt` dummy output contains packed synthetic latents.
 
@@ -75,18 +83,25 @@ qwen-slider-preflight --cache-dir /ml2/qwen-sliders/cache --device cuda:0
 
 The pinned snapshot has **33,115,613,408 weight bytes (30.84 GiB)**, plus processor
 and configuration files. Initial conservative policies require 45 GiB free download
-storage, 40 GiB available host RAM for a CUDA load, and 38 GiB free on the selected
+storage, 16 GiB available host RAM for a CUDA load, and 38 GiB free on the selected
 GPU. A CPU FP32 full load requires 80 GiB available RAM. These are **unmeasured
 headroom policies**, not fit claims. Activations, resolution and gradients can require
 more. Shared GPU jobs must retain their own resources; the loader does not choose an
 idle GPU, stop processes, quantize weights or download anything by default.
+The bounded 128×128 smoke measured 8.17 GiB peak process RSS and 30.45 GiB reserved
+GPU memory; these measurements do not establish headroom for larger training runs.
 
 Stage the exact official snapshot in `/ml2/models/Qwen-Image-2.1`. The loader checks
 all load-relevant file sizes and SHA256s, including every weight shard, before loading.
 Extra loadable files are rejected to prevent an unverified variant being selected.
 For an explicitly permitted pinned download, replace `--model-dir` with
 `--allow-hub --cache-dir /ml2/qwen-sliders/cache`. Resource checks happen before download.
-The package's preflight command itself is offline and downloads nothing.
+CUDA loading uses native `device_map="cuda"` and `low_cpu_mem_usage=True` inside the
+selected device context, streaming shards directly to that GPU instead of first
+staging the whole pipeline on CPU. The package's preflight command itself is offline
+and downloads nothing. The [official model CPU-offload example](https://github.com/QwenLM/Qwen-Image-2.1#memory-optimization)
+is another inference option, but its initial CPU staging and training hook behavior
+are not part of this loader.
 
 ## Training
 

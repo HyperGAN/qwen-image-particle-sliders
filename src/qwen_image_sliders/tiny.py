@@ -7,7 +7,12 @@ No pretrained files, encoder weights, or Hub downloads are involved.
 import hashlib
 
 import torch
-from diffusers import FlowMatchEulerDiscreteScheduler, QwenImage21Pipeline, QwenImage21Transformer2DModel
+from diffusers import (
+    AutoencoderKLQwenImage21,
+    FlowMatchEulerDiscreteScheduler,
+    QwenImage21Pipeline,
+    QwenImage21Transformer2DModel,
+)
 
 from .contracts import lock
 from .runtime import Runtime
@@ -29,7 +34,7 @@ class SyntheticProcessor:
 class TinyRuntime(Runtime):
     validation_kind = "tiny-native-random-weights-synthetic-text"
 
-    def __init__(self, seed=7):
+    def __init__(self, seed=7, *, with_vae=False):
         torch.manual_seed(seed)
         self.device = torch.device("cpu")
         transformer = (
@@ -47,10 +52,27 @@ class TinyRuntime(Runtime):
             .requires_grad_(False)
         )
         # Use exactly the official dynamic-shift scheduler configuration.
+        vae = None
+        if with_vae:
+            vae = (
+                AutoencoderKLQwenImage21(
+                    base_dim=4,
+                    decoder_base_dim=4,
+                    z_dim=8,
+                    dim_mult=[1, 1, 1, 1, 1],
+                    num_res_blocks=1,
+                    attn_scales=[],
+                    temperal_downsample=[False, True, True, True],
+                    latents_mean=[0.0] * 8,
+                    latents_std=[1.0] * 8,
+                )
+                .eval()
+                .requires_grad_(False)
+            )
         self.pipe = QwenImage21Pipeline(
             transformer=transformer,
             text_encoder=None,
-            vae=None,
+            vae=vae,
             processor=SyntheticProcessor(),
             scheduler=FlowMatchEulerDiscreteScheduler.from_config(lock()["scheduler_config"]),
         )
