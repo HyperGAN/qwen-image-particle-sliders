@@ -1,0 +1,21 @@
+{
+  "name": "warm-light",
+  "rows": [
+    {
+      "neutral": "A portrait photograph of an adult woman in a studio.",
+      "positive": "A portrait photograph of an adult woman in a studio, lit by warm golden light."
+    },
+    {
+      "neutral": "A photograph of a ceramic cup on a wooden table.",
+      "positive": "A photograph of a ceramic cup on a wooden table, lit by warm golden light."
+    },
+    {
+      "neutral": "A photograph of a quiet reading room.",
+      "positive": "A photograph of a quiet reading room, lit by warm golden light."
+    }
+  ],
+  "controls": [
+    "A monochrome pencil drawing of a tree.",
+    "A technical line drawing of a bicycle."
+  ]
+}

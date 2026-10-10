@@ -1,0 +1,21 @@
+Particle Sliders for Qwen-Image 2.1
+Copyright 2026 HyperGAN contributors
+Built with Qwen
+
+Original product code is licensed under Apache License 2.0 (LICENSE).
+Qwen is licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyright (c) 2026 Hangzhou Tongyi Laboratory Technology Co., Ltd. All Rights Reserved.
+
+Qwen-Image 2.1 materials and trained derivatives retain the research/non-commercial
+license in QWEN-RESEARCH-LICENSE.txt. This repository's Apache license does not
+relicense Qwen materials or grant commercial model usage rights. Request a separate
+commercial model license from the upstream licensor where required.
+
+Dependency code and base weights are not vendored. Downloaded dependencies retain
+licenses: particle-sliders-core and ParticleGAN (MIT), Diffusers and Transformers
+(Apache-2.0). Model weights are downloaded separately from the official snapshot.
+
+adapters.py and projection.py adapt product wiring from HyperGAN/iris-particle-sliders,
+commit 6a226126623fb17c87fe22b86173fe2fcff4bf3e, Apache-2.0. Modified for Qwen-Image 2.1.
+No routed network, critic, regularizer, losses, or optimizer engine is copied here.
+The repository name describes the supported base model. The product's display name
+is Particle Sliders for Qwen-Image 2.1; it is independent of the Qwen team.
