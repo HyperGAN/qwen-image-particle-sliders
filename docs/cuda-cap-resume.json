@@ -1,0 +1,237 @@
+{
+  "status": "success",
+  "real_model": true,
+  "quality_validated": false,
+  "download_bytes": 0,
+  "jobs_modified": false,
+  "height": 128,
+  "width": 128,
+  "training_updates_total": 8,
+  "trajectory_steps": 2,
+  "records_per_pair": 1,
+  "batch": 1,
+  "seed": 7,
+  "gradient_checkpointing": true,
+  "traces": {
+    "full": [
+      {
+        "step": 1,
+        "inputs_sha256": "f182ea3644f50380d0404560b5148ae3dad735f38f94c1f4ec6848577e2c2c44",
+        "rng_before_sha256": "e92dfe00490464c7187e3cb99d2807256d4fb0eb4e7703652e653691a97c384d",
+        "stats": {
+          "step": 1.0,
+          "d_loss": 0.9235344529151917,
+          "g_loss": 0.9202554225921631,
+          "vic": 0.9767648577690125,
+          "sigma": 4.237745063645499
+        }
+      },
+      {
+        "step": 2,
+        "inputs_sha256": "1ae45ebb9dcf197f7b6c14fda40c58df8eef23ac081a32038eda53f84b4e98f1",
+        "rng_before_sha256": "888fbb2a3a72b5588b377dfdc0e3dbacd489de9c5e1fc81501a9cf7b0390da0b",
+        "stats": {
+          "step": 2.0,
+          "d_loss": 0.6525014042854309,
+          "g_loss": 0.8560765981674194,
+          "vic": 0.9745206832885742,
+          "sigma": 4.224653243568279
+        }
+      },
+      {
+        "step": 3,
+        "inputs_sha256": "4b61095544883f9f290f943f7b522a81d573bd3223449fa26b30a9c991a24a23",
+        "rng_before_sha256": "36a7a53e528237f6bf8c7c0bc145c5b0cd22e6c2fed52d45324eaeb8fd4d9520",
+        "stats": {
+          "step": 3.0,
+          "d_loss": 0.6836526393890381,
+          "g_loss": 0.703866720199585,
+          "vic": 0.9703603386878967,
+          "sigma": 4.21160186852736
+        }
+      },
+      {
+        "step": 4,
+        "inputs_sha256": "f182ea3644f50380d0404560b5148ae3dad735f38f94c1f4ec6848577e2c2c44",
+        "rng_before_sha256": "1bf2e5302ee7147119d921302cccd0c06a4f8600b5aaa3447e39af98db470da3",
+        "stats": {
+          "step": 4.0,
+          "d_loss": 0.6072688698768616,
+          "g_loss": 1.6357227563858032,
+          "vic": 0.9673410654067993,
+          "sigma": 4.19859081357442
+        }
+      }
+    ],
+    "split": [
+      {
+        "step": 1,
+        "inputs_sha256": "f182ea3644f50380d0404560b5148ae3dad735f38f94c1f4ec6848577e2c2c44",
+        "rng_before_sha256": "e92dfe00490464c7187e3cb99d2807256d4fb0eb4e7703652e653691a97c384d",
+        "stats": {
+          "step": 1.0,
+          "d_loss": 0.9235344529151917,
+          "g_loss": 0.9202554225921631,
+          "vic": 0.9767648577690125,
+          "sigma": 4.237745063645499
+        }
+      },
+      {
+        "step": 2,
+        "inputs_sha256": "1ae45ebb9dcf197f7b6c14fda40c58df8eef23ac081a32038eda53f84b4e98f1",
+        "rng_before_sha256": "888fbb2a3a72b5588b377dfdc0e3dbacd489de9c5e1fc81501a9cf7b0390da0b",
+        "stats": {
+          "step": 2.0,
+          "d_loss": 0.6525014042854309,
+          "g_loss": 0.8560765981674194,
+          "vic": 0.9745206832885742,
+          "sigma": 4.224653243568279
+        }
+      }
+    ],
+    "resume": [
+      {
+        "step": 3,
+        "inputs_sha256": "4b61095544883f9f290f943f7b522a81d573bd3223449fa26b30a9c991a24a23",
+        "rng_before_sha256": "36a7a53e528237f6bf8c7c0bc145c5b0cd22e6c2fed52d45324eaeb8fd4d9520",
+        "stats": {
+          "step": 3.0,
+          "d_loss": 0.6836526393890381,
+          "g_loss": 0.703866720199585,
+          "vic": 0.9703603386878967,
+          "sigma": 4.21160186852736
+        }
+      },
+      {
+        "step": 4,
+        "inputs_sha256": "f182ea3644f50380d0404560b5148ae3dad735f38f94c1f4ec6848577e2c2c44",
+        "rng_before_sha256": "1bf2e5302ee7147119d921302cccd0c06a4f8600b5aaa3447e39af98db470da3",
+        "stats": {
+          "step": 4.0,
+          "d_loss": 0.6072688698768616,
+          "g_loss": 1.6357227563858032,
+          "vic": 0.9673410654067993,
+          "sigma": 4.19859081357442
+        }
+      }
+    ]
+  },
+  "cap_events": [
+    {
+      "phase": "full",
+      "step": 4,
+      "applied": true,
+      "pen": 0.0,
+      "center": 1.0,
+      "coefficient": 1.0,
+      "effective_lazy_coefficient": 4.0,
+      "requires_grad": true,
+      "fake_detached": true,
+      "input_shape": [
+        1,
+        8
+      ],
+      "gradient_norms": [
+        [
+          0.3440980315208435
+        ],
+        [
+          0.13609212636947632
+        ]
+      ],
+      "backward_seen": true,
+      "incoming_gradient": 1.0
+    },
+    {
+      "phase": "resume",
+      "step": 4,
+      "applied": true,
+      "pen": 0.0,
+      "center": 1.0,
+      "coefficient": 1.0,
+      "effective_lazy_coefficient": 4.0,
+      "requires_grad": true,
+      "fake_detached": true,
+      "input_shape": [
+        1,
+        8
+      ],
+      "gradient_norms": [
+        [
+          0.3440980315208435
+        ],
+        [
+          0.13609212636947632
+        ]
+      ],
+      "backward_seen": true,
+      "incoming_gradient": 1.0
+    }
+  ],
+  "supervisor_timeout_seconds": 600,
+  "process_rss_cap_bytes": 19327352832,
+  "host_available_floor_bytes": 4294967296,
+  "process_gpu_cap_bytes": 36507222016,
+  "torch": "2.13.0+cu126",
+  "deterministic_algorithms": false,
+  "cublas_workspace_config": null,
+  "gpu_free_before_bytes": 41469411328,
+  "host_available_before_bytes": 32483397632,
+  "elapsed_seconds": 141.9308756403625,
+  "process_peak_rss_bytes": 10334425088,
+  "state_mismatches": [],
+  "all_checkpoint_fields_exact": true,
+  "adapter_sha256": {
+    "full": "546a5d8cadeb55ddce49ba5abb5ef9f1770ecd73ab068a7536a1c1b165526285",
+    "resumed": "546a5d8cadeb55ddce49ba5abb5ef9f1770ecd73ab068a7536a1c1b165526285"
+  },
+  "ema_safetensors_bytes_exact": true,
+  "matched_rng_inputs_and_stats": true,
+  "native_cap_backward_passed": true,
+  "gpu_peak_allocated_bytes": 32559554560,
+  "gpu_peak_reserved_bytes": 32602324992,
+  "date": "2026-10-10",
+  "backend_commit": "2f15d01418d443277b9b174e343f79357a55f44d",
+  "model": {
+    "model_id": "Qwen/Qwen-Image-2.1",
+    "revision": "d26bb61231c349cf6b7896fa83353113880e1ba3",
+    "manifest_sha256": "169977e8991eb3b4c2d1c9945093899e1ef70925062138922ea7b56c9a99954b"
+  },
+  "core_commit": "20fdf98d25455582e7e7191eef8ef51cf73173ae",
+  "diffusers_commit": "1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458",
+  "particlegan_commit": "82b72661c03377f348ccb76de37cd4ca02d45a8d",
+  "environment": {
+    "python": "3.12.15",
+    "torchvision": "0.28.0+cu126",
+    "transformers": "5.17.0",
+    "cuda": "12.6",
+    "driver": "580.173.02",
+    "gpu_model": "NVIDIA RTX A6000",
+    "device": "cuda:0",
+    "execution": "normal approved host execution"
+  },
+  "all_checkpoint_tensor_bytes_exact": true,
+  "checkpoint_tensor_pairs_checked_finite_and_byte_equal": 2956,
+  "resume_scope": "fresh game and teacher cache per training call, same pretrained pipeline and process",
+  "measured_cap_violation": false,
+  "adapter_released": false,
+  "harness_sha256": "9dfe83856674191e27b5f9f4624be042785e6f6e1b83d5cfe4fe8e69bec1e954",
+  "tested_source_sha256": {
+    "src/qwen_image_sliders/__init__.py": "ae28eb848715f2d7bec1433d091415552919f6a09fdee7039d96d5e75f1c48e6",
+    "src/qwen_image_sliders/adapters.py": "ca03121755158af21c67cd59d09296af525263e50ea1fe64dd0250abd1da65b2",
+    "src/qwen_image_sliders/checkpoint.py": "652376027c1be4e4e2c9c43d7e8a25941e04faab4f58caf2314d10c14addf048",
+    "src/qwen_image_sliders/contracts.py": "4a44d6ab7e9163b6fd58226e0a3e2256aba22b2f2637e35edeeb43ab3aa2bc1b",
+    "src/qwen_image_sliders/infer.py": "5e6f3fdbd5636b82c9f7accdb3c74e1432abf50e3d7b7a3fe94ecea97dd166f4",
+    "src/qwen_image_sliders/projection.py": "23d268c887c57d4e734117aef039df9b60d0e87795f6e58dadfb4c4768ea26fe",
+    "src/qwen_image_sliders/runtime.py": "3ee7540eae607d5e1250dc5a9fd0c3b9033533e14b3c7a32e69254b699efab9a",
+    "src/qwen_image_sliders/teachers.py": "08512fd662316162134b08136b7ab7333059944149934b8f60d4152a129de745",
+    "src/qwen_image_sliders/tiny.py": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031",
+    "src/qwen_image_sliders/train.py": "567980425dcb9a297db8df78190581ed4ed3b33009b1545d410c36bd1b2b01dc"
+  },
+  "remaining_gaps": [
+    "full-resolution memory and numerics",
+    "cross-runtime/device or restarted-process replay",
+    "held-out semantic quality",
+    "full-budget convergence"
+  ]
+}

@@ -4,8 +4,10 @@ Validation on 2026-10-10 uses Transformers 5.17.0, Diffusers
 `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458`, core
 `20fdf98d25455582e7e7191eef8ef51cf73173ae` and ParticleGAN
 `82b72661c03377f348ccb76de37cd4ca02d45a8d`. CI independently installs dependencies
-from their public pins. The machine-readable real-model receipt is
-[docs/real-model-smoke.json](docs/real-model-smoke.json).
+from their public pins. Machine-readable receipts cover the
+[initial RGBA smoke](docs/real-model-smoke.json) and the subsequent
+[full-coefficient cap/CUDA-resume check](docs/cuda-cap-resume.json).
+The older receipt's gap list describes that earlier run.
 
 ## Native CPU evidence
 
@@ -41,7 +43,8 @@ Separate CLI smokes run four CPU training steps with batch one, and four with ba
 two plus gradient checkpointing. Losses, noise and VIC remain finite. Inference writes
 synthetic latent tensors. Ruff lint/format checks and wheel/sdist packaging pass.
 The revised installed wheel also trains/infers outside the source checkout.
-CI repeats native/unit tests and exercises the installed wheel.
+CI repeats native/unit tests, executes the cap/resume verification harness with the
+native CPU fixture, and exercises the installed wheel. It does not load real weights.
 
 ## Official-weight CUDA smoke
 
@@ -89,12 +92,52 @@ GPU peaks are PyTorch allocator measurements, not total machine use.
 The two-update smoke adapter and low-step images are local test artifacts, not released
 trained sliders or evidence of useful semantic control.
 
+## Native fourth-step cap and exact CUDA resume
+
+A second bounded run used the same official cached weights, runtime, device, 128×128
+resolution, prompt rows and resource limits. It made eight updates total: four
+uninterrupted, then two in a fresh game, then two after loading that game's raw
+checkpoint. Each training call rebuilt its game and teacher cache on the same
+immutable pretrained pipeline in one process. No weights were downloaded and shared
+jobs were not modified. The script is [scripts/check_cuda_resume.py](scripts/check_cuda_resume.py).
+
+The native shared regularizer stayed `b_cap`, autograd/L2, coefficient **1.0**, cap
+**1.0**, lazy interval **4**, no annealing. On both fourth steps the native penalty
+computed its gradient-norm graph and participated in the actual critic loss backward,
+at the full lazy effective coefficient **4.0**. A tensor hook observed incoming loss
+gradient **1.0**. Measured real/fake norms were **0.34409803** and **0.13609213**;
+the penalty was correctly **0.0** because both were below the cap. This tests the
+actual full-coefficient computation/backward, not a positive cap violation induced
+by changing the critic, threshold or formulation.
+
+The cap differentiates the detached `[1, 8]` normalized-error/noise features through
+the small native critic; it does not double-differentiate the frozen Qwen backbone.
+Instrumentation only observed the original regularizer and returned its unmodified
+penalty tensor. The shared engine and coefficient were not copied or replaced.
+
+The comparison was **bit-for-bit exact**, without forcing deterministic algorithms
+or a CUBLAS workspace configuration in this tested runtime:
+
+- Every raw checkpoint field, including bridge, critic, particles, both optimizers,
+  CPU/CUDA RNG, EMA, metadata and run configuration.
+- A post-run CPU check verified all **2,956 tensor pairs** finite and equal in raw
+  bytes, including optimizer states.
+- EMA safetensors bytes: both SHA256
+  `546a5d8cadeb55ddce49ba5abb5ef9f1770ecd73ab068a7536a1c1b165526285`.
+- Every step's captured model inputs/positive targets, RNG fingerprint, noise
+  schedule and reported D/G/VIC metrics.
+
+The run finished in **141.93 seconds**, with **9.62 GiB peak process RSS**, **30.32 GiB
+peak GPU allocations** and **30.36 GiB peak GPU reservations**. This closes the basic
+fourth-step native cap and CUDA checkpoint/resume gaps for this bounded configuration.
+Cross-device/runtime replay, a separately restarted process, and larger-resolution
+numerics are not established by the same-process comparison.
+
 ## Remaining validation
 
-512×512 or larger full-model memory use, exact CUDA resume, full-budget convergence,
+512×512 or larger full-model memory use, full-budget convergence,
 held-out semantic direction, identity/composition preservation, and interpolation
-quality remain open. The smoke did not reach the shared cap penalty's lazy fourth
-step; that path is covered by native CPU tests, not by a full-weight CUDA test.
+quality remain open. These are outside the bounded correctness follow-up.
 Follow [the bounded acceptance procedure](docs/real-model-validation.md) with fresh
 resource checks before extending validation. CI success establishes source/package
 integration, not trained-slider quality or broad hardware fit.

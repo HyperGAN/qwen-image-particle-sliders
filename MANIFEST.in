@@ -2,3 +2,4 @@ include README.md FORMULATION.md PROVENANCE.md VALIDATION.md backend.lock.json
 recursive-include configs *.json
 recursive-include docs *.md *.json
 recursive-include tests *.py
+recursive-include scripts *.py

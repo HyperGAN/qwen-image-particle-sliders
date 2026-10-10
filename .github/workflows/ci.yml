@@ -28,8 +28,10 @@ jobs:
           python -m pip install -e '.[dev]'
       - name: Test actual tiny native API and unit contracts
         run: |
-          python -m ruff check src tests
+          python -m ruff check src tests scripts
+          python -m ruff format --check src tests scripts
           python -m pytest -q
+          python scripts/check_cuda_resume.py --dummy --outdir outputs/resume-ci
           qwen-slider-train --dummy --steps 4 --gradient-checkpointing --outdir outputs/ci
           qwen-slider-infer --dummy --adapter outputs/ci/adapter.safetensors --prompt 'A ceramic cup.' --out outputs/ci/latents.pt
       - name: Build distributable with licenses

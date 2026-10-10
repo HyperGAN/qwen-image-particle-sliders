@@ -7,14 +7,15 @@ using `QwenImage21Pipeline` and the pinned shared
 
 The initial implementation supports text-to-image paired-prompt training, nonlinear
 routed attention output adapters, shared particle inference at strengths **0–1**,
-EMA safetensors export, and exact CPU resume. Strength zero bypasses the hooks exactly.
+EMA safetensors export, and checkpoint/resume. Strength zero bypasses the hooks exactly.
 The generator/critic update, noise, cap regularization and particle VIC come from
 `winning_formulation()` and `FormulationGame`; there is no copied training engine.
 
 **Status:** 21 CPU tests pass, and a bounded official-weight CUDA smoke passed at
-128×128: two training updates, EMA reload, exact strength-zero latent equivalence,
-and native RGBA PNG output. Full-resolution memory use, CUDA resume, image quality
-and convergence remain unvalidated. No pretrained slider weights are released.
+128×128: training, native fourth-step cap backward, exact two-plus-two CUDA resume,
+EMA reload, exact strength-zero latent equivalence, and native RGBA PNG output.
+Full-resolution memory use, image quality and convergence remain unvalidated.
+No pretrained slider weights are released.
 See [VALIDATION.md](VALIDATION.md).
 This product targets base 2.1, not older Qwen-Image, Edit/Layered, or 2.1 Turbo.
 Image-conditioned training, other CFG values, ComfyUI and ordinary-LoRA distillation
@@ -88,8 +89,8 @@ GPU. A CPU FP32 full load requires 80 GiB available RAM. These are **unmeasured
 headroom policies**, not fit claims. Activations, resolution and gradients can require
 more. Shared GPU jobs must retain their own resources; the loader does not choose an
 idle GPU, stop processes, quantize weights or download anything by default.
-The bounded 128×128 smoke measured 8.17 GiB peak process RSS and 30.45 GiB reserved
-GPU memory; these measurements do not establish headroom for larger training runs.
+The bounded 128×128 checks measured up to 9.62 GiB peak process RSS and 30.45 GiB
+reserved GPU memory; these measurements do not establish headroom for larger runs.
 
 Stage the exact official snapshot in `/ml2/models/Qwen-Image-2.1`. The loader checks
 all load-relevant file sizes and SHA256s, including every weight shard, before loading.
@@ -134,8 +135,11 @@ qwen-slider-train <same original options> --steps 2000 \
   --resume /ml2/qwen-sliders/warm-light/training.pt
 ```
 
-Exact resume is tested on CPU. CUDA RNG is captured for the selected device, but
-exact CUDA replay is unvalidated and device/runtime changes can alter numerics.
+Exact resume is tested on CPU and in one bounded 128×128 CUDA configuration with
+PyTorch 2.13.0+cu126. Every checkpoint field, EMA artifact byte, step input and RNG
+hash matched four uninterrupted updates versus two-plus-two resumed updates.
+Device/runtime changes can alter numerics; this is not a guarantee across hardware
+or processes with different settings. See the measured evidence in [VALIDATION.md](VALIDATION.md).
 Resume files are loaded with `weights_only=True`; inference uses safetensors.
 
 ## Inference
