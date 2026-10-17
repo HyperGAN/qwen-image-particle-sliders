@@ -119,6 +119,32 @@ def test_native_started_optimizer_history_rejection_is_atomic(
         assert receiver.backend.adapter.strength == 0 and receiver.backend.adapter._particles is None
 
 
+@pytest.mark.parametrize("started_native_checkpoint", ["bispf"], indirect=True)
+@pytest.mark.parametrize("optimizer", ["opt_g", "opt_d"])
+@pytest.mark.parametrize("invalid_clock", ["zero", "ahead"])
+def test_native_original_adam_clock_rejection_is_atomic(started_native_checkpoint, optimizer, invalid_clock):
+    preset, original, _, _ = started_native_checkpoint
+    packet = deepcopy(original)
+    history = packet[optimizer]["state"]
+    key = next(
+        key for group in packet[optimizer]["param_groups"] for key in group["params"] if history.get(key)
+    )
+    clock = history[key]["step"]
+    invalid_count = 0 if invalid_clock == "zero" else packet["completed_steps"] + 1
+    history[key]["step"] = (
+        clock.new_tensor(invalid_count) if isinstance(clock, torch.Tensor) else type(clock)(invalid_count)
+    )
+    with native_game(preset) as receiver:
+        assert isinstance(getattr(receiver, optimizer), torch.optim.Adam)
+        before = receiver.state_dict()
+        ambient_rng = torch.get_rng_state().clone()
+        with pytest.raises(ValueError, match="Adam step count differs"):
+            receiver.load_state_dict(packet)
+        assert_exact(before, receiver.state_dict())
+        assert torch.equal(ambient_rng, torch.get_rng_state())
+        assert receiver.backend.adapter.strength == 0 and receiver.backend.adapter._particles is None
+
+
 @pytest.mark.parametrize("preset", ["bispf", "bispf_optimized"])
 def test_native_initial_empty_optimizer_histories_accept_exact_first_update(preset):
     with native_game(preset) as source, native_game(preset) as receiver:

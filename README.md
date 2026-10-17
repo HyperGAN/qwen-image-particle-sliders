@@ -3,7 +3,7 @@
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,
 using `QwenImage21Pipeline` and the pinned shared
-[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/4be0b5b29d2e2c741431f468d71ba8a7c884b724/packages/particle-sliders-core).
+[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/cdfb80a76b882b4b73861b12f555263bd64ffeb7/packages/particle-sliders-core).
 
 The training CLI executes the installed shared `ConditionalPG09` game with released
 ParticleGAN **0.9.1** and the native `QwenImage21ResponseAdapter`. It trains the actual
@@ -13,7 +13,7 @@ Inference uses the same EMA maps/particles and the native Qwen pipeline at stren
 copied GAN engine.
 
 **Status:** the new PG0.9.1 path has offline CPU native-model regression coverage;
-see [the current audit](docs/pg09-audit.md). Older CUDA smoke measurements in
+see [the current audit](docs/pg09-final-core.md). Older CUDA smoke measurements in
 [VALIDATION.md](VALIDATION.md) belong to the previous gmix implementation and do not
 qualify this new objective. New pretrained/GPU, memory, sampler quality and convergence
 acceptance remain pending. No pretrained slider weights are released.
