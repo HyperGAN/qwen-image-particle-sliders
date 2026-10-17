@@ -29,12 +29,13 @@ def assert_same(left, right):
         assert left == right
 
 
-def test_exact_cpu_resume_and_ema_inference(tmp_path):
+@pytest.mark.parametrize("preset", ["bispf", "bispf_optimized"])
+def test_exact_cpu_resume_and_ema_inference(tmp_path, preset):
     rows = load_prompts()
     full, split = tmp_path / "full", tmp_path / "split"
-    meta = train(TinyRuntime(), rows, full, steps=4)
-    train(TinyRuntime(), rows, split, steps=2)
-    train(TinyRuntime(), rows, split, steps=4, resume=split / "training.pt")
+    meta = train(TinyRuntime(), rows, full, steps=4, preset=preset)
+    train(TinyRuntime(), rows, split, steps=4, stop_after=2, preset=preset)
+    train(TinyRuntime(), rows, split, steps=4, resume=split / "training.pt", preset=preset)
     assert_same(
         torch.load(full / "training.pt", weights_only=True),
         torch.load(split / "training.pt", weights_only=True),
@@ -43,7 +44,8 @@ def test_exact_cpu_resume_and_ema_inference(tmp_path):
     assert meta["quality_validated"] is False
     assert meta["validation_kind"] == "tiny-native-random-weights-synthetic-text"
     assert meta["formulation"]["architecture_id"] == "gmix"
-    assert meta["formulation"]["provisional"] is True
+    assert meta["protocol"]["engine"] == "particle_sliders.pg09.ConditionalPG09"
+    assert meta["shared_api"]["particlegan_version"] == "0.9.1"
     kwargs = {"seed": 42, "height": 32, "width": 32, "steps": 4, "output_type": "latent"}
     runtime = TinyRuntime()
     vanilla = runtime.sample(runtime.encode("A cup."), **kwargs)
@@ -71,7 +73,16 @@ def test_strict_artifact_metadata_and_tensors(export, tmp_path):
     particles = torch.zeros(128, 4)
     try:
         assert not any(k.startswith("transformer") for k in load_file(str(export)))
-        for key in ["base", "core_commit", "diffusers_commit", "protocol", "targets", "model_config_sha256"]:
+        for key in [
+            "base",
+            "core_commit",
+            "shared_api",
+            "product_sources",
+            "diffusers_commit",
+            "protocol",
+            "targets",
+            "model_config_sha256",
+        ]:
             changed = {**meta, key: "tampered"}
             target = tmp_path / f"bad-{key}.safetensors"
             save_file(
@@ -111,3 +122,79 @@ def test_artifact_architecture_identity_is_portable_between_snapshot_paths():
         assert metadata(runtime, bank, stamp, declared) != first
     finally:
         bank.close()
+
+
+def test_failed_build_restores_native_checkpoint_context_and_hooks(tmp_path, monkeypatch):
+    import qwen_image_sliders.train as trainer
+
+    runtime = TinyRuntime()
+    before = [
+        (
+            module,
+            getattr(module, "gradient_checkpointing", None),
+            getattr(module, "_gradient_checkpointing_func", None),
+        )
+        for module in runtime.model.modules()
+    ]
+
+    def fail(*args, **kwargs):
+        raise RuntimeError("injected common game failure")
+
+    monkeypatch.setattr(trainer, "ConditionalPG09", fail)
+    with pytest.raises(RuntimeError, match="injected common game failure"):
+        train(runtime, load_prompts(), tmp_path, gradient_checkpointing=True)
+    assert not any(module._forward_hooks for module in runtime.model.modules())
+    for module, enabled, function in before:
+        assert getattr(module, "gradient_checkpointing", None) == enabled
+        assert getattr(module, "_gradient_checkpointing_func", None) is function
+
+
+def test_resume_rejects_budget_drift_and_corrupt_ema_before_restore(tmp_path, monkeypatch):
+    import qwen_image_sliders.train as trainer
+
+    rows = load_prompts()
+    train(TinyRuntime(), rows, tmp_path / "split", steps=4, stop_after=2)
+    checkpoint = tmp_path / "split/training.pt"
+    with pytest.raises(ValueError, match="fixed training budget"):
+        train(TinyRuntime(), rows, tmp_path / "wrong-budget", steps=5, resume=checkpoint)
+    packet = torch.load(checkpoint, weights_only=True)
+    packet["ema_particles"][0, 0] = float("nan")
+    bad = tmp_path / "bad-ema.pt"
+    torch.save(packet, bad)
+    calls = []
+    original = trainer.ConditionalPG09.load_state_dict
+
+    def observed(game, state):
+        calls.append(True)
+        return original(game, state)
+
+    monkeypatch.setattr(trainer.ConditionalPG09, "load_state_dict", observed)
+    runtime = TinyRuntime()
+    with pytest.raises(ValueError, match="EMA"):
+        train(runtime, rows, tmp_path / "wrong-ema", steps=4, resume=bad)
+    assert not calls
+    assert not any(module._forward_hooks for module in runtime.model.modules())
+
+
+def test_hndl_critic_executes_shared_native_gan_and_resumes(tmp_path):
+    pytest.importorskip("hndl")
+    from particle_sliders.pg09_hndl import HNDLConditionalReadoutCritic
+
+    from qwen_image_sliders.teachers import paired_records
+    from qwen_image_sliders.train import build_game, step_context
+
+    runtime = TinyRuntime()
+    captured = paired_records(runtime, load_prompts(), seed=7, height=32, width=32, trajectory_steps=4)
+    stamp, declared = formulation(batch=2)
+    game = build_game(runtime, captured, stamp, declared, 7, critic_kind="hndl")
+    try:
+        assert isinstance(game.critic, HNDLConditionalReadoutCritic)
+        assert game.critic.architecture()["hndl_version"] == "0.8.2"
+        step_context(game)
+        state = game.state_dict()
+        expected = step_context(game)
+        game.load_state_dict(state)
+        assert_same(expected, step_context(game))
+        assert game.completed_steps == 2
+    finally:
+        game.backend.adapter.close()

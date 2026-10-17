@@ -1,50 +1,57 @@
-# Shared formulation and native 2.1 wiring
+# Shared PG0.9.1 game and native Qwen wiring
 
-`winning_formulation()` at core `20fdf98d25455582e7e7191eef8ef51cf73173ae` selects
-gmix and the **provisional** `particle-gmix-1600-v2` overlay. `stamp.require()`
-rejects drift; only declared batch and optional generator learning rate change as
-permitted model surfaces. A later crowned overlay is adopted by bumping the core
-pin, without replacing product wiring or keeping a local set of game constants.
-`stamp.bridge()` supplies every routed MLP. `FormulationGame` supplies the critic,
-paired adversarial losses, Gaussian schedule, cap, particle VIC and both optimizers.
+The public training command executes `particle_sliders.pg09.ConditionalPG09`.
+`QwenImage21ResponseAdapter`, `ResponseRow`, `image_condition_features` and
+`ConditionalReadoutCritic` come from the installed shared core. There is no product
+implementation of adversarial losses, penalties, prior regularization, optimizers,
+row sampling or checkpoint restoration.
 
-The product inserts one down → routed map → zero-initialized up residual at each
-`transformer_blocks.i.attn.to_out.0` projection (32 for the official checkpoint).
-Base transformer, text encoder and VAE remain frozen. Particles are registered once
-in the game and referenced through an unregistered hook context. Inference uses
-exactly those same maps and the shared EMA particle bank. Strength 0 returns the
-original projection tensor without arithmetic; strengths 0–1 are the stamped range.
+The architecture still uses `winning_formulation().bridge()` for each routed
+attention-output residual and its 128x4 particle bank. The architecture stamp's
+historical gmix training fields do not select the new game. The actual objective
+is the released ParticleGAN 0.9.1 `bispf_optimized` recipe, or explicitly selected
+`bispf`. `--g-lr` overrides the public recipe's **base learning rate**, including
+its derived critic and prior rates. The resolved recipe is recorded in exports
+and bound in checkpoints. No reconstruction/MSE loss or legacy FormulationGame
+runs through the training CLI.
 
-At a captured neutral-trajectory state (x,t), the desired teacher is the frozen
-positive velocity at that same x,t. The student uses the neutral encoding:
+The native pipeline supplies bounded captured neutral-trajectory states. Its own
+scheduler controls timestep shifting and its own packing controls spatial geometry.
+The product retains exact neutral/positive text encodings, masks (including `None`)
+and raw scheduler times. The shared adapter reversibly restores a true
+`[1,C,1,H,W]` VAE field, then evaluates the neutral-conditioned student and frozen
+positive teacher at the same latent/time. No rank-eight error sketch remains.
+Variable text prefix lengths retain their individual native forwards. Only
+text-to-image, CFG=1 and uncached native attention are supported.
 
-```
-e = P_step(v_student(x,t,neutral) - v_base(x,t,positive)) / paired_edit_scale
-```
+The shared game adds the normalized native student-minus-target field to Gaussian
+reference samples and applies the released adversarial losses and public critic
+penalty. The native field reaches that penalty without arbitrary reshaping. A
+median positive noncontrol edit RMS supplies the fixed response scale. Identical
+prompt controls remain training rows but do not dilute scale calibration. At least
+two nondegenerate edit records are required. The critic receives globally checked
+full-conditioning sketches plus time/CFG/strength coordinates from the shared API.
 
-The native pipeline owns the neutral trajectory, latent packing, dynamic shift and
-Euler scheduler. The native transformer emits a joint text/image sequence, so the
-bridge takes the final target-image token suffix, exactly as the pipeline does.
-The released protocol uses CFG=1 and no image conditioning or prefix KV caching.
-Each trajectory retains a bounded, evenly spaced set of states on CPU. Each batch uses sample-wise native forwards to preserve variable-length
-text/image RoPE layouts; adding text padding would change image positions.
+Generator and critic use the shared balanced row samplers and independent stored
+RNG streams. The exact participating particle Parameter is registered once in the
+shared adapter network and reused by every routed hook and the public prior. Only
+FP32 adapter/particle and critic leaves enter optimizers; the base stays frozen.
+Native checkpointing captures each forward's adapter context through the shared
+checkpoint helper, including repeated backward. The product restores checkpoint
+functions/flags and removes its hooks on both success and failure.
 
-`P_step` is a rank-eight Rademacher sketch of **every** packed latent coordinate,
-with entries +/-1/sqrt(number_of_coordinates). The seed is
-`31415 + 1000003*step`, fixed across one D/G update and changing deterministically
-between updates. In expectation, projected mean-square error equals full latent
-mean-square error. Finite sketches and finite training do not prove image quality.
-The sketch does not receive the game's Gaussian noise and cannot cancel that noise
-by conditioning on it. There is no extra MSE objective.
+Training uses a fixed `--steps` recipe budget. `--stop-after` writes a resumable
+checkpoint before that budget is exhausted; resume retains the same budget and
+configuration. The shared checkpoint binds recipe, all native rows/conditions,
+source/runtime/model identity, optimizer and penalty state, row coverage and RNG.
+The product additionally validates its EMA state before restoring the game.
 
-For each non-control teacher edit of RMS r, calibration contains the balanced rows
-`+/-sqrt(rank)*r*basis_j`. Their first/second moments equal those of fresh sketches:
-zero mean, covariance r²I, row RMS r. The unchanged core normalizer owns its floors,
-median RMS gain and resulting noise calibration. Identical-prompt controls are
-trained but excluded from calibration; at least two nondegenerate edit records
-are needed. Permanent spatial pooling and fixed-coordinate whitening are avoided.
+EMA safetensors exports remain separate from raw resumable checkpoints. Inference
+loads the exported maps and particles into the same hooked bank, then uses the
+native Qwen pipeline. Strength zero bypasses each hook exactly; positive strength
+adds that fraction of the nonlinear residual. This is not an ordinary LoRA.
 
-The hook context stays active for the complete core update and backward, including
-native non-reentrant gradient checkpoint recomputation. The base model is held as
-an unregistered reference, so the game optimizer owns only product projections,
-routed maps and particles. Raw resume state is separate from FP32 EMA exports.
+The new artifact/protocol format is v2. Older gmix/sketch artifacts and checkpoints
+are rejected rather than relabeled. Historical CUDA measurements in this repository
+belong to the former pinned implementation. New PG0.9.1 pretrained/GPU, full sampler,
+quality and convergence acceptance remain unqualified.

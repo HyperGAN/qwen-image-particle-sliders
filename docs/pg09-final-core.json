@@ -1,0 +1,184 @@
+{
+  "schema": "qwen-final-core-acceptance-v1",
+  "base": "b418ff5b709dd687fdc7d9fbb5498c592ec21a58",
+  "merge_target": "HyperGAN/qwen-image-particle-sliders:main",
+  "core_pull_request": "https://github.com/HyperGAN/particle-sliders/pull/141",
+  "installed": {
+    "schema": "qwen-final-core-installed-origin-v1",
+    "core_commit": "cdfb80a76b882b4b73861b12f555263bd64ffeb7",
+    "core_wheel_sha256": "4abc83988fdeb6d7478de830e7ee8ec5d9bd99c20d52f89e4ce594d50dfd39a3",
+    "product_wheel_sha256": "bc880a9aa16bb390acc5f99bbc7d7fd6327ce9b7bad85c443254541fa379cbc4",
+    "core_source_sha256": {
+      "__init__.py": "2424d5a850d1f10734f452175b40caa9761d579e69eb8f0eb2b919776beb1d25",
+      "_training.py": "0a5802997adec58998beb6598861f6a0f0aa1245a10053666e16300b67d3bc44",
+      "bispf_game.py": "3c95d19a9adcfde3a468359fec44dcf1f7dce2d63a5a6318d6c4b3b6d6091a5e",
+      "bispf_provenance.json": "00b294a9e1a36539c2b6f6e58921b955b973c54c8b75c92fd69b88b31c73333c",
+      "bonsai_native.py": "c46de3514a1169ba6d61dc0558975e498c1e7f2fab7d2d5710590c0687a57922",
+      "distillation.py": "b277e561517a9cb40d1a399ad07c6350aa22a287232aea816b7f6e434e18a232",
+      "endpoint_game.py": "78ace462127468dff98eb2eccfbdae442d188999cace8f72137fefc2a4924f45",
+      "formulation.py": "a61b06e93efb24e92a72d826f696ede8694e97a3c27c5e6262a2912caac28e12",
+      "formulation_game.py": "a11585b4dc6b549de6e62716f0b05d6810addcf61932e190ed50cd2469c21490",
+      "grad_regularizers.py": "b1d27df47870814b8a3b05839c833792489e2fe5aff3b2875ab03c74f983a33a",
+      "hypergan_diagnostics.py": "4c525a555d8d2f664442e5635b3dd13ecb7e675b06d2d5a6be8f0561950960bc",
+      "locked_provenance.json": "c38e864b789823476036800eea435586ba6d5208bba4008cbd54fdb8cc88826d",
+      "music3_native.py": "bbdd408259475b6d2a16158eaa283d302f22f6d8e7a64c44aad35d8a1e943819",
+      "native_lora.py": "9cb43b8b03148e11c9b957e81ed3897a965f2a21c69d440c6aaafee452aa6018",
+      "pg09.py": "190a7e6c3a8b53d7d495a577183deacce5c8a1250b674de87c349fb7aead84b3",
+      "pg09_audio.py": "b46a66c56fe237510f06b5d963c084c34bdb1ea87b2732c361f2665c9d221a79",
+      "pg09_backends.py": "5db98918880af33f55ca7312975a0fd112bdae8a7c69a3e357433beb056e32c1",
+      "pg09_continuous_profile.json": "97a92b88aa341369d4ad93595d5beea0dbcc54a0151599b320e5bef940d0ef0b",
+      "pg09_hndl.py": "437b0915264ef6ab886408d2bee8817e7dd47f63a46dbf998fa10a06960bc31e",
+      "pg09_images.py": "f37ef7db2e43a33a20389a4695e78c44be3c231057ea71ec24909aa08d02ae65",
+      "pg09_moss_campaign.py": "29ab37cc00a1d3785a90630071c286275be1710c9134f8d05581bb3f28c5f0c5",
+      "pg09_readout_critic.py": "b83322a2ef2192ac3693fe136d019259c7fd8bf26fba25bb254931ba25462a57",
+      "pg09_release_sources.json": "dae443e436a3a9d3e3d351663bb9480c3340659fb82fdf75282bd5ceeceadd3d",
+      "pg09_remaining_campaigns.py": "cdb2221953607540d68dbe6c9262a9bc4a21f3f736cc3023180a84d364cff82f",
+      "pg09_text_video.py": "6d4c60f0235573c944bfb12ecada0c45a774b419aefc10c73af8758ea62fb580",
+      "provenance.json": "efd60e615dc247b531dfb01a0be5728edcd7e442a9b6b888b848e716273ab45a",
+      "recipe.py": "63726226e681e517c49943f6150989a8277031762c6253a338892dac340b5600",
+      "reference.py": "2c5809edd3818fab9efdd0c5234ea6b5027de5fc0130155e537950471018a371",
+      "supra_model.py": "640851f4570d0f9eacccac70022f06668ddf92dcf8629e978a76443db60acdc4",
+      "teachers.py": "9a35fcff05a15d00f6aa67b5cb9e53cf55526d7e06631ef8cfeb0169519818d2",
+      "tiny_llm_backend.py": "392344c0c2e966db72a46bd44fd4363c05914f6ab134414133e87bb983523186",
+      "tiny_native.py": "336df6f61d12429420caa4a4bbe349e04021f7da594a3f185471a86e4d5f334e"
+    },
+    "product_source_sha256": {
+      "tiny.py": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031",
+      "checkpoint.py": "65348b0b02021449b9108dc1ab6ade67a415105dea448531cb064c129e3403fe",
+      "infer.py": "5e6f3fdbd5636b82c9f7accdb3c74e1432abf50e3d7b7a3fe94ecea97dd166f4",
+      "backend.lock.json": "34c04f729e303e81c59c5b732689db7d30d59a06b1b220e2be4fd1393e05c921",
+      "__init__.py": "a839121f0322991a73046f43fe53a9d112ecf851699871b63d98f11b2f1e0fdb",
+      "prompts.json": "1c46388dff31a09b84682719d41b20756e15a1405ec5c467da9a0f54df94f88a",
+      "train.py": "e22f5b09a19b8168c533dccb484b8d88d597bf3f7188ef013d63f4fae765601c",
+      "projection.py": "26414fde22ee6aeaf682f3e81c07a1175c4e0f47fb9caecabc0f1eed02bbd2da",
+      "teachers.py": "17e45db1f0040b9238652a9ebaca990decd1ab99937d38988cc5cd0758517a0b",
+      "adapters.py": "0fc288d3bba3672215e5a00f21c860dade1a4492056e229dfc6dbf8d43843152",
+      "contracts.py": "5987bfa3685bef0fcd3312b6b80db24554ab1f626347bafd1e1ac1d2131afcac",
+      "runtime.py": "3ee7540eae607d5e1250dc5a9fd0c3b9033533e14b3c7a32e69254b699efab9a"
+    },
+    "modules": {
+      "qwen_image_sliders": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/qwen_image_sliders/__init__.py",
+      "particle_sliders": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/particle_sliders/__init__.py",
+      "particlegan": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/particlegan/__init__.py",
+      "diffusers": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/diffusers/__init__.py",
+      "transformers": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/transformers/__init__.py"
+    },
+    "installed_core_direct_url": {
+      "archive_info": {
+        "hash": "sha256=4abc83988fdeb6d7478de830e7ee8ec5d9bd99c20d52f89e4ce594d50dfd39a3",
+        "hashes": {
+          "sha256": "4abc83988fdeb6d7478de830e7ee8ec5d9bd99c20d52f89e4ce594d50dfd39a3"
+        }
+      },
+      "url": "file:///ml2/codex-storage/future-workspaces/2026-10-17/task-14/releases/cdfb80a76b882b4b73861b12f555263bd64ffeb7/dist/particle_sliders_core-0.6.0-py3-none-any.whl"
+    },
+    "public_git_pin_direct_url": {
+      "subdirectory": "packages/particle-sliders-core",
+      "url": "https://github.com/HyperGAN/particle-sliders.git",
+      "vcs_info": {
+        "commit_id": "cdfb80a76b882b4b73861b12f555263bd64ffeb7",
+        "requested_revision": "cdfb80a76b882b4b73861b12f555263bd64ffeb7",
+        "vcs": "git"
+      }
+    },
+    "producer_installed_and_public_sources_equal": true,
+    "source_free": true,
+    "isolated_python": true,
+    "sys_path": [
+      "/mnt/nvme/ai/conda/anaconda3/envs/minimax-music3/lib/python311.zip",
+      "/mnt/nvme/ai/conda/anaconda3/envs/minimax-music3/lib/python3.11",
+      "/mnt/nvme/ai/conda/anaconda3/envs/minimax-music3/lib/python3.11/lib-dynload",
+      "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages",
+      "/mnt/nvme/ai/conda/anaconda3/envs/minimax-music3/lib/python3.11/site-packages"
+    ],
+    "cuda_initialized": false,
+    "full_fresh_dependency_resolution": false,
+    "inherited_torch_numpy_dependencies": true
+  },
+  "tests": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 5.733,
+    "selectors": "clock_rejection or initial_empty or valid_started or unused_critic",
+    "names": [
+      "test_native_original_adam_clock_rejection_is_atomic[zero-opt_g-bispf]",
+      "test_native_original_adam_clock_rejection_is_atomic[zero-opt_d-bispf]",
+      "test_native_original_adam_clock_rejection_is_atomic[ahead-opt_g-bispf]",
+      "test_native_original_adam_clock_rejection_is_atomic[ahead-opt_d-bispf]",
+      "test_native_valid_started_checkpoint_preserves_exact_next_update[bispf]",
+      "test_native_valid_started_checkpoint_preserves_exact_next_update[bispf_optimized]",
+      "test_native_initial_empty_optimizer_histories_accept_exact_first_update[bispf]",
+      "test_native_initial_empty_optimizer_histories_accept_exact_first_update[bispf_optimized]",
+      "test_native_unused_critic_parameter_can_honestly_resume_without_history[bispf]",
+      "test_native_unused_critic_parameter_can_honestly_resume_without_history[bispf_optimized]"
+    ],
+    "junit_sha256": "269cbbc52f918ab4e8e705e3b52fb812211f7fb30676830fe28bce65973c18a1"
+  },
+  "fresh_process": {
+    "schema": "qwen-installed-fresh-process-resume-v2",
+    "presets": {
+      "bispf": {
+        "checkpoint_fingerprint": {
+          "full": "e29aa57d1d37fe50d7daaa6db984cdaa90ffa06e14c174ea861a1d9706f09bc2",
+          "resumed": "e29aa57d1d37fe50d7daaa6db984cdaa90ffa06e14c174ea861a1d9706f09bc2"
+        },
+        "ema_safetensors_sha256": {
+          "full": "544c0b283174244b76f48048b18451d2f5653ffca74d78216d1c5867d526f6a4",
+          "resumed": "544c0b283174244b76f48048b18451d2f5653ffca74d78216d1c5867d526f6a4"
+        },
+        "native_inference_shape": [
+          1,
+          4,
+          8
+        ],
+        "status": "passed"
+      },
+      "bispf_optimized": {
+        "checkpoint_fingerprint": {
+          "full": "a3bb45899e7ce6d1e84d62b445396777a1611da86d62a3af89dc438d3b4c40de",
+          "resumed": "a3bb45899e7ce6d1e84d62b445396777a1611da86d62a3af89dc438d3b4c40de"
+        },
+        "ema_safetensors_sha256": {
+          "full": "f17e5e73dd7ad9d32a588bc88758cbc38222094685b54fed158a1b40584da030",
+          "resumed": "f17e5e73dd7ad9d32a588bc88758cbc38222094685b54fed158a1b40584da030"
+        },
+        "native_inference_shape": [
+          1,
+          4,
+          8
+        ],
+        "status": "passed"
+      }
+    },
+    "cuda_initialized": false,
+    "quality_validated": false
+  },
+  "fresh_process_receipt_sha256": "83756f83ef7a00e154583588afccb1d22ace186436fa1379c5e996acfab0aa11",
+  "preserved_previous_baseline": {
+    "product_head": "95c7283813b868434d6b92bbd86c37790f62cf92",
+    "core_commit": "4be0b5b29d2e2c741431f468d71ba8a7c884b724",
+    "tests": {
+      "installed_product_tests": 64,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 16.133,
+      "junit_sha256": "a70ee136172ef9600749f96b2437c2f78f73edbc5bd1c5120765aad43860cdc0",
+      "fresh_process_receipt_sha256": "d5b7a8d147b949023bf7ffc3ee77e97aed3ec2b4ec973457abc310c7bc3d905c",
+      "native_hndl_cli_two_updates": true,
+      "native_optimizer_history_cases": 30
+    },
+    "audit_sha256": "e36a86341b48a1d3fa22449167e29f996228ed1c6dee1b8af053973e20380d78",
+    "status": "unchanged; all 64 tests apply to 4be, not silently requalified for cdf"
+  },
+  "scope": "Narrow final 4be to cdf delta acceptance: original Adam clocks, valid native restore/update, actual CLI export/resume/inference and installed origin/source identity",
+  "no_old_checkpoint_migration": true,
+  "active_source_pins_changed": false,
+  "gpu_jobs": false,
+  "permissions_changed": false,
+  "services_changed": false,
+  "merged": false,
+  "ada_review": "pending parent routing exact final head"
+}

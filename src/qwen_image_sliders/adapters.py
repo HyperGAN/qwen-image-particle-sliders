@@ -69,7 +69,7 @@ class AdapterBank(nn.Module):
             if particles.device != self.layers[0].up.weight.device:
                 raise ValueError("particles and adapter must use the same device")
         previous = self._particles, self.strength
-        # Keep the context unregistered: FormulationGame owns the particle parameter.
+        # Keep the context unregistered: the shared game network owns the particle parameter.
         object.__setattr__(self, "_particles", particles)
         self.strength = float(strength)
         try:
