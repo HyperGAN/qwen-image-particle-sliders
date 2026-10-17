@@ -1,3 +1,8 @@
+> Historical gmix protocol and receipts. These commands/measurements do not qualify
+> the new PG0.9.1 objective. `check_cuda_resume.py` now accepts only the offline
+> CPU fixture. New native/GPU admission belongs to the coordinator; see
+> [pg09-audit.md](pg09-audit.md).
+
 # Remaining real-model validation
 
 Run only after checking storage, host RAM, selected GPU headroom and other users'

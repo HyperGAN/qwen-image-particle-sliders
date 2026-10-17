@@ -1,0 +1,39 @@
+{
+  "schema": "qwen-installed-fresh-process-resume-v2",
+  "presets": {
+    "bispf": {
+      "checkpoint_fingerprint": {
+        "full": "681dd7c5c58d364502592b77dc90c18dd1dc9e7cf9aaa646ed7db9062eb64d08",
+        "resumed": "681dd7c5c58d364502592b77dc90c18dd1dc9e7cf9aaa646ed7db9062eb64d08"
+      },
+      "ema_safetensors_sha256": {
+        "full": "17fff3144e15a95e36257301e93ae3d2a671cd41795670c9f8780896fef6fb58",
+        "resumed": "17fff3144e15a95e36257301e93ae3d2a671cd41795670c9f8780896fef6fb58"
+      },
+      "native_inference_shape": [
+        1,
+        4,
+        8
+      ],
+      "status": "passed"
+    },
+    "bispf_optimized": {
+      "checkpoint_fingerprint": {
+        "full": "37689bf6599e636ba2bdad332340cf861a9246f13e6932a66dbb57f3712b77d4",
+        "resumed": "37689bf6599e636ba2bdad332340cf861a9246f13e6932a66dbb57f3712b77d4"
+      },
+      "ema_safetensors_sha256": {
+        "full": "eff11a210d17b734518190109eb97b9edb4390d1c64e534717f271d817a951b1",
+        "resumed": "eff11a210d17b734518190109eb97b9edb4390d1c64e534717f271d817a951b1"
+      },
+      "native_inference_shape": [
+        1,
+        4,
+        8
+      ],
+      "status": "passed"
+    }
+  },
+  "cuda_initialized": false,
+  "quality_validated": false
+}

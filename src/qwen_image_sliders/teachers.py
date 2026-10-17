@@ -69,6 +69,7 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
                     (
                         cpu_kwargs(kwargs),
                         output[0][:, -kwargs["hidden_states"].shape[1] :].float().cpu().clone(),
+                        runtime.pipe.scheduler.timesteps[count].detach().float().cpu().clone(),
                     )
                 )
             count += 1
@@ -81,7 +82,7 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
             handle.remove()
         if count != trajectory_steps or len(pending) != records_per_pair:
             raise RuntimeError("native pipeline trajectory contract changed")
-        for kwargs_cpu, v_neutral in pending:
+        for kwargs_cpu, v_neutral, raw_timestep in pending:
             kwargs = {
                 k: v.to(runtime.device) if isinstance(v, torch.Tensor) else v for k, v in kwargs_cpu.items()
             }
@@ -92,6 +93,9 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
                     "neutral": v_neutral,
                     "target": v_positive.cpu(),
                     "control": bool(row.get("control", False)),
+                    "raw_timestep": raw_timestep,
+                    "neutral_condition": cpu_kwargs(neutral),
+                    "positive_condition": cpu_kwargs(positive),
                 }
             )
     return records

@@ -7,16 +7,16 @@ from importlib.resources import files
 
 from particle_sliders import winning_formulation
 
-FORMAT = "qwen-image21-routed-particle-v1"
+FORMAT = "qwen-image21-routed-particle-pg09-v2"
 PROTOCOL = {
-    "id": "qwen-image21-t2i-paired-velocity-sketch-v1",
+    "id": "qwen-image21-t2i-native-velocity-pg09-v2",
     "true_cfg_scale": 1.0,
     "use_kv_cache": False,
     "prediction": "native-flow-velocity",
-    "projection": "all-latent-coordinate-step-seeded-rademacher",
-    "projection_seed": 31415,
-    "projection_stride": 1000003,
-    "calibration": "exact-isotropic-edit-rms-moments",
+    "response": "native-spatial-VAE-field-[1,C,1,H,W]",
+    "objective": "g_adv+public_prior;d_adv+public_penalty",
+    "engine": "particle_sliders.pg09.ConditionalPG09",
+    "calibration": "median-noncontrol-positive-edit-rms",
     "trained_strength": 1.0,
     "strength_range": [0.0, 1.0],
     "image_conditioning": False,

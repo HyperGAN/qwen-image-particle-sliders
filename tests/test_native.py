@@ -94,83 +94,201 @@ def test_variable_length_native_microbatches_preserve_individual_forward():
         )
 
 
-def test_native_error_depends_on_positive_teacher_and_not_feature_noise():
+def test_native_response_matches_captured_teachers_and_supports_unmasked_text():
+    from diffusers import QwenImage21Pipeline
+    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+
+    from qwen_image_sliders.train import response_rows
+
     runtime = TinyRuntime()
-    stamp, declared = formulation()
-    bank = records(runtime)
-    game = build_game(runtime, bank, stamp, declared, 7)
+    captured = records(runtime)
+    stamp, declared = formulation(batch=2)
+    game = build_game(runtime, captured, stamp, declared, 7)
     try:
-        kwargs, target = batch_records(bank, 1, 1, "cpu")
-        game.bridge.set_context(kwargs, target, game.critic.target_std, 1)
-        a = game.bridge(torch.zeros(1, 8), game.particles)
-        b = game.bridge(torch.randn(1, 8), game.particles)
-        assert torch.equal(a, b)
-        expected = (
-            game.bridge.projector(
-                predict(runtime.model, kwargs) - target, seed=game.bridge.projector.seed_for_step(1)
-            )
-            / game.critic.target_std
-        )
-        torch.testing.assert_close(a, expected, atol=0, rtol=0)
-        game.bridge.set_context(kwargs, predict(runtime.model, kwargs).detach(), game.critic.target_std, 1)
-        assert torch.count_nonzero(game.bridge(torch.zeros(1, 8), game.particles)) == 0
+        assert isinstance(game.backend, QwenImage21ResponseAdapter)
+        assert game.response_shape == (1, 8, 1, 2, 2)
+        for source, prepared in zip(captured, game.rows):
+            expected = QwenImage21Pipeline._unpack_latents(source["target"], 16, 16, 8)
+            assert torch.equal(prepared.target, expected)
+            assert torch.equal(game.backend.generated(prepared), prepared.neutral)
+        plain = copy.deepcopy(captured[0])
+        plain["kwargs"]["encoder_hidden_states_mask"] = None
+        plain["neutral_condition"]["prompt_embeds_mask"] = None
+        row = response_rows(runtime, [plain])[0]
+        response = game.backend.velocity(row.neutral, row.latent, row.timestep, scale=0)
+        native = QwenImage21Pipeline._unpack_latents(predict(runtime.model, plain["kwargs"]), 16, 16, 8)
+        assert torch.equal(response, native)
     finally:
-        game.bridge.bank.close()
+        game.backend.adapter.close()
 
 
-@pytest.mark.parametrize("checkpointing", [False, True])
-def test_core_updates_native_hooks_and_keeps_base_frozen(checkpointing):
+@pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16], ids=["fp32", "bf16"])
+def test_rectangular_response_preserves_raw_times_and_each_prompt_mask(dtype, monkeypatch):
+    from diffusers import QwenImage21Pipeline
+    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+
+    from qwen_image_sliders.train import response_rows
+
     runtime = TinyRuntime()
-    bank = records(runtime)
+    runtime.model.to(dtype)
+    original_encode = runtime.encode
+
+    def encode(prompt):
+        encoding = original_encode(prompt)
+        positive = "warm" in prompt
+        length = 3 if positive else 4
+        encoding["prompt_embeds"] = encoding["prompt_embeds"][:, :length]
+        encoding["prompt_embeds_mask"] = torch.tensor([[True, True, False]]) if positive else None
+        encoding["image_pad_mask"] = torch.zeros(1, length, dtype=torch.bool)
+        return encoding
+
+    monkeypatch.setattr(runtime, "encode", encode)
+    captured = paired_records(
+        runtime,
+        [
+            {"neutral": "A cup.", "positive": "A cup in warm light."},
+            {"neutral": "A room.", "positive": "A room in warm light."},
+        ],
+        seed=7,
+        height=64,
+        width=96,
+        trajectory_steps=3,
+        records_per_pair=3,
+    )
+    stamp, _ = formulation()
+    bank = AdapterBank(runtime.model, stamp)
+    particles = torch.nn.Parameter(torch.zeros(bank.particle_shape))
+    try:
+        backend = QwenImage21ResponseAdapter(runtime, bank, particles)
+        rows = response_rows(runtime, captured)
+        assert len(rows) == 6
+        assert any(float(row.timestep) % 1 for row in rows)
+        with torch.no_grad():
+            for source, row in zip(captured, rows):
+                assert row.latent.shape == (1, 8, 1, 4, 6)
+                assert row.neutral["embeds"].shape[1] == 4 and row.neutral["mask"] is None
+                assert row.positive["embeds"].shape[1] == 3
+                assert torch.equal(row.positive["mask"], torch.tensor([[True, True, False]]))
+                assert torch.equal(row.timestep, source["raw_timestep"])
+                prepared = backend.prepare(row)
+                for field in ("target", "neutral"):
+                    expected = QwenImage21Pipeline._unpack_latents(
+                        source[field], 64, 96, runtime.pipe.vae_scale_factor
+                    )
+                    assert torch.equal(getattr(prepared, field), expected)
+    finally:
+        bank.close()
+
+
+def test_shared_binding_captures_checkpoint_scale_after_response_context_exits():
+    def gradients(checkpointing):
+        runtime = TinyRuntime()
+        captured = records(runtime)
+        if checkpointing:
+            runtime.model.enable_gradient_checkpointing()
+        stamp, declared = formulation(batch=2)
+        game = build_game(runtime, captured, stamp, declared, 7)
+        bank = game.backend.adapter
+        try:
+            with torch.no_grad():
+                for layer in bank.layers:
+                    layer.up.weight.copy_(
+                        torch.linspace(-0.03, 0.03, layer.up.weight.numel()).reshape_as(layer.up.weight)
+                    )
+            # No step_context/outer active scope can mask a missing shared checkpoint binding.
+            generated = game.backend.generated(game.rows[1])
+            assert bank.strength == 0 and bank._particles is None
+            named = list(game.network.named_parameters())
+            result = torch.autograd.grad(
+                generated.square().mean(), [parameter for _, parameter in named], allow_unused=True
+            )
+            assert all(gradient is not None and torch.isfinite(gradient).all() for gradient in result)
+            assert sum(float(gradient.abs().sum()) for gradient in result) > 0
+            assert bank.strength == 0 and bank._particles is None
+            return {name: gradient.detach().clone() for (name, _), gradient in zip(named, result)}
+        finally:
+            bank.close()
+
+    baseline = gradients(False)
+    checkpointed = gradients(True)
+    assert baseline.keys() == checkpointed.keys()
+    for name in baseline:
+        torch.testing.assert_close(checkpointed[name], baseline[name], rtol=0, atol=0)
+
+
+@pytest.mark.parametrize("preset", ["bispf", "bispf_optimized"])
+@pytest.mark.parametrize("checkpointing", [False, True])
+def test_shared_core_updates_actual_bank_and_keeps_base_frozen(checkpointing, preset):
+    from particle_sliders.pg09 import ConditionalPG09
+
+    runtime = TinyRuntime()
+    captured = records(runtime)
     if checkpointing:
         runtime.model.enable_gradient_checkpointing()
     base = {k: v.clone() for k, v in runtime.model.state_dict().items()}
-    stamp, declared = formulation()
-    game = build_game(runtime, bank, stamp, declared, 7)
-    initial = {k: v.clone() for k, v in game.bridge.bank.state_dict().items()}
+    stamp, declared = formulation(batch=2)
+    game = build_game(runtime, captured, stamp, declared, 7, preset=preset)
+    bank = game.backend.adapter
+    initial = {k: v.clone() for k, v in bank.state_dict().items()}
+    particles = game.backend.particles
+    seen = []
+    handle = bank.layers[0].route.register_forward_pre_hook(
+        lambda module, args: seen.append(args[1] is particles)
+    )
     try:
+        assert isinstance(game, ConditionalPG09)
+        assert game.prior.z is particles
         for i in range(1, 5):
-            stats = step_context(game, bank, i, 1)
-            assert all(torch.isfinite(torch.tensor(v)) for v in stats.values())
+            stats = step_context(game)
+            assert all(torch.isfinite(torch.tensor(v)).all() for v in stats.values())
+        assert seen and all(seen)
         assert game.normalization_records == 6
-        for layer in game.bridge.bank.layers:
-            assert layer.up.weight.grad is not None and layer.up.weight.grad.abs().sum() > 0
-        assert any(not torch.equal(v, initial[k]) for k, v in game.bridge.bank.state_dict().items())
+        assert game.state_dict()["config"]["objective"] == "g_adv+public_prior;d_adv+public_penalty"
+        assert game.state_dict()["config"]["pg_version"] == "0.9.1"
+        assert all(layer.up.weight.grad.abs().sum() > 0 for layer in bank.layers)
+        assert any(not torch.equal(v, initial[k]) for k, v in bank.state_dict().items())
         assert all(torch.equal(v, base[k]) for k, v in runtime.model.state_dict().items())
         assert all(p.grad is None for p in runtime.model.parameters())
-        assert len(game.opt_g.param_groups[0]["params"]) == len(list(game.bridge.bank.parameters()))
+        owned = [p for group in game.opt_g.param_groups for p in group["params"]]
+        assert len(owned) == len(set(map(id, owned)))
+        assert set(map(id, owned)) == set(map(id, game.network.parameters()))
+        assert sum(p is particles for p in owned) == 1
+        assert game.exposures["g"].sum() == game.exposures["d"].sum() == 8
     finally:
-        game.bridge.bank.close()
+        handle.remove()
+        bank.close()
 
 
-def test_bfloat16_native_base_with_fp32_adapter_and_gradient_checkpointing():
+def test_bfloat16_base_checkpointing_and_fp32_adapters():
     runtime = TinyRuntime()
     runtime.model.to(torch.bfloat16)
-    bank = records(runtime)
+    captured = records(runtime)
     runtime.model.enable_gradient_checkpointing()
     stamp, declared = formulation(batch=2)
-    game = build_game(runtime, bank, stamp, declared, 7)
+    game = build_game(runtime, captured, stamp, declared, 7)
     try:
-        stats = step_context(game, bank, 1, 2)
-        assert all(torch.isfinite(torch.tensor(v)) for v in stats.values())
-        assert all(p.dtype == torch.float32 for p in game.bridge.bank.parameters())
-        assert all(layer.up.weight.grad.abs().sum() > 0 for layer in game.bridge.bank.layers)
+        stats = step_context(game)
+        assert all(torch.isfinite(torch.tensor(v)).all() for v in stats.values())
+        assert all(p.dtype == torch.float32 for p in game.network.parameters())
+        assert all(layer.up.weight.grad.abs().sum() > 0 for layer in game.backend.adapter.layers)
     finally:
-        game.bridge.bank.close()
+        game.backend.adapter.close()
 
 
 def test_controls_do_not_dilute_calibration_and_degenerate_edits_fail():
     runtime = TinyRuntime()
-    bank = records(runtime)
-    stamp, declared = formulation()
-    game = build_game(runtime, bank, stamp, declared, 7)
-    controls = [row for row in bank if row["control"]]
-    more_controls = build_game(runtime, bank + controls * 20, stamp, declared, 7)
+    captured = records(runtime)
+    stamp, declared = formulation(batch=2)
+    game = build_game(runtime, captured, stamp, declared, 7)
+    controls = [row for row in captured if row["control"]]
     try:
-        assert torch.equal(game.critic.target_std, more_controls.critic.target_std)
-        assert game.edit_rms == more_controls.edit_rms
+        game.backend.adapter.close()
+        more_controls = build_game(runtime, captured + controls * 20, stamp, declared, 7)
+        try:
+            assert game.response_scale == more_controls.response_scale
+        finally:
+            more_controls.backend.adapter.close()
         with pytest.raises(ValueError, match="calibration"):
             build_game(runtime, controls, stamp, declared, 7)
     finally:
-        game.bridge.bank.close()
-        more_controls.bridge.bank.close()
+        game.backend.adapter.close()

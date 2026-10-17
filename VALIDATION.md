@@ -1,3 +1,7 @@
+> Historical gmix validation: these receipts predate the native PG0.9.1 v2 objective.
+> Current CPU-only evidence and remaining gates are in [pg09-audit.md](docs/pg09-audit.md).
+> These old CUDA results do not qualify the new path.
+
 # Validation evidence and limits
 
 Validation on 2026-10-10 uses Transformers 5.17.0, Diffusers

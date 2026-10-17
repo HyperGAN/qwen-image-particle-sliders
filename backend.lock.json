@@ -1,16 +1,21 @@
 {
   "core": {
     "repository": "https://github.com/HyperGAN/particle-sliders",
-    "commit": "20fdf98d25455582e7e7191eef8ef51cf73173ae",
+    "commit": "1bfafe193005af2db91472268be3e555964f36e1",
     "subdirectory": "packages/particle-sliders-core",
     "license": "MIT",
-    "runner": "FormulationGame"
+    "runner": "particle_sliders.pg09.ConditionalPG09",
+    "version": "0.6.0",
+    "native_adapter": "particle_sliders.pg09_images.QwenImage21ResponseAdapter",
+    "qualification": "proposed CPU-tested candidate; Ada review and merge pending"
   },
   "particlegan": {
     "repository": "https://github.com/255BITS/ParticleGAN",
-    "commit": "82b72661c03377f348ccb76de37cd4ca02d45a8d",
+    "commit": "9fc8fb51cba27c26d61f2b6a7d139f55cc726c35",
     "license": "MIT",
-    "role": "core transitive dependency"
+    "role": "released base dependency; native spatial image domain, no source overlay",
+    "version": "0.9.1",
+    "wheel_sha256": "b01b7957169cb3de45887e22b4d525fd54071577e1de58089707cf05fe6992ec"
   },
   "diffusers": {
     "repository": "https://github.com/huggingface/diffusers",
@@ -154,5 +159,11 @@
     "use_dynamic_shifting": true,
     "use_exponential_sigmas": false,
     "use_karras_sigmas": false
+  },
+  "legacy_training": {
+    "core_commit": "20fdf98d25455582e7e7191eef8ef51cf73173ae",
+    "particlegan_commit": "82b72661c03377f348ccb76de37cd4ca02d45a8d",
+    "artifact_format": "qwen-image21-routed-particle-v1",
+    "status": "historical gmix cohort; not resumed or relabeled"
   }
 }
