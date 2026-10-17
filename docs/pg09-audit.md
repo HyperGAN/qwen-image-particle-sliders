@@ -3,12 +3,12 @@
 The public training CLI now calls installed `ConditionalPG09` with the shared
 `QwenImage21ResponseAdapter` and conditional readout critic. The original Qwen main
 was verified as `b418ff5b709dd687fdc7d9fbb5498c592ec21a58`. The dependency is proposed
-shared commit `1bfafe193005af2db91472268be3e555964f36e1` (core 0.6.0); its review and
+shared replacement commit `4be0b5b29d2e2c741431f468d71ba8a7c884b724` (core 0.6.0); its review and
 publication are separate from this product draft. ParticleGAN is the latest official
 released 0.9.1, tag commit `9fc8fb51cba27c26d61f2b6a7d139f55cc726c35`. No PG source
 overlay is used for the native spatial response domain.
 
-[Machine receipt](pg09-audit.json), [34-test JUnit](pg09-cpu-tests.xml), and
+[Machine receipt](pg09-audit.json), [64-test JUnit](pg09-cpu-tests.xml), and
 [fresh-process resume receipt](pg09-fresh-process.json) record exact source/wheel
 hashes and results. Product and shared wheels were installed into an isolated
 consumer environment, with native Diffusers built at its retained source pin.
@@ -16,10 +16,11 @@ Tests ran outside the checkout under `python -I`, with `pythonpath=''`; all Qwen
 core, PG, Diffusers and Transformers imports resolved to that environment. Existing
 PyTorch/NumPy dependencies were reused. This is source-free package installation,
 not a claim of complete fresh dependency resolution or a new Python-version matrix.
-Every installed product Python/JSON file and shared Python file matched its tested
-source bytes. No engine was copied into the product.
+Every installed product and shared Python/JSON file matched its frozen source
+bytes. A separate installation from the declared published Git pin also matched
+all 32 shared Python/JSON files, without changing the producer-wheel test environment. No engine was copied into the product.
 
-All **34 tests passed**. Coverage includes native rectangular FP32/BF16 teacher
+All **64 tests passed**. Coverage includes native rectangular FP32/BF16 teacher
 parity with differing text lengths and None/explicit masks; both PG presets; actual
 particle identity and unique optimizer ownership; frozen base weights; balanced
 sampling; repeated checkpoint backward with exact gradient parity after scale scopes
@@ -29,7 +30,13 @@ exact zero bypass; atomic bad-tensor rejection; and cleanup after failed constru
 Public CLI runs in separate Python processes proved four uninterrupted updates
 identical to two plus two resumed updates under both presets, including complete
 checkpoint fingerprints and exact EMA safetensors bytes. The same installed CLI
-performed native latent inference. A separate installed `--critic hndl` CLI completed
+performed native latent inference. Thirty additional cases use real native Qwen updates and both presets to reject
+negative second moments, missing/extra slot fields, unknown parameter histories,
+and deleted/empty started G/D history atomically. They also accept initial-empty
+and valid started histories, including a genuinely unused critic parameter, with
+native checkpointing enabled.
+
+A separate installed `--critic hndl` CLI completed
 two native GAN updates. The old script name `check_cuda_resume.py --dummy` now
 provides a CPU-only proof of the new recipe and never claims a new CUDA cap test.
 
@@ -58,3 +65,7 @@ python scripts/check_cuda_resume.py --dummy --preset bispf --outdir /tmp/qwen-re
 python scripts/check_cuda_resume.py --dummy --preset bispf_optimized --outdir /tmp/qwen-resume-optimized
 qwen-slider-train --dummy --steps 2 --critic hndl --outdir /tmp/qwen-hndl
 ```
+
+The previous staging receipts for shared `1bfafe19` remain preserved in Qwen
+commit `5d7d9d8a9d29db6dc7a8a6c4bf64956829244f5e`. The replacement pin and tests above
+supersede them for final acceptance; existing checkpoints were not rebound.

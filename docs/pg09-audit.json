@@ -5,39 +5,45 @@
   "intended_merge_target": "main",
   "core": {
     "repository": "HyperGAN/particle-sliders",
-    "commit": "1bfafe193005af2db91472268be3e555964f36e1",
+    "commit": "4be0b5b29d2e2c741431f468d71ba8a7c884b724",
     "version": "0.6.0",
-    "wheel_sha256": "dc5590483c426d776f15cf09b711cddcde8039e0b18fd325e2f400cbd9c5d859",
-    "built_from": "git archive exact commit; no mutable source imports",
+    "wheel_sha256": "2e7621c370e790f65702acf76cfa2f428b393cd3f863245aa26d8a76ff096ada",
+    "built_from": "authoritative producer immutable Git-archive wheel; installed unchanged",
     "package_source_sha256": {
       "pg09_hndl.py": "437b0915264ef6ab886408d2bee8817e7dd47f63a46dbf998fa10a06960bc31e",
+      "bispf_provenance.json": "00b294a9e1a36539c2b6f6e58921b955b973c54c8b75c92fd69b88b31c73333c",
       "formulation_game.py": "a11585b4dc6b549de6e62716f0b05d6810addcf61932e190ed50cd2469c21490",
       "reference.py": "2c5809edd3818fab9efdd0c5234ea6b5027de5fc0130155e537950471018a371",
       "supra_model.py": "640851f4570d0f9eacccac70022f06668ddf92dcf8629e978a76443db60acdc4",
       "recipe.py": "63726226e681e517c49943f6150989a8277031762c6253a338892dac340b5600",
       "tiny_native.py": "336df6f61d12429420caa4a4bbe349e04021f7da594a3f185471a86e4d5f334e",
-      "pg09_remaining_campaigns.py": "8c179833404980f18cfe7e2f14b889db17da800230f85499b6018fe24831e209",
+      "locked_provenance.json": "c38e864b789823476036800eea435586ba6d5208bba4008cbd54fdb8cc88826d",
+      "pg09_remaining_campaigns.py": "cdb2221953607540d68dbe6c9262a9bc4a21f3f736cc3023180a84d364cff82f",
       "__init__.py": "2424d5a850d1f10734f452175b40caa9761d579e69eb8f0eb2b919776beb1d25",
       "pg09_text_video.py": "6d4c60f0235573c944bfb12ecada0c45a774b419aefc10c73af8758ea62fb580",
+      "pg09_release_sources.json": "dae443e436a3a9d3e3d351663bb9480c3340659fb82fdf75282bd5ceeceadd3d",
       "pg09_audio.py": "b46a66c56fe237510f06b5d963c084c34bdb1ea87b2732c361f2665c9d221a79",
       "pg09_backends.py": "5db98918880af33f55ca7312975a0fd112bdae8a7c69a3e357433beb056e32c1",
       "grad_regularizers.py": "b1d27df47870814b8a3b05839c833792489e2fe5aff3b2875ab03c74f983a33a",
       "pg09_readout_critic.py": "b83322a2ef2192ac3693fe136d019259c7fd8bf26fba25bb254931ba25462a57",
-      "pg09.py": "7a342a09ed834aaaf0e025db0ae1bef3faf29ab892094f8c77ab1d98e06896ce",
+      "pg09.py": "0a4a3a298784f7d250286cb27b1c7c230fbedcbd53773e2352d520b516ba5c07",
       "endpoint_game.py": "78ace462127468dff98eb2eccfbdae442d188999cace8f72137fefc2a4924f45",
-      "pg09_moss_campaign.py": "2490bf752322a7d720b6a83db73ddff74a239ab07c3cce8624c8ea54889eb624",
+      "pg09_moss_campaign.py": "29ab37cc00a1d3785a90630071c286275be1710c9134f8d05581bb3f28c5f0c5",
       "bonsai_native.py": "c46de3514a1169ba6d61dc0558975e498c1e7f2fab7d2d5710590c0687a57922",
-      "_training.py": "1eeb32e1b371137f92e1427b87140fbd64ce85734c609a0d063b4cb60cf8ae46",
+      "_training.py": "0a5802997adec58998beb6598861f6a0f0aa1245a10053666e16300b67d3bc44",
       "tiny_llm_backend.py": "392344c0c2e966db72a46bd44fd4363c05914f6ab134414133e87bb983523186",
       "formulation.py": "a61b06e93efb24e92a72d826f696ede8694e97a3c27c5e6262a2912caac28e12",
-      "music3_native.py": "36b1f9627ecf7f92fc4cc4a127ea9b541d4c669a8dc5321fe1ef23097dd406d8",
+      "music3_native.py": "bbdd408259475b6d2a16158eaa283d302f22f6d8e7a64c44aad35d8a1e943819",
       "hypergan_diagnostics.py": "4c525a555d8d2f664442e5635b3dd13ecb7e675b06d2d5a6be8f0561950960bc",
       "teachers.py": "9a35fcff05a15d00f6aa67b5cb9e53cf55526d7e06631ef8cfeb0169519818d2",
-      "native_lora.py": "f8538a4459465e9153bb457c32257847321d067b361aa42fbf8264868abd2f71",
+      "native_lora.py": "9cb43b8b03148e11c9b957e81ed3897a965f2a21c69d440c6aaafee452aa6018",
       "pg09_images.py": "e92e36fdcc8e5327ea096fa8d48adc8749d453d19c4e945fd246dd931fe2c5c3",
+      "provenance.json": "efd60e615dc247b531dfb01a0be5728edcd7e442a9b6b888b848e716273ab45a",
       "distillation.py": "b277e561517a9cb40d1a399ad07c6350aa22a287232aea816b7f6e434e18a232",
-      "bispf_game.py": "3c95d19a9adcfde3a468359fec44dcf1f7dce2d63a5a6318d6c4b3b6d6091a5e"
-    }
+      "bispf_game.py": "3c95d19a9adcfde3a468359fec44dcf1f7dce2d63a5a6318d6c4b3b6d6091a5e",
+      "pg09_continuous_profile.json": "97a92b88aa341369d4ad93595d5beea0dbcc54a0151599b320e5bef940d0ef0b"
+    },
+    "public_commit_verified": true
   },
   "particlegan": {
     "version": "0.9.1",
@@ -48,12 +54,12 @@
   },
   "product": {
     "version": "0.2.0",
-    "wheel_sha256": "dd9c019e2fafc932e53e582727135c20dc3b2160aaad2102e90d0b60dfdf7691",
+    "wheel_sha256": "a7aaa7b4609f39902a6ebd6cee9c08ab88cdcf4edf59e6a71cb87fff900b9e59",
     "package_source_sha256": {
       "tiny.py": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031",
       "checkpoint.py": "65348b0b02021449b9108dc1ab6ade67a415105dea448531cb064c129e3403fe",
       "infer.py": "5e6f3fdbd5636b82c9f7accdb3c74e1432abf50e3d7b7a3fe94ecea97dd166f4",
-      "backend.lock.json": "47c5db9dc5dc317b0c639db1645d2047bc21114c2d4aaecd58c6ea2665a69965",
+      "backend.lock.json": "7d1d0ace1e48d6900cf3074f1032de48a763337063cf9ecc90d94b58ebee568f",
       "__init__.py": "a839121f0322991a73046f43fe53a9d112ecf851699871b63d98f11b2f1e0fdb",
       "prompts.json": "1c46388dff31a09b84682719d41b20756e15a1405ec5c467da9a0f54df94f88a",
       "train.py": "e22f5b09a19b8168c533dccb484b8d88d597bf3f7188ef013d63f4fae765601c",
@@ -88,17 +94,65 @@
       "particlegan": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/particlegan/__init__.py",
       "diffusers": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/diffusers/__init__.py",
       "transformers": "/ml2/codex-storage/future-workspaces/2026-10-17/task-20/install-venv/lib/python3.11/site-packages/transformers/__init__.py"
+    },
+    "published_git_pin_verified": {
+      "public_git_pin_python_sources_match_frozen_wheel": true,
+      "sources": {
+        "pg09_hndl.py": "437b0915264ef6ab886408d2bee8817e7dd47f63a46dbf998fa10a06960bc31e",
+        "bispf_provenance.json": "00b294a9e1a36539c2b6f6e58921b955b973c54c8b75c92fd69b88b31c73333c",
+        "formulation_game.py": "a11585b4dc6b549de6e62716f0b05d6810addcf61932e190ed50cd2469c21490",
+        "reference.py": "2c5809edd3818fab9efdd0c5234ea6b5027de5fc0130155e537950471018a371",
+        "supra_model.py": "640851f4570d0f9eacccac70022f06668ddf92dcf8629e978a76443db60acdc4",
+        "recipe.py": "63726226e681e517c49943f6150989a8277031762c6253a338892dac340b5600",
+        "tiny_native.py": "336df6f61d12429420caa4a4bbe349e04021f7da594a3f185471a86e4d5f334e",
+        "locked_provenance.json": "c38e864b789823476036800eea435586ba6d5208bba4008cbd54fdb8cc88826d",
+        "pg09_remaining_campaigns.py": "cdb2221953607540d68dbe6c9262a9bc4a21f3f736cc3023180a84d364cff82f",
+        "__init__.py": "2424d5a850d1f10734f452175b40caa9761d579e69eb8f0eb2b919776beb1d25",
+        "pg09_text_video.py": "6d4c60f0235573c944bfb12ecada0c45a774b419aefc10c73af8758ea62fb580",
+        "pg09_release_sources.json": "dae443e436a3a9d3e3d351663bb9480c3340659fb82fdf75282bd5ceeceadd3d",
+        "pg09_audio.py": "b46a66c56fe237510f06b5d963c084c34bdb1ea87b2732c361f2665c9d221a79",
+        "pg09_backends.py": "5db98918880af33f55ca7312975a0fd112bdae8a7c69a3e357433beb056e32c1",
+        "grad_regularizers.py": "b1d27df47870814b8a3b05839c833792489e2fe5aff3b2875ab03c74f983a33a",
+        "pg09_readout_critic.py": "b83322a2ef2192ac3693fe136d019259c7fd8bf26fba25bb254931ba25462a57",
+        "pg09.py": "0a4a3a298784f7d250286cb27b1c7c230fbedcbd53773e2352d520b516ba5c07",
+        "endpoint_game.py": "78ace462127468dff98eb2eccfbdae442d188999cace8f72137fefc2a4924f45",
+        "pg09_moss_campaign.py": "29ab37cc00a1d3785a90630071c286275be1710c9134f8d05581bb3f28c5f0c5",
+        "bonsai_native.py": "c46de3514a1169ba6d61dc0558975e498c1e7f2fab7d2d5710590c0687a57922",
+        "_training.py": "0a5802997adec58998beb6598861f6a0f0aa1245a10053666e16300b67d3bc44",
+        "tiny_llm_backend.py": "392344c0c2e966db72a46bd44fd4363c05914f6ab134414133e87bb983523186",
+        "formulation.py": "a61b06e93efb24e92a72d826f696ede8694e97a3c27c5e6262a2912caac28e12",
+        "music3_native.py": "bbdd408259475b6d2a16158eaa283d302f22f6d8e7a64c44aad35d8a1e943819",
+        "hypergan_diagnostics.py": "4c525a555d8d2f664442e5635b3dd13ecb7e675b06d2d5a6be8f0561950960bc",
+        "teachers.py": "9a35fcff05a15d00f6aa67b5cb9e53cf55526d7e06631ef8cfeb0169519818d2",
+        "native_lora.py": "9cb43b8b03148e11c9b957e81ed3897a965f2a21c69d440c6aaafee452aa6018",
+        "pg09_images.py": "e92e36fdcc8e5327ea096fa8d48adc8749d453d19c4e945fd246dd931fe2c5c3",
+        "provenance.json": "efd60e615dc247b531dfb01a0be5728edcd7e442a9b6b888b848e716273ab45a",
+        "distillation.py": "b277e561517a9cb40d1a399ad07c6350aa22a287232aea816b7f6e434e18a232",
+        "bispf_game.py": "3c95d19a9adcfde3a468359fec44dcf1f7dce2d63a5a6318d6c4b3b6d6091a5e",
+        "pg09_continuous_profile.json": "97a92b88aa341369d4ad93595d5beea0dbcc54a0151599b320e5bef940d0ef0b"
+      },
+      "direct_url": {
+        "subdirectory": "packages/particle-sliders-core",
+        "url": "https://github.com/HyperGAN/particle-sliders.git",
+        "vcs_info": {
+          "commit_id": "4be0b5b29d2e2c741431f468d71ba8a7c884b724",
+          "requested_revision": "4be0b5b29d2e2c741431f468d71ba8a7c884b724",
+          "vcs": "git"
+        }
+      },
+      "producer_and_public_python_json_sources_match": true
     }
   },
   "tests": {
-    "installed_product_tests": 34,
+    "installed_product_tests": 64,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "seconds": 8.438,
-    "junit_sha256": "e4229bf4741742928de3ef7fb3de38e1d43b4d499ab4d9e04a6825825dd0d390",
-    "fresh_process_receipt_sha256": "6957d18b27615a4a5ec3d202fe7cd74aa35a3a0dba4b60a8d39f2c6f6c825e78",
-    "native_hndl_cli_two_updates": true
+    "seconds": 16.133,
+    "junit_sha256": "a70ee136172ef9600749f96b2437c2f78f73edbc5bd1c5120765aad43860cdc0",
+    "fresh_process_receipt_sha256": "d5b7a8d147b949023bf7ffc3ee77e97aed3ec2b4ec973457abc310c7bc3d905c",
+    "native_hndl_cli_two_updates": true,
+    "native_optimizer_history_cases": 30
   },
   "optional_shared_execution": {
     "response_shape": [
@@ -571,12 +625,19 @@
     "CPU random native models and synthetic text only",
     "New objective: no old gmix artifact or checkpoint relabeling",
     "Pretrained/GPU/sampler/quality/convergence acceptance remains with coordinator",
-    "Shared dependency source publication/approval remains separate from product draft"
+    "Shared/Qwen exact-head Ada review and parent merge remain separate gates; dependency commit is public"
   ],
   "cuda_initialized": false,
   "native_model_weights_loaded": false,
   "gpu_jobs": false,
   "services_changed": false,
   "permissions_changed": false,
-  "active_source_pins_changed": false
+  "active_source_pins_changed": false,
+  "superseded_staging_receipts": {
+    "qwen_commit": "5d7d9d8a9d29db6dc7a8a6c4bf64956829244f5e",
+    "shared_commit": "1bfafe193005af2db91472268be3e555964f36e1",
+    "receipt_sha256": "0d1d6e92306951d88b747f68a36a149c04c4c00a8e452d29aa30e03e28b738d0",
+    "junit_sha256": "e4229bf4741742928de3ef7fb3de38e1d43b4d499ab4d9e04a6825825dd0d390",
+    "status": "preserved in published ancestor and local evidence; superseded for final acceptance"
+  }
 }

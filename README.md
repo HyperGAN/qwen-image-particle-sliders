@@ -3,7 +3,7 @@
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,
 using `QwenImage21Pipeline` and the pinned shared
-[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/1bfafe193005af2db91472268be3e555964f36e1/packages/particle-sliders-core).
+[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/4be0b5b29d2e2c741431f468d71ba8a7c884b724/packages/particle-sliders-core).
 
 The training CLI executes the installed shared `ConditionalPG09` game with released
 ParticleGAN **0.9.1** and the native `QwenImage21ResponseAdapter`. It trains the actual

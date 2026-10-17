@@ -3,12 +3,12 @@
   "presets": {
     "bispf": {
       "checkpoint_fingerprint": {
-        "full": "681dd7c5c58d364502592b77dc90c18dd1dc9e7cf9aaa646ed7db9062eb64d08",
-        "resumed": "681dd7c5c58d364502592b77dc90c18dd1dc9e7cf9aaa646ed7db9062eb64d08"
+        "full": "40845947c924d06875a5f5f3684ebd39a485f5bd879ba6b7daa4f2a7cfceee88",
+        "resumed": "40845947c924d06875a5f5f3684ebd39a485f5bd879ba6b7daa4f2a7cfceee88"
       },
       "ema_safetensors_sha256": {
-        "full": "17fff3144e15a95e36257301e93ae3d2a671cd41795670c9f8780896fef6fb58",
-        "resumed": "17fff3144e15a95e36257301e93ae3d2a671cd41795670c9f8780896fef6fb58"
+        "full": "3a0d2120c46e992016e74616d7a3a07a12fbc906e6537321c20fd3b6b29c0615",
+        "resumed": "3a0d2120c46e992016e74616d7a3a07a12fbc906e6537321c20fd3b6b29c0615"
       },
       "native_inference_shape": [
         1,
@@ -19,12 +19,12 @@
     },
     "bispf_optimized": {
       "checkpoint_fingerprint": {
-        "full": "37689bf6599e636ba2bdad332340cf861a9246f13e6932a66dbb57f3712b77d4",
-        "resumed": "37689bf6599e636ba2bdad332340cf861a9246f13e6932a66dbb57f3712b77d4"
+        "full": "b767a06553099d3df270115efc732d293605e65ac5652b7d501982abba4726cb",
+        "resumed": "b767a06553099d3df270115efc732d293605e65ac5652b7d501982abba4726cb"
       },
       "ema_safetensors_sha256": {
-        "full": "eff11a210d17b734518190109eb97b9edb4390d1c64e534717f271d817a951b1",
-        "resumed": "eff11a210d17b734518190109eb97b9edb4390d1c64e534717f271d817a951b1"
+        "full": "2dec52cfe8b8e5a0f4ef2aee4ef0d56a81892aa697e7fc0d3cbd6a0ae3aa2b9a",
+        "resumed": "2dec52cfe8b8e5a0f4ef2aee4ef0d56a81892aa697e7fc0d3cbd6a0ae3aa2b9a"
       },
       "native_inference_shape": [
         1,
