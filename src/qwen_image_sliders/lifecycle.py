@@ -197,6 +197,7 @@ def prepare(options, *, runtime=None, admission=None):
             runtime = Runtime(allow_hub=False, **{key: value for key, value in options.items() if key in _RUNTIME})
     _validate_runtime(runtime, options)
     restore = _runtime_cleanup(runtime)
+    frequencies = runtime.model.pos_embed.freqs
     game = None
     try:
         # Teacher capture runs the native pipeline, which mutates scheduler state.
@@ -219,6 +220,9 @@ def prepare(options, *, runtime=None, admission=None):
         finally:
             restore()
         raise
+    finally:
+        # Response-row preparation also calls the native model after capture.
+        runtime.model.pos_embed.freqs = frequencies
     def close():
         try:
             game.backend.adapter.close()
