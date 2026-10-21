@@ -1,3 +1,5 @@
+For the new common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+
 # Particle Sliders for Qwen-Image 2.1
 
 **Built with Qwen.** A separate HyperGAN product for the official

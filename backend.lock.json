@@ -1,13 +1,14 @@
 {
   "core": {
     "repository": "https://github.com/HyperGAN/particle-sliders",
-    "commit": "cdfb80a76b882b4b73861b12f555263bd64ffeb7",
+    "commit": "cb0e6c39a51d451fa6ed5e72169b66e12ac247d1",
     "subdirectory": "packages/particle-sliders-core",
     "license": "MIT",
     "runner": "particle_sliders.pg09.ConditionalPG09",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "native_adapter": "particle_sliders.pg09_images.QwenImage21ResponseAdapter",
-    "qualification": "proposed CPU-tested candidate; Ada review and merge pending"
+    "qualification": "proposed CPU-tested candidate; Ada review and merge pending",
+    "lifecycle": "particle_sliders.lifecycle.open_session"
   },
   "particlegan": {
     "repository": "https://github.com/255BITS/ParticleGAN",
