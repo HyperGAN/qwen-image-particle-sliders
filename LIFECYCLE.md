@@ -1,8 +1,11 @@
 # Qwen Image 2.1 common lifecycle
 
-Proposed local shared pin: `32f6830f6402e85aa77b6631db64fcbbb2131f6b` / core 0.8.1.
-Unpublished; exact-head review is required before draft publication.
-The source-only adoption and outstanding gates are recorded in
+Exact tested shared pin: `32f6830f6402e85aa77b6631db64fcbbb2131f6b` / core 0.8.1.
+This runtime passed **26 installed CPU checks**; the pin is publicly reachable
+through merged common-core PR144 ancestry. This published source remains a draft
+for exact-head review, not a package or pretrained-model release. See
+[qualification status](PUBLICATION-STATUS.md).
+The original source-only adoption audit and outstanding native gates are recorded in
 [docs/core081-adoption.md](docs/core081-adoption.md). The prior core0.7.0 source
 pass is preserved at `bf8a6c160153c80f7c4155f96ed3f943114615d7`.
 

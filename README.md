@@ -14,7 +14,8 @@ Inference uses the same EMA maps/particles and the native Qwen pipeline at stren
 **0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
 copied GAN engine.
 
-**Status:** this unpublished lifecycle candidate has source inspection only;
+**Status:** this draft lifecycle runtime passed **26 installed CPU checks**;
+see [qualification status](PUBLICATION-STATUS.md). No pretrained image quality is established;
 see [the core 0.8.1 adoption audit](docs/core081-adoption.md).
 The [prior PR1 audit](docs/pg09-final-core.md) qualifies its original exact core pin.
 Older CUDA smoke measurements in
