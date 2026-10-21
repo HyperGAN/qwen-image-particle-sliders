@@ -1,5 +1,9 @@
 # Fresh Qwen integration source audit
 
+Historical source-pass report for `bf8a6c160153c80f7c4155f96ed3f943114615d7`.
+The current proposal's follow-up is [core081-adoption.md](core081-adoption.md);
+the original inspection JSON is preserved without relabeling its evidence.
+
 This is an unpublished local candidate, inspected on 2026-10-21. It is not a
 merge, a checkpoint migration, a new installed-wheel qualification, or an active
 training pin update. Resource admission for tests and builds is pending.

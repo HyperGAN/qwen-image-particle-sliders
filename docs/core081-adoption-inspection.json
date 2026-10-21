@@ -1,0 +1,93 @@
+{
+  "schema": "qwen-core081-source-adoption-v1",
+  "date": "2026-10-21",
+  "prior_derivative_head": "bf8a6c160153c80f7c4155f96ed3f943114615d7",
+  "preserved_public_pr1": "31e797f290c58bda74bb2e7e69ad2aeef2b4244b",
+  "shared_candidate": {
+    "commit": "32f6830f6402e85aa77b6631db64fcbbb2131f6b",
+    "version": "0.8.1",
+    "canonical_receipt": "/ml2/codex-storage/future-workspaces/2026-10-21/task-2/evidence/core081-build/receipt.json",
+    "canonical_receipt_sha256": "81c9407544a97568ff8f8eb5d78166595cb7971837f14ef0e08dc78a3bb38046",
+    "source_files_verified": 30,
+    "source_map_copied_verbatim_to_both_locks": true,
+    "canonical_artifacts": {
+      "particle_sliders_core-0.8.1.tar.gz": "36b84f56e2ac23e807c262c5ef25eddad9c121e1d573c4773937d58508632803",
+      "particle_sliders_core-0.8.1-py3-none-any.whl": "279aaab83da05b6ebeca030dfe115e1ae2232ca4924fe4278ea48103918fbd8d"
+    },
+    "parent_review_evidence": "delegated message reports independent 220 checks passed, 30 files/hash matched, no actual CUDA; canonical pending-review text preserved"
+  },
+  "profile": {
+    "particlegan": "0.9.1",
+    "particlegan_wheel_sha256": "b01b7957169cb3de45887e22b4d525fd54071577e1de58089707cf05fe6992ec",
+    "pg093_downgraded": false,
+    "math_files_identical_to_fd89": [
+      "pg09.py",
+      "pg09_backends.py",
+      "pg09_images.py",
+      "pg09_readout_critic.py",
+      "pg09_hndl.py",
+      "reference.py",
+      "formulation.py",
+      "recipe.py",
+      "pg09_continuous_profile.json"
+    ]
+  },
+  "source_sha256": {
+    "src/qwen_image_sliders/__init__.py": "a839121f0322991a73046f43fe53a9d112ecf851699871b63d98f11b2f1e0fdb",
+    "src/qwen_image_sliders/adapters.py": "7878c9edb1780713503134bdf851ec7344f1a8c586a6bbcbfc9d5da7ab58a26b",
+    "src/qwen_image_sliders/backend.lock.json": "60bf00c28a1919099136d257180b2e668be5aa55f41ff78394f565d553265b05",
+    "src/qwen_image_sliders/checkpoint.py": "65348b0b02021449b9108dc1ab6ade67a415105dea448531cb064c129e3403fe",
+    "src/qwen_image_sliders/contracts.py": "5987bfa3685bef0fcd3312b6b80db24554ab1f626347bafd1e1ac1d2131afcac",
+    "src/qwen_image_sliders/infer.py": "5e6f3fdbd5636b82c9f7accdb3c74e1432abf50e3d7b7a3fe94ecea97dd166f4",
+    "src/qwen_image_sliders/inference.py": "17ea6bad473887dff45a645fabea65de66e39f6c8850ec783da6fe3846b1ffcf",
+    "src/qwen_image_sliders/lifecycle.py": "18083a696fc3d78d00dcc3caa54ee5fb713ae42544e41174f172701d841ef82e",
+    "src/qwen_image_sliders/projection.py": "7f71f3deba7a997ad5abf9595f77c5443d3d7ee40bb97506da20c040074e709d",
+    "src/qwen_image_sliders/prompts.json": "1c46388dff31a09b84682719d41b20756e15a1405ec5c467da9a0f54df94f88a",
+    "src/qwen_image_sliders/runtime.py": "3ee7540eae607d5e1250dc5a9fd0c3b9033533e14b3c7a32e69254b699efab9a",
+    "src/qwen_image_sliders/teachers.py": "8a437ef82703ceebad67432fe8677c241b8cef74778cc9ffea31b15a534ac219",
+    "src/qwen_image_sliders/tiny.py": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031",
+    "src/qwen_image_sliders/train.py": "42fb5ab0f59b8757af9e8c40a9f4ecf690ba478736622d03d412fc8c903b3b95"
+  },
+  "metadata_sha256": {
+    "pyproject.toml": "9d04c9698ffb184d6c94573667b444f8c07a96d3d17ea97e636bd9f59708e02e",
+    "backend.lock.json": "60bf00c28a1919099136d257180b2e668be5aa55f41ff78394f565d553265b05",
+    "LIFECYCLE.md": "d8b8c9fd88635a7c14d46647ae919f22142f0ecb314d7a15c447096e5440b926",
+    "README.md": "f2c271adec4e4ef510f96ffb282c5b6ce5f06cf708cf8f6188ed0657c3b3db8e",
+    "docs/core081-adoption.md": "24c31eada44ba12f664ca250fba9a0fc5830dd778dadb2cdf3f763402d028afb",
+    "tests/test_native_inference_lifecycle.py": "168232e08e9267a8c6c1f423d635b339e0619775235a6caeb63b77ffdae46ebb"
+  },
+  "checks": {
+    "AST_files": 22,
+    "core_reverse_imports": [],
+    "guard_sha256": "07d5913b38acb03371ab615041dcf2416882ac0757f5ec30f01843d7a81f4711",
+    "native_factory_forbidden_training_names": [],
+    "whitespace": "git diff --check",
+    "runtime_tests": "not run; explicit CPU slot pending"
+  },
+  "adoption": [
+    "native-only inference entrypoint and data-free InferenceSpec",
+    "request preflight before allocation",
+    "before_update runtime/admission callback",
+    "native observation buffers/modes/scheduler/RoPE preservation",
+    "explicit native sampler/encoder/decoder/helper source binding"
+  ],
+  "remaining": [
+    "parent explicit CPU slot for installed-wheel qualification",
+    "common optional CLI v2 export switch",
+    "public buffer-only native observation helper",
+    "HyperGAN presentation and matched-weight HNDL definitions",
+    "publication and merge remain parent-owned"
+  ],
+  "actions": {
+    "owner_core_edits": false,
+    "test_suites": false,
+    "installs": false,
+    "builds": false,
+    "model_access": false,
+    "gpu": false,
+    "public_writes": false,
+    "active_pin_changes": false,
+    "denied": [],
+    "uncertain": []
+  }
+}
