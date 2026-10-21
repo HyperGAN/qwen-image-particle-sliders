@@ -5,10 +5,10 @@ from importlib.resources import files
 from pathlib import Path
 
 import torch
+from particle_sliders.qwen_native import with_encoding
 
 from .contracts import validate_shape
 from .projection import predict
-from particle_sliders.qwen_native import with_encoding
 
 
 def load_prompts(path=None):
@@ -32,8 +32,6 @@ def cpu_kwargs(kwargs):
         for k, v in kwargs.items()
         if k not in {"return_dict", "kv_cache", "kv_cache_mode", "attention_kwargs"}
     }
-
-
 
 
 @torch.no_grad()

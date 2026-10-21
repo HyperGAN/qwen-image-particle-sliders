@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 import torch
-from particle_sliders.lifecycle import advance, EMA, atomic_save
+from particle_sliders.lifecycle import EMA, advance, atomic_save
 from particle_sliders.pg09 import ConditionalPG09
 from particle_sliders.pg09_backends import ResponseRow
 from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
@@ -223,9 +223,9 @@ def train(
             )
         )
         decay = float(stamp.spec["ema"])
-        cloud = torch.nn.ParameterDict({'particles': game.backend.particles})
+        cloud = torch.nn.ParameterDict({"particles": game.backend.particles})
         bank_ema, cloud_ema = EMA(bank, decay), EMA(cloud, decay)
-        ema, ema_particles = bank_ema.values, cloud_ema.values['particles']
+        ema, ema_particles = bank_ema.values, cloud_ema.values["particles"]
         if resume:
             state = torch.load(resume, map_location=game.device, weights_only=True)
             if (
@@ -238,9 +238,11 @@ def train(
             if state["game"]["completed_steps"] >= stop_after:
                 raise ValueError("resume stop-after must exceed the completed checkpoint step")
             game.load_state_dict(state["game"])
-            bank_ema.load_state_dict(bank, dict(decay=decay, values=state['ema']))
-            cloud_ema.load_state_dict(cloud, dict(decay=decay, values={'particles': state['ema_particles']}))
-            ema, ema_particles = bank_ema.values, cloud_ema.values['particles']
+            bank_ema.load_state_dict(bank, {"decay": decay, "values": state["ema"]})
+            cloud_ema.load_state_dict(
+                cloud, {"decay": decay, "values": {"particles": state["ema_particles"]}}
+            )
+            ema, ema_particles = bank_ema.values, cloud_ema.values["particles"]
         outdir = Path(outdir)
         outdir.mkdir(parents=True, exist_ok=True)
         stats = None
@@ -251,7 +253,8 @@ def train(
             with (outdir / "train.jsonl").open("a") as stream:
                 stream.write(json.dumps(stats) + "\n")
             print(json.dumps(stats), flush=True)
-        atomic_save(outdir / "training.pt",
+        atomic_save(
+            outdir / "training.pt",
             {
                 "schema": "qwen-native-pg09-training-v2",
                 "metadata": meta,
