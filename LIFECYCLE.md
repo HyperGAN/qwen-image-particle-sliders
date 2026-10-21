@@ -2,12 +2,16 @@
 
 Proposed local shared pin: `fd89e1c780ab5210cd1be98ec3b70977e6349379` / core 0.7.0.
 Unpublished; exact-head review is required before draft publication.
+The fresh source inspection and outstanding gates are recorded in
+[docs/fresh-integration-audit.md](docs/fresh-integration-audit.md).
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
 The core owns preparation dispatch, updates, EMA, checkpoints, export,
 evaluation and cleanup. The product factory owns native loading/conditioning,
 geometry and sampler differences. This is a new source cohort; keep original
 pinned runs and receipts with their original loaders.
+The dependency direction is product → particle-sliders-core → ParticleGAN;
+the core owns the exact released GAN dependency.
 
 ```python
 from particle_sliders.lifecycle import SessionConfig, open_session
@@ -28,6 +32,18 @@ Qwen uses its native 2.1 packing/scheduler. Local native options are `model_dir`
 `cache_dir`, `device`; downloads remain disabled. The tiny fixture can render
 latents using `session.render(prompt=..., height=32, width=32, steps=4,
 output_type="latent")`. Native pixel decoding is a separate qualification.
+At open time, use `operation='render', output_type='latent'` for the tiny
+fixture so capability preflight knows the intended output.
+
+Base precision follows the native loader: CPU uses `float32`, CUDA uses
+`bfloat16`; `base_precision` may assert that value but does not cast the runtime.
+Trainable adapters and the particle bank remain FP32. Dummy mode accepts no
+model/cache paths and uses CPU FP32. `gradient_checkpointing=True` enables the
+native transformer setting for this session; close and setup failures restore
+the caller's settings. Teacher capture and native rendering use private
+scheduler copies and restore the pinned pipeline's transient sampling fields.
+An injected staged runtime must match the declared dummy/native kind, device
+and precision. Reference images, negative strengths and nonnative devices reject.
 
 Write `config.as_dict()` as JSON to use `particle-slider capabilities`,
 `particle-slider train`, `particle-slider evaluate` and `particle-slider render`.

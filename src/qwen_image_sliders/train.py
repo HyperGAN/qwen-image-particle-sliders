@@ -75,8 +75,9 @@ def build_game(
     if len(edits) < 2:
         raise ValueError("calibration requires at least two nondegenerate noncontrol edits")
     response_scale = float(torch.tensor(edits, dtype=torch.float64).median())
-    bank = AdapterBank(runtime.model, stamp).to(runtime.device)
+    bank = AdapterBank(runtime.model, stamp)
     try:
+        bank.to(runtime.device)
         particles = torch.nn.Parameter(
             torch.randn(int(stamp.spec["parts"]), int(stamp.spec["particle_dim"]), device=runtime.device)
             * 0.02
@@ -110,7 +111,7 @@ def build_game(
         )
         game.normalization_records = len(edits)
         return game
-    except Exception:
+    except BaseException:
         bank.close()
         raise
 

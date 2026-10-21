@@ -47,7 +47,13 @@ class AdapterBank(nn.Module):
         self.strength = 0.0
         self.particle_shape = (int(stamp.spec["parts"]), int(stamp.spec["particle_dim"]))
         object.__setattr__(self, "_particles", None)
-        self.handles = [base.register_forward_hook(self._hook(i)) for i, (_, base) in enumerate(targets)]
+        self.handles = []
+        try:
+            for i, (_, base) in enumerate(targets):
+                self.handles.append(base.register_forward_hook(self._hook(i)))
+        except BaseException:
+            self.close()
+            raise
 
     def _hook(self, index):
         def hook(module, inputs, output):
