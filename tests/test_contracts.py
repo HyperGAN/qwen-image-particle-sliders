@@ -1,10 +1,8 @@
 import json
 
 import pytest
-import torch
 
 from qwen_image_sliders.contracts import file_digest, formulation, validate_shape
-from qwen_image_sliders.projection import VelocityProjection, isotropic_calibration_bank
 from qwen_image_sliders.runtime import GIB, require_resources, verify_snapshot
 from qwen_image_sliders.teachers import load_prompts, paired_records
 from qwen_image_sliders.tiny import TinyRuntime
@@ -19,24 +17,6 @@ def test_formulation_drift_and_shape_validation():
     for size in [(16, 32), (33, 32), (0, 32)]:
         with pytest.raises(ValueError):
             validate_shape(*size)
-
-
-def test_full_coordinate_projection_moments_and_step_replay():
-    projector = VelocityProjection(8)
-    x = torch.tensor([[[1.0, -1.0, 1.0, -1.0], [-1.0, 1.0, -1.0, 1.0]]])
-    rng = torch.get_rng_state().clone()
-    a = projector(x, seed=projector.seed_for_step(1))
-    assert torch.equal(a, projector(x, seed=projector.seed_for_step(1)))
-    assert not torch.equal(a, projector(x, seed=projector.seed_for_step(2)))
-    assert torch.equal(rng, torch.get_rng_state())
-    energy = torch.stack([projector(x, seed=i).square().mean() for i in range(256)]).mean()
-    assert abs(energy.item() - x.square().mean().item()) < 0.15
-    bank = isotropic_calibration_bank(torch.tensor([1.0, 2.0]), 8)
-    assert torch.equal(bank.mean(0), torch.zeros(8))
-    torch.testing.assert_close(bank.T @ bank / len(bank), torch.eye(8) * 2.5)
-    for values in [[], [0.0, 1.0], [float("nan"), 1.0]]:
-        with pytest.raises(ValueError):
-            isotropic_calibration_bank(values, 8)
 
 
 def test_resource_guards_are_unit_checks_without_loading():

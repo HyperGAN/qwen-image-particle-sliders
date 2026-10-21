@@ -5,6 +5,7 @@ from importlib.resources import files
 from pathlib import Path
 
 import torch
+from particle_sliders.qwen_native import with_encoding
 
 from .contracts import validate_shape
 from .projection import predict
@@ -33,19 +34,6 @@ def cpu_kwargs(kwargs):
     }
 
 
-def with_encoding(kwargs, encoding):
-    tokens = kwargs["hidden_states"].shape[1]
-    image_mask = encoding["image_pad_mask"]
-    if image_mask.any():
-        raise ValueError("image-conditioned training is outside this protocol")
-    return {
-        **kwargs,
-        "encoder_hidden_states": encoding["prompt_embeds"],
-        "encoder_hidden_states_mask": encoding["prompt_embeds_mask"],
-        "img_mask": torch.cat([image_mask, image_mask.new_ones(image_mask.shape[0], tokens // 4)], dim=1),
-    }
-
-
 @torch.no_grad()
 def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, records_per_pair=2):
     validate_shape(height, width)
@@ -69,6 +57,7 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
                     (
                         cpu_kwargs(kwargs),
                         output[0][:, -kwargs["hidden_states"].shape[1] :].float().cpu().clone(),
+                        runtime.pipe.scheduler.timesteps[count].detach().float().cpu().clone(),
                     )
                 )
             count += 1
@@ -81,7 +70,7 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
             handle.remove()
         if count != trajectory_steps or len(pending) != records_per_pair:
             raise RuntimeError("native pipeline trajectory contract changed")
-        for kwargs_cpu, v_neutral in pending:
+        for kwargs_cpu, v_neutral, raw_timestep in pending:
             kwargs = {
                 k: v.to(runtime.device) if isinstance(v, torch.Tensor) else v for k, v in kwargs_cpu.items()
             }
@@ -92,6 +81,9 @@ def paired_records(runtime, rows, *, seed, height, width, trajectory_steps=40, r
                     "neutral": v_neutral,
                     "target": v_positive.cpu(),
                     "control": bool(row.get("control", False)),
+                    "raw_timestep": raw_timestep,
+                    "neutral_condition": cpu_kwargs(neutral),
+                    "positive_condition": cpu_kwargs(positive),
                 }
             )
     return records

@@ -1,22 +1,27 @@
+For the new common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+
 # Particle Sliders for Qwen-Image 2.1
 
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,
 using `QwenImage21Pipeline` and the pinned shared
-[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/20fdf98d25455582e7e7191eef8ef51cf73173ae/packages/particle-sliders-core).
+[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/32f6830f6402e85aa77b6631db64fcbbb2131f6b/packages/particle-sliders-core).
 
-The initial implementation supports text-to-image paired-prompt training, nonlinear
-routed attention output adapters, shared particle inference at strengths **0–1**,
-EMA safetensors export, and checkpoint/resume. Strength zero bypasses the hooks exactly.
-The generator/critic update, noise, cap regularization and particle VIC come from
-`winning_formulation()` and `FormulationGame`; there is no copied training engine.
+The training CLI executes the installed shared `ConditionalPG09` game with released
+ParticleGAN **0.9.1** and the native `QwenImage21ResponseAdapter`. It trains the actual
+hooked routed maps and 128x4 particle bank on native spatial VAE velocity fields.
+Inference uses the same EMA maps/particles and the native Qwen pipeline at strengths
+**0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
+copied GAN engine.
 
-**Status:** 21 CPU tests pass, and a bounded official-weight CUDA smoke passed at
-128×128: training, native fourth-step cap backward, exact two-plus-two CUDA resume,
-EMA reload, exact strength-zero latent equivalence, and native RGBA PNG output.
-Full-resolution memory use, image quality and convergence remain unvalidated.
-No pretrained slider weights are released.
-See [VALIDATION.md](VALIDATION.md).
+**Status:** this draft lifecycle runtime passed **26 installed CPU checks**;
+see [qualification status](PUBLICATION-STATUS.md). No pretrained image quality is established;
+see [the core 0.8.1 adoption audit](docs/core081-adoption.md).
+The [prior PR1 audit](docs/pg09-final-core.md) qualifies its original exact core pin.
+Older CUDA smoke measurements in
+[VALIDATION.md](VALIDATION.md) belong to the previous gmix implementation and do not
+qualify this new objective. New pretrained/GPU, memory, sampler quality and convergence
+acceptance remain pending. No pretrained slider weights are released.
 This product targets base 2.1, not older Qwen-Image, Edit/Layered, or 2.1 Turbo.
 Image-conditioned training, other CFG values, ComfyUI and ordinary-LoRA distillation
 are outside this initial release.
@@ -107,14 +112,14 @@ are not part of this loader.
 ## Training
 
 The example card trains warm light from three neutral/positive pairs plus two
-identical-prompt controls. Edit-bearing records set critic calibration; controls
+identical-prompt controls. Edit-bearing records set the fixed response scale; controls
 remain in training and cannot dilute that calibration. Customize
 [configs/warm-light.json](configs/warm-light.json), retaining at least two pairs.
 
 ```bash
 qwen-slider-train --model-dir /ml2/models/Qwen-Image-2.1 --device cuda:0 \
   --prompts configs/warm-light.json --height 512 --width 512 \
-  --trajectory-steps 40 --records-per-pair 2 --batch 1 --steps 1600 \
+  --trajectory-steps 40 --records-per-pair 2 --batch 2 --steps 1600 \
   --gradient-checkpointing --outdir /ml2/qwen-sliders/warm-light
 ```
 
@@ -122,25 +127,34 @@ The native neutral trajectory supplies matched latent/time states; the positive
 teacher is evaluated at those same states. Training and inference both use native
 CFG=1 with KV caching disabled. Native packing uses unpatched 64-channel latents,
 model time is scheduler time/1000, and dynamic timestep shifting follows the pinned
-scheduler. Teachers are cached on CPU with at most 128 retained records.
-See [FORMULATION.md](FORMULATION.md) for the error sketch and shared game contract.
+scheduler. Teachers are captured on CPU with at most 128 retained records. The shared game
+uses native `[1,C,1,H,W]` response fields and balanced row sampling; its batch must
+be at least two. Choose `--preset bispf` or the default `bispf_optimized`.
+`--g-lr` overrides the recipe base learning rate, including derived critic/prior rates.
+An optional HNDL 0.8.2 critic uses the shared source-defined raw-logit builder:
+install `.[hndl]` and choose `--critic hndl`. It is a separate checkpoint architecture.
+See [FORMULATION.md](FORMULATION.md) for the native response and shared game contract.
 
 `train.jsonl` can be tailed. `adapter.safetensors` and its JSON sidecar contain the
-EMA routed maps/particles and strict provenance. `training.pt` contains raw maps,
-particles, critic, optimizers, RNG, EMA and run configuration. Resume with the same
-original options and a larger total `--steps`:
+EMA routed maps/particles and strict provenance. `training.pt` contains the shared game's raw maps, actual particles, critic,
+optimizers, penalty/prior state, independent RNG streams and balanced sampler state,
+plus the EMA maps and particles. The new v2 format rejects former gmix artifacts.
+Installed API source hashes and the actual recipe are recorded; an objective/source
+change requires a new cohort.
+
+Keep `--steps` fixed across resume because it defines the PG recipe schedule.
+Use `--stop-after` for a planned interruption, then resume with the same options:
 
 ```bash
-qwen-slider-train <same original options> --steps 2000 \
-  --resume /ml2/qwen-sliders/warm-light/training.pt
+qwen-slider-train <original options> --steps 1600 --stop-after 800 --outdir /ml2/qwen-sliders/warm-light
+qwen-slider-train <original options> --steps 1600 \
+  --resume /ml2/qwen-sliders/warm-light/training.pt --outdir /ml2/qwen-sliders/warm-light
 ```
 
-Exact resume is tested on CPU and in one bounded 128×128 CUDA configuration with
-PyTorch 2.13.0+cu126. Every checkpoint field, EMA artifact byte, step input and RNG
-hash matched four uninterrupted updates versus two-plus-two resumed updates.
-Device/runtime changes can alter numerics; this is not a guarantee across hardware
-or processes with different settings. See the measured evidence in [VALIDATION.md](VALIDATION.md).
-Resume files are loaded with `weights_only=True`; inference uses safetensors.
+CPU tests compare every checkpoint field and EMA export for uninterrupted versus
+resumed updates under both PG presets. This does not establish equivalence across
+hardware or runtime changes. Resume uses `weights_only=True`; inference uses
+safetensors. The former CUDA proof is retained as historical evidence only.
 
 ## Inference
 

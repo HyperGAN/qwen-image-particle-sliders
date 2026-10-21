@@ -1,5 +1,7 @@
 """Strict safe inference exports and independently reconstructed compatibility metadata."""
 
+import importlib.metadata
+import inspect
 import json
 from pathlib import Path
 
@@ -7,7 +9,21 @@ import torch
 from safetensors import safe_open
 from safetensors.torch import load_file, save_file
 
-from .contracts import FORMAT, PROTOCOL, canonical, digest, formulation_record, lock
+from .contracts import FORMAT, PROTOCOL, canonical, digest, file_digest, formulation_record, lock
+
+
+def shared_api_identity():
+    """Bind artifacts to the installed executable API, independent of checkout paths."""
+    from particle_sliders import pg09, pg09_backends, pg09_images, pg09_readout_critic, reference
+
+    return {
+        "package_version": importlib.metadata.version("particle-sliders-core"),
+        "particlegan_version": importlib.metadata.version("particlegan"),
+        "sources": {
+            module.__name__: file_digest(inspect.getsourcefile(module))
+            for module in (pg09, pg09_backends, pg09_images, pg09_readout_critic, reference)
+        },
+    }
 
 
 def metadata(runtime, bank, stamp, declared):
@@ -23,6 +39,20 @@ def metadata(runtime, bank, stamp, declared):
         "model_config_sha256": digest(model_config),
         "scheduler_config_sha256": digest(scheduler_config),
         "core_commit": pins["core"]["commit"],
+        "shared_api": shared_api_identity(),
+        "product_sources": {
+            name: file_digest(Path(__file__).with_name(name))
+            for name in (
+                "adapters.py",
+                "checkpoint.py",
+                "contracts.py",
+                "infer.py",
+                "projection.py",
+                "runtime.py",
+                "teachers.py",
+                "train.py",
+            )
+        },
         "diffusers_commit": pins["diffusers"]["commit"],
         "formulation": formulation_record(stamp, declared),
         "protocol": PROTOCOL,
