@@ -8,6 +8,7 @@ import torch
 
 from .contracts import validate_shape
 from .projection import predict
+from particle_sliders.qwen_native import with_encoding
 
 
 def load_prompts(path=None):
@@ -33,17 +34,6 @@ def cpu_kwargs(kwargs):
     }
 
 
-def with_encoding(kwargs, encoding):
-    tokens = kwargs["hidden_states"].shape[1]
-    image_mask = encoding["image_pad_mask"]
-    if image_mask.any():
-        raise ValueError("image-conditioned training is outside this protocol")
-    return {
-        **kwargs,
-        "encoder_hidden_states": encoding["prompt_embeds"],
-        "encoder_hidden_states_mask": encoding["prompt_embeds_mask"],
-        "img_mask": torch.cat([image_mask, image_mask.new_ones(image_mask.shape[0], tokens // 4)], dim=1),
-    }
 
 
 @torch.no_grad()

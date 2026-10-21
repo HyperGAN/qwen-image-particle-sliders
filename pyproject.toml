@@ -15,7 +15,7 @@ dependencies = [
   "torch>=2.6,<3", "torchvision>=0.21,<1", "numpy>=1.26", "pillow>=10", "safetensors>=0.8,<1",
   "transformers==5.17.0", "accelerate>=1,<2", "huggingface-hub>=1.32,<2",
   "diffusers @ git+https://github.com/huggingface/diffusers.git@1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458",
-  "particle-sliders-core @ git+https://github.com/HyperGAN/particle-sliders.git@cb0e6c39a51d451fa6ed5e72169b66e12ac247d1#subdirectory=packages/particle-sliders-core",
+  "particle-sliders-core @ git+https://github.com/HyperGAN/particle-sliders.git@fd89e1c780ab5210cd1be98ec3b70977e6349379#subdirectory=packages/particle-sliders-core",
 ]
 
 [project.optional-dependencies]

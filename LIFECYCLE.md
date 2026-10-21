@@ -1,6 +1,6 @@
 # Qwen Image 2.1 common lifecycle
 
-Proposed local shared pin: `cb0e6c39a51d451fa6ed5e72169b66e12ac247d1` / core 0.7.0.
+Proposed local shared pin: `fd89e1c780ab5210cd1be98ec3b70977e6349379` / core 0.7.0.
 Unpublished; exact-head review is required before draft publication.
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
