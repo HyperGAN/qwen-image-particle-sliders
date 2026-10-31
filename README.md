@@ -1,4 +1,6 @@
-For the new common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
+executes shared graphs on tiny native CPU fixtures; default installation remains S081.
 
 # Particle Sliders for Qwen-Image 2.1
 
@@ -14,7 +16,7 @@ Inference uses the same EMA maps/particles and the native Qwen pipeline at stren
 **0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
 copied GAN engine.
 
-**Status:** this draft lifecycle runtime passed **26 installed CPU checks**;
+**Status:** the historical lifecycle receipt records **26 installed CPU checks**;
 see [qualification status](PUBLICATION-STATUS.md). No pretrained image quality is established;
 see [the core 0.8.1 adoption audit](docs/core081-adoption.md).
 The [prior PR1 audit](docs/pg09-final-core.md) qualifies its original exact core pin.

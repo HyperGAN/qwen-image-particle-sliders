@@ -1,9 +1,9 @@
 # Qwen Image 2.1 common lifecycle
 
 Exact tested shared pin: `32f6830f6402e85aa77b6631db64fcbbb2131f6b` / core 0.8.1.
-This runtime passed **26 installed CPU checks**; the pin is publicly reachable
-through merged common-core PR144 ancestry. This published source remains a draft
-for exact-head review, not a package or pretrained-model release. See
+The historical runtime receipt records **26 installed CPU checks**; the pin is publicly reachable
+through merged common-core PR144 ancestry. Product PR1 is merged; source publication
+does not establish a package or pretrained-model release. See
 [qualification status](PUBLICATION-STATUS.md).
 The original source-only adoption audit and outstanding native gates are recorded in
 [docs/core081-adoption.md](docs/core081-adoption.md). The prior core0.7.0 source
@@ -86,3 +86,8 @@ packet and error contracts. Backend dependencies stay isolated: Qwen and Fibo
 use different Diffusers Git revisions and are not a joint environment promise.
 Use CPU thread limits and offline mode for these fixtures. They do not qualify
 pretrained behavior, GPU memory, convergence or image quality.
+
+The opt-in modern API is documented in [hypergan-hndl-candidate.md](docs/hypergan-hndl-candidate.md).
+It uses a separate environment and architecture identity. The shared lifecycle
+entrypoints and product CLI above continue to select S081; the modern API has
+no native inference/export lifecycle qualification yet.
