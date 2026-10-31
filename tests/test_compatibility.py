@@ -31,7 +31,10 @@ def test_installed_public_entrypoints_resolve_to_product_backends():
 
 
 def test_modern_binding_refuses_supported_environment_before_model_access():
-    from qwen_image_sliders.hypergan_hndl import build_game
+    # A stable wheel contains no modern runtime; editable development checkouts
+    # may expose source files, whose admission still refuses the stable lane.
+    if importlib.util.find_spec("qwen_image_sliders.hypergan_hndl") is not None:
+        from qwen_image_sliders.hypergan_hndl import build_game
 
-    with pytest.raises(RuntimeError, match="separate qualified core 0.12.0 environment"):
-        build_game(None, [])
+        with pytest.raises(RuntimeError, match="separate environment without the stable distribution"):
+            build_game(None, [])

@@ -16,10 +16,13 @@ from torch import nn
 from .adapters import target_modules
 from .contracts import file_digest, validate_strength
 
-PROFILE = "qwen-image21-hypergan-hndl-v1"
+PROFILE = "qwen-image21-hypergan-hndl-v2"
 
 
 def _shared():
+    from .hypergan_hndl_runtime import isolated_runtime, loaded_dependency_origins, module_origin
+
+    product_sources = isolated_runtime()
     if version("particle-sliders-core") != "0.12.0":
         raise RuntimeError(
             "Qwen HNDL requires a separate qualified core 0.12.0 environment; keep S081 intact"
@@ -29,12 +32,21 @@ def _shared():
         raise ValueError("Qwen HNDL shared profile differs from the qualified candidate")
     core = distribution("particle-sliders-core")
     for relative, expected in profile["core_source_sha256"].items():
+        if relative.endswith(".py"):
+            name = relative[:-3].replace("/", ".").removesuffix(".__init__")
+            module_origin("particle-sliders-core", name, relative)
         if file_digest(core.locate_file(relative)) != expected:
             raise ValueError("Qwen HNDL shared source differs: " + relative)
     from particle_sliders.fibo_hndl import HNDLFieldCritic, HNDLParticleProjection, verified_builder
 
     builder, identity = verified_builder()
-    return HNDLFieldCritic, HNDLParticleProjection, builder, identity
+    loaded_dependency_origins()
+    return (
+        HNDLFieldCritic,
+        HNDLParticleProjection,
+        builder,
+        {**identity, "qwen_product_sources": product_sources},
+    )
 
 
 class QwenHNDLBank(nn.Module):

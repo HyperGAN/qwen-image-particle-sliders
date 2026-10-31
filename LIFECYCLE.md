@@ -87,9 +87,11 @@ use different Diffusers Git revisions and are not a joint environment promise.
 Use CPU thread limits and offline mode for these fixtures. They do not qualify
 pretrained behavior, GPU memory, convergence or image quality.
 
-The opt-in modern API is documented in [hypergan-hndl-candidate.md](docs/hypergan-hndl-candidate.md).
-It uses a separate environment and architecture identity. Its local candidate
-package registers `qwen-hndl` for shared sessions and native-only raw/EMA v2
-export/inference, qualified with tiny CPU fixtures. The default package keeps
-the S081 entrypoints and product CLI above. The exact core source is public at verified draft PR148; promoting the modern
-profile as the default remains a separate review decision.
+The modern candidate is documented in [hypergan-hndl-candidate.md](docs/hypergan-hndl-candidate.md).
+It is a distinct prerelease distribution, `qwen-image-particle-sliders-modern-candidate==0.3.0a1`,
+for a separate environment. The stable wheel excludes its modules/lock. The candidate
+registers `qwen-hndl` for shared sessions and native-only raw/EMA v2 export/inference.
+V2 records training geometry and both trajectory/training step budgets; incompatible
+render contexts refuse. Normal CI qualifies S081 only; modern CPU checks are an
+explicit manual lane. The verified core source is public; default promotion and
+pretrained/GPU qualification remain separate review decisions.

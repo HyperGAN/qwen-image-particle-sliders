@@ -21,6 +21,27 @@ def test_candidate_builder_rejects_unverified_core_before_writing_profile(tmp_pa
     assert not destination.exists()
 
 
+def test_receipt_ignores_stale_outdir_artifacts(tmp_path):
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "candidate_builder", root / "scripts/build_hypergan_hndl_candidate.py"
+    )
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    generated, output = tmp_path / "new", tmp_path / "out"
+    generated.mkdir()
+    output.mkdir()
+    (generated / "new.whl").write_bytes(b"fresh wheel")
+    (generated / "new.tar.gz").write_bytes(b"fresh sdist")
+    (output / "old.whl").write_bytes(b"stale wheel")
+    builder.copy_new_artifacts(generated, output, {})
+    receipt = json.loads((output / "candidate-build.json").read_text())
+    assert set(receipt["artifacts"]) == {"new.whl", "new.tar.gz"}
+    assert (output / "old.whl").read_bytes() == b"stale wheel"
+
+
 def test_public_candidate_rejects_changed_metadata_before_staging(tmp_path, monkeypatch):
     root = Path(__file__).resolve().parents[1]
     spec = importlib.util.spec_from_file_location(

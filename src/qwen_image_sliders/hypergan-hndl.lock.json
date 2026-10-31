@@ -1,6 +1,6 @@
 {
   "schema": "qwen-hypergan-hndl-candidate-v1",
-  "profile": "qwen-image21-hypergan-hndl-v1",
+  "profile": "qwen-image21-hypergan-hndl-v2",
   "core_version": "0.12.0",
   "core_commit": "4abc0eb03a4e3a84fc3e6d02734c13dc7e8ea231",
   "particlegan_version": "0.9.4",

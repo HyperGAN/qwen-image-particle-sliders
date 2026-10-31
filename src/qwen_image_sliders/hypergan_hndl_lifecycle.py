@@ -65,7 +65,17 @@ def prepare(options, *, runtime=None, admission=None):
                 if key in {"seed", "steps", "batch", "preset", "g_lr"}
             },
         )
-        native_spec = specification(game.backend, runtime, dummy=options.get("dummy", False))
+        native_spec = specification(
+            game.backend,
+            runtime,
+            dummy=options.get("dummy", False),
+            context={
+                "height": options.get("height", 32),
+                "width": options.get("width", 32),
+                "trajectory_steps": options.get("trajectory_steps", 4),
+                "training_steps": options.get("steps", 4),
+            },
+        )
     except BaseException:
         try:
             if game is not None:

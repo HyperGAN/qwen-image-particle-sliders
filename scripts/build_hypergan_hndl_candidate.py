@@ -1,7 +1,7 @@
 """Build a separate candidate profile from a verified core wheel/public commit.
 
 The default pyproject and S081 source tree are never rewritten. The resulting
-local-version wheel binds one exact reviewed core and registers only qwen-hndl.
+distinct prerelease wheel binds one exact reviewed core and registers only qwen-hndl.
 Default/public promotion is a separate review; --public-core verifies live sources.
 """
 
@@ -32,7 +32,7 @@ def verified_core(path, profile):
         for relative, expected in profile["core_source_sha256"].items():
             if hashlib.sha256(archive.read(relative)).hexdigest() != expected:
                 raise ValueError("core wheel source differs: " + relative)
-    return path.as_uri() + "#sha256=" + profile["core_wheel_sha256"]
+    return profile["core_wheel_sha256"]
 
 
 def _public_bytes(url):
@@ -66,7 +66,10 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     profile = json.loads((root / "src/qwen_image_sliders/hypergan-hndl.lock.json").read_text())
     if public_core == (core_wheel is not None):
         raise ValueError("select one exact local core wheel or verified public core")
-    core_url = verified_public_core(profile) if public_core else verified_core(core_wheel, profile)
+    local_hash = None if public_core else verified_core(core_wheel, profile)
+    # Even local-artifact qualification emits a portable immutable dependency.
+    # If publication is unavailable, fail rather than embedding a file:// URL.
+    core_url = verified_public_core(profile)
     for name in ("src", "tests", "docs", "configs", "scripts"):
         shutil.copytree(
             root / name,
@@ -94,13 +97,16 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     ]
     changes = {
         original: "particle-sliders-core[hypergan-hndl] @ " + core_url,
-        'version = "0.2.0"': 'version = "0.2.0+hypergan.hndl.local"',
+        'name = "qwen-image-particle-sliders"': 'name = "qwen-image-particle-sliders-modern-candidate"',
+        'version = "0.2.0"': 'version = "0.3.0a1"',
         'requires-python = ">=3.11"': 'requires-python = ">=3.11,<3.15"',
         "hndl==0.8.2": "hndl==0.10.0",
         'qwen-slider-train = "qwen_image_sliders.train:main"\n': "",
         'qwen-slider-infer = "qwen_image_sliders.infer:main"\n': "",
         'qwen = "qwen_image_sliders.lifecycle:BACKEND"': 'qwen-hndl = "qwen_image_sliders.hypergan_hndl_lifecycle:BACKEND"',
         'qwen = "qwen_image_sliders.inference:INFERENCE_BACKEND"': 'qwen-hndl = "qwen_image_sliders.hypergan_hndl_inference:INFERENCE_BACKEND"',
+        'qwen_image_sliders = ["backend.lock.json", "prompts.json"]': 'qwen_image_sliders = ["*.json"]',
+        '[tool.setuptools.cmdclass]\nbuild_py = "_qwen_build_support.StableBuildPy"\n': "",
     }
     for before, after in changes.items():
         if source.count(before) != 1:
@@ -108,19 +114,45 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         source = source.replace(before, after)
     tomllib.loads(source)
     (destination / "pyproject.toml").write_text(source)
+    package_init = destination / "src/qwen_image_sliders/__init__.py"
+    package_init.write_text(
+        package_init.read_text().replace('__version__ = "0.2.0"', '__version__ = "0.3.0a1"')
+        + "\nfrom importlib.metadata import PackageNotFoundError as _Missing, distribution as _distribution\n"
+        + 'try:\n    _distribution("qwen-image-particle-sliders")\n'
+        + "except _Missing:\n    pass\n"
+        + 'else:\n    raise RuntimeError("modern Qwen requires a separate environment without the stable distribution")\n'
+    )
     readme = destination / "README.md"
     readme.write_text(
-        "Local HyperGAN/HNDL candidate profile; use the qwen-hndl shared backend.\n"
+        "Isolated HyperGAN/HNDL prerelease; never co-install the stable distribution.\n"
         "Requires the exact reviewed core; default-profile promotion remains gated.\n\n" + readme.read_text()
     )
     return {
         "profile": profile["profile"],
         "core_url": core_url,
         "core_commit": profile["core_commit"],
-        "public_sources_verified": public_core,
+        "public_sources_verified": True,
+        "verified_local_core_sha256": local_hash,
         "default_profile_promoted": False,
         "pyproject": source,
     }
+
+
+def copy_new_artifacts(generated, output, receipt):
+    """Receipt only the fresh isolated build outputs, never existing outdir files."""
+    artifacts = sorted(
+        path
+        for path in generated.iterdir()
+        if path.is_file() and (path.suffix == ".whl" or path.name.endswith(".tar.gz"))
+    )
+    if len(artifacts) != 2:
+        raise ValueError("expected exactly the newly built wheel and sdist")
+    output.mkdir(parents=True, exist_ok=True)
+    receipt["artifacts"] = {}
+    for path in artifacts:
+        shutil.copyfile(path, output / path.name)
+        receipt["artifacts"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    (output / "candidate-build.json").write_text(json.dumps(receipt, indent=2) + "\n")
 
 
 def main():
@@ -139,17 +171,12 @@ def main():
     with tempfile.TemporaryDirectory(prefix="qwen-hndl-profile-") as directory:
         staged = Path(directory)
         receipt = stage(root, staged, arguments.core_wheel, public_core=arguments.public_core)
-        output.mkdir(parents=True, exist_ok=True)
+        generated = staged / "candidate-dist"
         subprocess.run(
-            [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(output), str(staged)],
+            [sys.executable, "-m", "build", "--no-isolation", "--outdir", str(generated), str(staged)],
             check=True,
         )
-        receipt["artifacts"] = {
-            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in output.iterdir()
-            if path.suffix in (".whl", ".gz")
-        }
-        (output / "candidate-build.json").write_text(json.dumps(receipt, indent=2) + "\n")
+        copy_new_artifacts(generated, output, receipt)
 
 
 if __name__ == "__main__":

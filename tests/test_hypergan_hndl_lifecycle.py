@@ -22,18 +22,20 @@ def config(**options):
     return SessionConfig(
         "qwen-hndl",
         "qwen-hndl-modern-cpu-v1",
-        dummy=True,
-        steps=4,
-        ema_decay=0.5,
-        height=32,
-        width=32,
-        trajectory_steps=4,
-        records_per_pair=2,
-        rows=[
-            {"neutral": "a red cup", "positive": "a shiny red cup"},
-            {"neutral": "a blue bowl", "positive": "a shiny blue bowl"},
-        ],
-        **options,
+        **{
+            "dummy": True,
+            "steps": 4,
+            "ema_decay": 0.5,
+            "height": 32,
+            "width": 32,
+            "trajectory_steps": 4,
+            "records_per_pair": 2,
+            "rows": [
+                {"neutral": "a red cup", "positive": "a shiny red cup"},
+                {"neutral": "a blue bowl", "positive": "a shiny blue bowl"},
+            ],
+            **options,
+        },
     )
 
 
@@ -46,7 +48,9 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
 
     from qwen_image_sliders import hypergan_hndl, hypergan_hndl_lifecycle, teachers
 
+    opening_rng = torch.get_rng_state().clone()
     with BACKEND.open(config(gradient_checkpointing=checkpointing)) as training:
+        assert torch.equal(opening_rng, torch.get_rng_state())
         training.train(stop_after=3)
         before = training.checkpoint()["sha256"]
         raw = training.export_inference(selection="raw")
@@ -80,6 +84,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
     monkeypatch.setattr(teachers, "paired_records", forbidden)
     before_rng = torch.get_rng_state().clone()
     with open_inference(tmp_path / "native.pt") as inference:
+        assert torch.equal(before_rng, torch.get_rng_state())
         assert inference.selection == selection
         assert not any(hasattr(inference, name) for name in ("game", "critic", "rows", "optimizer"))
         assert _hash(inference.binding.network.state_dict()) == _hash(packet["network"])
@@ -91,7 +96,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
 
 
 @pytest.mark.parametrize("corruption", ["checksum", "profile", "late_tensor", "model"])
-def test_native_refusal_is_atomic_for_borrowed_runtime_and_owned_values(corruption, monkeypatch):
+def test_native_refusal_preserves_managed_runtime_and_owned_values(corruption, monkeypatch):
     from qwen_image_sliders import hypergan_hndl_inference as native
     from qwen_image_sliders.hypergan_hndl import QwenHNDLBank
 
@@ -157,11 +162,18 @@ def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
     from importlib.resources import files
 
     from packaging.requirements import Requirement
+    from packaging.specifiers import SpecifierSet
+    from packaging.version import Version
     from particle_sliders.inference import inference_backend
     from particle_sliders.lifecycle import backend
 
-    package = distribution("qwen-image-particle-sliders")
-    assert package.version == "0.2.0+hypergan.hndl.local"
+    package = distribution("qwen-image-particle-sliders-modern-candidate")
+    assert package.version == "0.3.0a1"
+    import qwen_image_sliders
+
+    assert qwen_image_sliders.__version__ == package.version
+    assert Version(package.version).is_prerelease
+    assert not SpecifierSet("==0.2").contains(package.version, prereleases=True)
     assert backend("qwen-hndl") is BACKEND
     assert inference_backend("qwen-hndl") is INFERENCE_BACKEND
     for group in ("particle_sliders.image_backends", "particle_sliders.inference_backends"):
@@ -172,7 +184,7 @@ def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
     ]
     profile = json.loads(files("qwen_image_sliders").joinpath("hypergan-hndl.lock.json").read_text())
     assert core.extras == {"hypergan-hndl"}
-    assert core.url.endswith("#sha256=" + profile["core_wheel_sha256"]) or core.url == (
+    assert core.url == (
         "git+https://github.com/HyperGAN/particle-sliders.git@"
         + profile["core_commit"]
         + "#subdirectory=packages/particle-sliders-core"
@@ -201,3 +213,33 @@ def test_modern_factory_preserves_borrowed_rope_and_checkpoint_settings():
     for module, checkpointing, function in settings:
         assert getattr(module, "gradient_checkpointing", None) == checkpointing
         assert getattr(module, "_gradient_checkpointing_func", None) is function
+
+
+def test_exported_training_context_controls_defaults_and_refuses_changes(monkeypatch):
+    from qwen_image_sliders import hypergan_hndl_inference as native
+
+    with BACKEND.open(config(width=64, trajectory_steps=3)) as training:
+        training.step()
+        packet = training.export_inference(selection="raw")
+        context = packet["specification"]["configuration"]["training_context"]
+        assert context == {"height": 32, "width": 64, "trajectory_steps": 3, "training_steps": 4}
+        expected = training.render(prompt="a green vase", seed=11)
+    rng = torch.get_rng_state().clone()
+    with open_inference(packet) as inference:
+        assert torch.equal(rng, torch.get_rng_state())
+        assert torch.equal(inference.render(prompt="a green vase", seed=11), expected)
+        for changed in ({"height": 64}, {"width": 32}, {"steps": 4}):
+            with pytest.raises(ValueError, match="exported training context"):
+                inference.render(prompt="a green vase", **changed)
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("incompatible native request reached runtime construction")
+
+    monkeypatch.setattr(native, "_load_runtime", forbidden)
+    with pytest.raises(ValueError, match="exported training context"):
+        open_inference(packet, native_request={"width": 32})
+    changed = deepcopy(packet)
+    changed["specification"]["configuration"]["training_context"]["width"] = 32
+    changed["sha256"] = _hash({key: value for key, value in changed.items() if key != "sha256"})
+    with pytest.raises(ValueError, match="training context differs"):
+        open_inference(changed)

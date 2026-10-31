@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.8", "build>=1"]
+dev = ["pytest>=8,<10", "ruff>=0.8", "build>=1", "setuptools>=84.2.1"]
 hndl = ["hndl==0.8.2; python_version < '3.15'"]
 
 [project.scripts]
@@ -33,7 +33,10 @@ Repository = "https://github.com/HyperGAN/qwen-image-particle-sliders"
 where = ["src"]
 
 [tool.setuptools.package-data]
-qwen_image_sliders = ["*.json"]
+qwen_image_sliders = ["backend.lock.json", "prompts.json"]
+
+[tool.setuptools.cmdclass]
+build_py = "_qwen_build_support.StableBuildPy"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

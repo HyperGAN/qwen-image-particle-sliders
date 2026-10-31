@@ -1,6 +1,8 @@
 For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
 The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
-executes shared graphs on tiny native CPU fixtures; default installation remains S081.
+is a distinct prerelease distribution for an isolated environment. Stable wheels
+exclude modern modules/lock; default installation remains S081. CI checks S081 only;
+modern CPU qualification is a separate explicit test lane.
 
 # Particle Sliders for Qwen-Image 2.1
 
