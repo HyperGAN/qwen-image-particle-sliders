@@ -16,11 +16,16 @@ from torch import nn
 from .adapters import target_modules
 from .contracts import file_digest, validate_strength
 
-PROFILE = "qwen-image21-hypergan-hndl-v2"
+PROFILE = "qwen-image21-hypergan-hndl-v3"
 
 
 def _shared():
-    from .hypergan_hndl_runtime import isolated_runtime, loaded_dependency_origins, module_origin
+    from .hypergan_hndl_runtime import (
+        check_core_inventory,
+        isolated_runtime,
+        loaded_dependency_origins,
+        module_origin,
+    )
 
     product_sources = isolated_runtime()
     if version("particle-sliders-core") != "0.12.0":
@@ -31,6 +36,7 @@ def _shared():
     if profile["profile"] != PROFILE or version("particlegan") != profile["particlegan_version"]:
         raise ValueError("Qwen HNDL shared profile differs from the qualified candidate")
     core = distribution("particle-sliders-core")
+    check_core_inventory(profile)
     for relative, expected in profile["core_source_sha256"].items():
         if relative.endswith(".py"):
             name = relative[:-3].replace("/", ".").removesuffix(".__init__")
@@ -45,12 +51,20 @@ def _shared():
         HNDLFieldCritic,
         HNDLParticleProjection,
         builder,
-        {**identity, "qwen_product_sources": product_sources},
+        {
+            **identity,
+            "qwen_product_sources": product_sources,
+            "core_commit": profile["core_commit"],
+            "core_runtime_closure_sha256": profile["core_source_closure_sha256"],
+        },
     )
 
 
 class QwenHNDLBank(nn.Module):
-    """Borrow Qwen projections and restore their exact forwards on close."""
+    """Borrow Qwen projections; unwind owned setup and retain failed restores for retry.
+
+    Third-party side effects outside these captured callbacks are not rolled back.
+    """
 
     particle_shape = (128, 4)
 
@@ -72,15 +86,16 @@ class QwenHNDLBank(nn.Module):
         object.__setattr__(self, "_particles", None)
         try:
             for name, base in targets:
-                # Build first; partial setup never replaces a caller's forward.
+                # Build this branch before attaching it. Cleanup attempts every
+                # earlier owned attachment and retains failed restores for retry.
                 layer = projection(
                     name, base, particles, 8, 8, builder=builder, identity=identity, attach=False
                 )
                 self.layers.append(layer)
                 self._restore.append((base, "forward" in vars(base), vars(base).get("forward")))
                 base.forward = layer.forward
-        except BaseException:
-            self.close()
+        except BaseException as primary:
+            self.close(primary=primary)
             raise
 
     @contextmanager
@@ -108,14 +123,27 @@ class QwenHNDLBank(nn.Module):
             object.__setattr__(self, "_particles", previous[0])
             self.strength = previous[1]
 
-    def close(self):
-        for base, owned, forward in reversed(self._restore):
-            if owned:
-                base.forward = forward
-            else:
-                vars(base).pop("forward", None)
-        self._restore.clear()
-        self._native_cleanup()
+    def _restore_projection(self, entry):
+        base, owned, forward = entry
+        if owned:
+            base.forward = forward
+        else:
+            vars(base).pop("forward", None)
+        self._restore.remove(entry)
+
+    def close(self, *, primary=None):
+        from particle_sliders.lifecycle import _restore_all
+
+        _restore_all(
+            [
+                *(
+                    lambda entry=entry: self._restore_projection(entry)
+                    for entry in reversed(tuple(self._restore))
+                ),
+                self._native_cleanup,
+            ],
+            primary=primary,
+        )
 
 
 class QwenHNDLCritic(nn.Module):
@@ -195,6 +223,6 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
         )
         game.normalization_records = len(edits)
         return game
-    except BaseException:
-        bank.close()
+    except BaseException as primary:
+        bank.close(primary=primary)
         raise

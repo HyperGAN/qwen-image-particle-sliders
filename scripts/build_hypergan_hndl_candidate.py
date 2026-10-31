@@ -29,9 +29,13 @@ def verified_core(path, profile):
         metadata = BytesParser().parsebytes(archive.read(name))
         if metadata["Name"] != "particle-sliders-core" or metadata["Version"] != profile["core_version"]:
             raise ValueError("core wheel package/version differs")
-        for relative, expected in profile["core_source_sha256"].items():
-            if hashlib.sha256(archive.read(relative)).hexdigest() != expected:
-                raise ValueError("core wheel source differs: " + relative)
+        actual = {
+            name: hashlib.sha256(archive.read(name)).hexdigest()
+            for name in archive.namelist()
+            if name.split("/", 1)[0] in profile["core_roots"]
+        }
+        if actual != profile["core_source_sha256"]:
+            raise ValueError("core wheel recursive source/data closure differs")
     return profile["core_wheel_sha256"]
 
 
@@ -47,6 +51,20 @@ def verified_public_core(profile):
     root = f"https://raw.githubusercontent.com/HyperGAN/particle-sliders/{commit}/packages/particle-sliders-core/"
     if hashlib.sha256(_public_bytes(root + "pyproject.toml")).hexdigest() != profile["core_pyproject_sha256"]:
         raise ValueError("public core package metadata differs from the reviewed candidate")
+    tree = json.loads(
+        _public_bytes(
+            "https://api.github.com/repos/HyperGAN/particle-sliders/git/trees/"
+            + profile["core_src_tree"]
+            + "?recursive=1"
+        )
+    )
+    paths = {node["path"] for node in tree.get("tree", []) if node["type"] == "blob"}
+    if (
+        tree.get("truncated")
+        or tree.get("sha") != profile["core_src_tree"]
+        or paths != set(profile["core_source_sha256"])
+    ):
+        raise ValueError("public core recursive source/data inventory differs from the reviewed closure")
 
     def verify(item):
         relative, expected = item
@@ -98,7 +116,7 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     changes = {
         original: "particle-sliders-core[hypergan-hndl] @ " + core_url,
         'name = "qwen-image-particle-sliders"': 'name = "qwen-image-particle-sliders-modern-candidate"',
-        'version = "0.2.0"': 'version = "0.3.0a1"',
+        'version = "0.2.0"': 'version = "' + profile["product_version"] + '"',
         'requires-python = ">=3.11"': 'requires-python = ">=3.11,<3.15"',
         "hndl==0.8.2": "hndl==0.10.0",
         'qwen-slider-train = "qwen_image_sliders.train:main"\n': "",
@@ -116,7 +134,9 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     (destination / "pyproject.toml").write_text(source)
     package_init = destination / "src/qwen_image_sliders/__init__.py"
     package_init.write_text(
-        package_init.read_text().replace('__version__ = "0.2.0"', '__version__ = "0.3.0a1"')
+        package_init.read_text().replace(
+            '__version__ = "0.2.0"', '__version__ = "' + profile["product_version"] + '"'
+        )
         + "\nfrom importlib.metadata import PackageNotFoundError as _Missing, distribution as _distribution\n"
         + 'try:\n    _distribution("qwen-image-particle-sliders")\n'
         + "except _Missing:\n    pass\n"
@@ -131,6 +151,8 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         "profile": profile["profile"],
         "core_url": core_url,
         "core_commit": profile["core_commit"],
+        "core_src_tree": profile["core_src_tree"],
+        "core_source_closure_sha256": profile["core_source_closure_sha256"],
         "public_sources_verified": True,
         "verified_local_core_sha256": local_hash,
         "default_profile_promoted": False,

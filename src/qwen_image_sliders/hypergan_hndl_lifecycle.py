@@ -1,10 +1,11 @@
 """Shared session/EMA/export plumbing for the separate modern Qwen cohort."""
 
-from particle_sliders.lifecycle import Backend, Binding
+from particle_sliders.lifecycle import Backend, Binding, _restore_all
 
 from . import lifecycle as legacy
 from .hypergan_hndl import _shared, build_game
 from .hypergan_hndl_inference import NAME, specification
+from .hypergan_hndl_runtime import runtime_cleanup
 
 
 def validate(options):
@@ -35,7 +36,7 @@ def prepare(options, *, runtime=None, admission=None):
                 },
             )
     legacy._validate_runtime(runtime, options)
-    restore = legacy._runtime_cleanup(runtime)
+    restore = runtime_cleanup(runtime)
     frequencies = runtime.model.pos_embed.freqs
     game = None
     try:
@@ -76,21 +77,13 @@ def prepare(options, *, runtime=None, admission=None):
                 "training_steps": options.get("steps", 4),
             },
         )
-    except BaseException:
-        try:
-            if game is not None:
-                game.backend.adapter.close()
-        finally:
-            restore()
-        raise
-    finally:
         runtime.model.pos_embed.freqs = frequencies
+    except BaseException as primary:
+        _restore_all([*([game.backend.adapter.close] if game is not None else []), restore], primary=primary)
+        raise
 
     def close():
-        try:
-            game.backend.adapter.close()
-        finally:
-            restore()
+        _restore_all([game.backend.adapter.close, restore])
 
     def render(*, prompt, strength, seed, images=None, **native):
         defaults = {

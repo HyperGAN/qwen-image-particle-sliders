@@ -2,12 +2,46 @@
 
 import hashlib
 import importlib.util
+import json
 import sys
 from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
 
 DIST = "qwen-image-particle-sliders-modern-candidate"
-VERSION = "0.3.0a1"
+VERSION = "0.3.0a2"
+
+
+def check_core_inventory(profile):
+    roots = profile.get("core_roots")
+    if roots != ["concept_slider_core", "particle_sliders"]:
+        raise ValueError("the core recursive runtime roots differ from the reviewed closure")
+    expected = profile["core_source_sha256"]
+    digest = hashlib.sha256(json.dumps(expected, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if digest != profile["core_source_closure_sha256"]:
+        raise ValueError("the core recursive closure digest differs")
+    package = distribution("particle-sliders-core")
+    actual = set()
+    for root in roots:
+        base = Path(package.locate_file(root))
+        actual.update(
+            root + "/" + path.relative_to(base).as_posix()
+            for path in base.rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts and path.suffix not in (".pyc", ".pyo")
+        )
+    if actual != set(expected):
+        raise ValueError("the core runtime file inventory differs from the recursive lock")
+
+
+def runtime_cleanup(runtime):
+    from particle_sliders.lifecycle import _restore_all, native_cleanup
+
+    restore = native_cleanup(runtime.model)
+    rope, frequencies = runtime.model.pos_embed, runtime.model.pos_embed.freqs
+
+    def close():
+        _restore_all([restore, lambda: setattr(rope, "freqs", frequencies)])
+
+    return close
 
 
 def module_origin(owner, name, relative):

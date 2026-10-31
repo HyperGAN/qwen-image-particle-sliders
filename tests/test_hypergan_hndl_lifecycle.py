@@ -168,7 +168,7 @@ def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
     from particle_sliders.lifecycle import backend
 
     package = distribution("qwen-image-particle-sliders-modern-candidate")
-    assert package.version == "0.3.0a1"
+    assert package.version == "0.3.0a2"
     import qwen_image_sliders
 
     assert qwen_image_sliders.__version__ == package.version

@@ -4,10 +4,12 @@ from types import SimpleNamespace
 
 import torch
 from particle_sliders.inference import InferenceBackend, InferenceBinding, native_identity
+from particle_sliders.lifecycle import _restore_all
 
 from . import inference as legacy
 from .hypergan_hndl import PROFILE, QwenHNDLBank, _shared
-from .lifecycle import _observation, _render_native, _runtime_cleanup, _validate_runtime
+from .hypergan_hndl_runtime import runtime_cleanup
+from .lifecycle import _observation, _render_native, _validate_runtime
 
 PROTOCOL = PROFILE + "-native-v1"
 NAME = "qwen-hndl"
@@ -100,7 +102,7 @@ def prepare(options, spec):
         local["fixture_seed"] = spec.configuration["fixture_seed"]
     runtime = _load_runtime(local)
     _validate_runtime(runtime, local)
-    restore = _runtime_cleanup(runtime)
+    restore = runtime_cleanup(runtime)
     bank = None
     try:
         # The shared loader validates the complete exported state before copying.
@@ -110,19 +112,12 @@ def prepare(options, spec):
             runtime, bank, particles, model_identity=model_identity(runtime, context)
         )
         identity = native_identity(native, model_identity=model_identity(runtime, context), protocol=PROTOCOL)
-    except BaseException:
-        try:
-            if bank is not None:
-                bank.close()
-        finally:
-            restore()
+    except BaseException as primary:
+        _restore_all([*([bank.close] if bank is not None else []), restore], primary=primary)
         raise
 
     def close():
-        try:
-            bank.close()
-        finally:
-            restore()
+        _restore_all([bank.close, restore])
 
     def render(*, prompt, strength, seed, images=None, **request):
         defaults = {

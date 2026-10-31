@@ -1,13 +1,15 @@
 {
-  "schema": "qwen-hypergan-hndl-candidate-v1",
-  "profile": "qwen-image21-hypergan-hndl-v2",
+  "schema": "qwen-hypergan-hndl-candidate-v2",
+  "profile": "qwen-image21-hypergan-hndl-v3",
   "core_version": "0.12.0",
-  "core_commit": "4abc0eb03a4e3a84fc3e6d02734c13dc7e8ea231",
+  "core_commit": "a794e3b4a8813b012f2c4faa3da82b78d4a90214",
   "particlegan_version": "0.9.4",
   "hypergan_commit": "5f368a3770cf5bdae0448995c9f76e29af8049f7",
   "hndl_version": "0.10.0",
-  "qualification": "local candidate; no pretrained/GPU qualification",
+  "qualification": "CPU software candidate; native model and GPU qualification remain product-specific.",
   "core_source_sha256": {
+    "concept_slider_core/__init__.py": "9afadb5c36b00413160442900e6190a7d93f272b61413f72a932c1db948623d3",
+    "particle_sliders/LICENSE": "2b61d4a8dd7a958b99133a92e92eede6f5e8b0f7b44d234665f822051e530685",
     "particle_sliders/__init__.py": "840ac3d54df90b121c7d2a13c5097c6132ba19ec3c95f5673251dd709935f799",
     "particle_sliders/_training.py": "0a5802997adec58998beb6598861f6a0f0aa1245a10053666e16300b67d3bc44",
     "particle_sliders/audio_closure_provenance.json": "d1eb31852cc6ea3328d03f52537f376abfa5d1c53e1e97abd0124b1fce7d65b5",
@@ -26,16 +28,16 @@
     "particle_sliders/formulation.py": "1c248ca0d3d7bf5edb5ae06821cf52480ed9877414b10d1c7c9f843968bd8d01",
     "particle_sliders/formulation_game.py": "a11585b4dc6b549de6e62716f0b05d6810addcf61932e190ed50cd2469c21490",
     "particle_sliders/grad_regularizers.py": "25852cf640d87485e01ccef1ec6f5bb6a57a03ac9970121e1ca9124b345d6092",
-    "particle_sliders/inference.py": "945f11cb3c465627da686483ecf1d137e81c272bf5dcb81c05da8c6482ec6830",
+    "particle_sliders/inference.py": "a44ad31b8976f5ad4519f658e4d5ab3c0ab875c4345696eba728835971be914a",
     "particle_sliders/legacy_compat.py": "82d036b7ec0aa9e3da7efd7b932fd756ef07a7cad799434180ec9ae4f9280435",
     "particle_sliders/legacy_stamp.json": "3532272646d7ab6d7d304f289e5866225f066aac6a3f9a0691a53807a0cf0605",
-    "particle_sliders/lifecycle.py": "cc94be191c5810f79642349c9258c466553c41e509df2e28622bfac82bc802c0",
+    "particle_sliders/lifecycle.py": "ec27ef58ba544ddaf4f5e51ff48dd08d73686bf81df4e500d822500a297f2c29",
     "particle_sliders/locked_provenance.json": "c38e864b789823476036800eea435586ba6d5208bba4008cbd54fdb8cc88826d",
     "particle_sliders/music3_native.py": "bbdd408259475b6d2a16158eaa283d302f22f6d8e7a64c44aad35d8a1e943819",
     "particle_sliders/native_lora.py": "9cb43b8b03148e11c9b957e81ed3897a965f2a21c69d440c6aaafee452aa6018",
     "particle_sliders/optimizer_policy.py": "9ae5fd84987d9a2ae4c202801a9f24b2fe4cebc6d0c8bdc737341a895a79b9a9",
     "particle_sliders/peft_scaling.py": "bdb9bdb8b77bfb785658542d48cd4fa04969320898fa83ed30e8d33bcef9640e",
-    "particle_sliders/pg09.py": "e580a9339630bea7cf3aa82e34c2d08a3e231b8df0aa408b29baa08b8de01671",
+    "particle_sliders/pg09.py": "8d347665884fc371505e39819d6ee1081d893a8b2a8bbf8e5842b0d11f54c895",
     "particle_sliders/pg093.py": "61bcd076d0c79dc47ae041d79d45defee25d326fee34fd2cc5b6b42d6e878b8d",
     "particle_sliders/pg093_release.json": "551f015d5e8cb359d570f6b3eea4772f1f986267b92d51e58643733cb49b9a91",
     "particle_sliders/pg094.py": "3ab6309465328332bb5b35702fa9d04848d2f81bfb25e74d8c7187dc552d9ab3",
@@ -58,6 +60,25 @@
     "particle_sliders/teachers.py": "9a35fcff05a15d00f6aa67b5cb9e53cf55526d7e06631ef8cfeb0169519818d2",
     "particle_sliders/yue2_native.py": "b28b9db5358df02a1f9d65e07b4aa7537fab9e8d1ff416a03c8e353513b9c2b3"
   },
-  "core_wheel_sha256": "9afad3afc1f6c653a574074dc14f0da1f1c43975c31ca45c4eac049df0b0b4ad",
-  "core_pyproject_sha256": "f6c53441da0c657b44252072b4bce67ec1562a7acdf427fbde299e0374c3ccad"
+  "core_wheel_sha256": "113496f2b1a7e1c40eeec1df84678bb718234edf73023a4e46f515b209d95b6a",
+  "core_pyproject_sha256": "f6c53441da0c657b44252072b4bce67ec1562a7acdf427fbde299e0374c3ccad",
+  "product_version": "0.3.0a2",
+  "core_roots": [
+    "concept_slider_core",
+    "particle_sliders"
+  ],
+  "core_src_tree": "241f0f6d885f9289369f0c4f39eb414f08620a75",
+  "core_source_closure_sha256": "b21169484cfe9ab39dac98d8ca1b68863ec02478c4a698413bf34b4b15298db7",
+  "core_wheel_build": {
+    "source_date_epoch": 1793476986,
+    "setuptools": "84.2.1",
+    "purpose": "Reproducible local qualification artifact; not a published release."
+  },
+  "previous_preview": {
+    "profile": "qwen-image21-hypergan-hndl-v2",
+    "core_commit": "4abc0eb03a4e3a84fc3e6d02734c13dc7e8ea231",
+    "product_version": "0.3.0a1",
+    "product_head": "ecb50267562afa0eb374000d9761b57b0e25fde7",
+    "status": "Use the original environment. No automatic packet migration is supported."
+  }
 }

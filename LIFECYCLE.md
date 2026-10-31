@@ -6,7 +6,7 @@ through merged common-core PR144 ancestry. Product PR1 is merged; source publica
 does not establish a package or pretrained-model release. See
 [qualification status](PUBLICATION-STATUS.md).
 The original source-only adoption audit and outstanding native gates are recorded in
-[docs/core081-adoption.md](docs/core081-adoption.md). The prior core0.7.0 source
+[docs/core081-adoption.md](docs/core081-adoption.md). The prior core 0.7.0 source
 pass is preserved at `bf8a6c160153c80f7c4155f96ed3f943114615d7`.
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
@@ -88,10 +88,10 @@ Use CPU thread limits and offline mode for these fixtures. They do not qualify
 pretrained behavior, GPU memory, convergence or image quality.
 
 The modern candidate is documented in [hypergan-hndl-candidate.md](docs/hypergan-hndl-candidate.md).
-It is a distinct prerelease distribution, `qwen-image-particle-sliders-modern-candidate==0.3.0a1`,
+It is a distinct prerelease distribution, `qwen-image-particle-sliders-modern-candidate==0.3.0a2`,
 for a separate environment. The stable wheel excludes its modules/lock. The candidate
 registers `qwen-hndl` for shared sessions and native-only raw/EMA v2 export/inference.
 V2 records training geometry and both trajectory/training step budgets; incompatible
 render contexts refuse. Normal CI qualifies S081 only; modern CPU checks are an
-explicit manual lane. The verified core source is public; default promotion and
+explicit manual lane. The active modern core pin is `a794e3b4a8813b012f2c4faa3da82b78d4a90214`; default promotion and
 pretrained/GPU qualification remain separate review decisions.
