@@ -65,6 +65,20 @@ def test_real_shared_graphs_own_gradients_and_exact_resume(preset, checkpointing
         assert any(not torch.equal(value, initial[key]) for key, value in bank.state_dict().items())
         assert all(layer.lora_up.weight.grad.abs().sum() > 0 for layer in bank.layers)
         assert game.backend.particles.grad is not None and game.backend.particles.grad.abs().sum() > 0
+        # Isolate the native response path from the shared particle prior: a
+        # nonzero particle gradient here must traverse the actual HNDL route.
+        named = list(game.network.named_parameters())
+        generated = game.backend.generated(game.rows[1])
+        gradients = torch.autograd.grad(
+            generated.square().mean(), [parameter for _, parameter in named], allow_unused=True
+        )
+        assert all(gradient is not None and torch.isfinite(gradient).all() for gradient in gradients)
+        particle_gradient = next(
+            gradient
+            for (_, parameter), gradient in zip(named, gradients)
+            if parameter is game.backend.particles
+        )
+        assert particle_gradient.abs().sum() > 0
         assert all(parameter.grad is None for parameter in runtime.model.parameters())
         assert all(torch.equal(value, original[key]) for key, value in runtime.model.state_dict().items())
         with game.network.scaled(0):
