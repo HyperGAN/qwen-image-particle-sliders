@@ -107,8 +107,9 @@ context requires a separately qualified cohort rather than silently reusing
 these results. This conservative restriction applies to raw and EMA alike.
 
 Native-only inference constructs a verified frozen runtime and selected HNDL
-adapter/particles, never teachers, a game, critic or optimizer. Exports contain
-no training rows/configuration/game state. Both selections reproduce their
+adapter/particles, never teachers, a game, critic or optimizer. Exports retain
+the context receipt above, but omit teacher rows, paired prompts, critic/optimizer
+state and resumable game state. Both selections reproduce their
 training-side latent exactly at strengths0/.5/1 with native checkpointing on/off.
 Opening either a session or inference preserves caller RNG; tests assert this
 immediately after open, before render or close. New checkpoints restore exact
