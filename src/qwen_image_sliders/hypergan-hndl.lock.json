@@ -57,5 +57,7 @@
     "particle_sliders/session_cli.py": "41557a38a8171a2366a1bff7f9f2d06c512fa50682d844feee6f8ce0a9a4e6e4",
     "particle_sliders/teachers.py": "9a35fcff05a15d00f6aa67b5cb9e53cf55526d7e06631ef8cfeb0169519818d2",
     "particle_sliders/yue2_native.py": "b28b9db5358df02a1f9d65e07b4aa7537fab9e8d1ff416a03c8e353513b9c2b3"
-  }
+  },
+  "core_wheel_sha256": "9afad3afc1f6c653a574074dc14f0da1f1c43975c31ca45c4eac049df0b0b4ad",
+  "core_pyproject_sha256": "f6c53441da0c657b44252072b4bce67ec1562a7acdf427fbde299e0374c3ccad"
 }
