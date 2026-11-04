@@ -67,6 +67,7 @@ def build_game(
 ):
     """Bind the real hooked bank once; losses, sampling, optimizers and state are shared."""
     from .learning_rates import resolve_alias
+
     rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     torch.manual_seed(seed)
     edits = []
@@ -163,6 +164,7 @@ def train(
     if type(seed) is not int or not 0 <= seed < 2**63 - 100:
         raise ValueError("invalid seed")
     from .learning_rates import resolve_alias
+
     rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     stamp, declared = formulation(batch=batch, lr=rates.get("lr"))
     records = paired_records(
@@ -310,7 +312,10 @@ def main(argv=None):
     if args.stop_after is not None and not 1 <= args.stop_after <= args.steps:
         parser.error("stop-after must be between one and the fixed steps budget")
     from .learning_rates import resolve_alias
-    rates = resolve_alias(lr=args.lr, g_lr=args.g_lr, d_lr_mult=args.d_lr_mult, prior_lr_mult=args.prior_lr_mult)
+
+    rates = resolve_alias(
+        lr=args.lr, g_lr=args.g_lr, d_lr_mult=args.d_lr_mult, prior_lr_mult=args.prior_lr_mult
+    )
     formulation(batch=args.batch, lr=rates.get("lr"))
     if not args.dummy:
         validate_shape(args.height, args.width)

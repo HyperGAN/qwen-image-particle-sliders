@@ -1,9 +1,10 @@
 """Allocation-free learning-rate input admission; the shared recipe owns rates."""
+
 import math
 
 
 def recipe_overrides(*, lr=None, d_lr_mult=None, prior_lr_mult=None):
-    values = dict(lr=lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
+    values = {"lr": lr, "d_lr_mult": d_lr_mult, "prior_lr_mult": prior_lr_mult}
     result = {}
     for key, value in values.items():
         if value is not None:

@@ -217,6 +217,7 @@ def validate(options):
         raise ValueError("Qwen height and width must be integers")
     validate_shape(options.get("height", 32), options.get("width", 32))
     from .learning_rates import resolve_alias
+
     rates = resolve_alias(**{key: options.get(key) for key in ("lr", "g_lr", "d_lr_mult", "prior_lr_mult")})
     formulation(batch=options.get("batch", 2), lr=rates.get("lr"))
     if options.get("critic_kind", "readout") not in ("readout", "hndl"):
@@ -270,7 +271,10 @@ def prepare(options, *, runtime=None, admission=None):
                 },
             )
         from .learning_rates import resolve_alias
-        rates = resolve_alias(**{key: options.get(key) for key in ("lr", "g_lr", "d_lr_mult", "prior_lr_mult")})
+
+        rates = resolve_alias(
+            **{key: options.get(key) for key in ("lr", "g_lr", "d_lr_mult", "prior_lr_mult")}
+        )
         stamp, declared = formulation(batch=options.get("batch", 2), lr=rates.get("lr"))
         if options.get("gradient_checkpointing", False):
             runtime.model.enable_gradient_checkpointing()
