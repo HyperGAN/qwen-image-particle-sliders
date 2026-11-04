@@ -1,0 +1,38 @@
+{
+  "schema": "qwen-strict-native-CPU-readiness-v2",
+  "runtime_commit": "ec9cd3c4c0b6ac632a775b31f40d0e5489abc566",
+  "release_base_commit": "7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19",
+  "core": "ddb41423bcefc1fe76cd94d0f9b367353b3ea137",
+  "PG": "official0.9.4-auto",
+  "installed_CPU_tests": 22,
+  "installed_CPU_test_seconds": 4.84,
+  "wheel_sha256": "1d144efd4659bd01dabc30205589bfbb6557e3b4768cc3cc4aad5802ab76d68c",
+  "sdist_sha256": "e74d321808f258d6f5e6682a22843a5c752831e83e7b364abd396c6300da4e90",
+  "wheel_sdist_Python_JSON_files_equal": 12,
+  "source_closure": {
+    "base_files": 16,
+    "product_files_excluding_self": 11,
+    "core_checked_by_unchanged_release_profile": true
+  },
+  "asset_readiness_sha256": "fd43f1bf4549959842a4bccf2246f6833c52e713e626ceb39e2b5b06baf5c5ed",
+  "structural_readiness_sha256": "6425296029b47be9b071c8cb89ee8baef2e2da733c0ba954466bb04aa4cd2da9",
+  "evidence": [
+    "actual tiny Qwen3VL BF16 and FP32 exact source-cast/full-prefix/transport",
+    "actual shared routed PG optimizer ownership and two vs1+1 bitwise full-state replay",
+    "source mismatch / geometry / missing guardian refused before allocation",
+    "EMA disabled on actual resolved SessionConfig",
+    "caller-owned CPU RNG restored; no torch.manual_seed/manual_seed_all in new factory"
+  ],
+  "pretrained_encoder_loaded": false,
+  "pretrained_GPU_loaded": false,
+  "CUDA_initialized": false,
+  "qualification": "CPU-only source/structural readiness; no full model fit/native resume/render/rate/quality qualification",
+  "limitations": [
+    "Proposed24GiB GPU cap is unmeasured",
+    "Native pretrained from_pretrained partial-allocation failure requires owned worker-process teardown",
+    "Full public native inference/render still needs pretrained mechanics proof",
+    "BF16 and FP32 encoder outputs are distinct numerical cohorts"
+  ],
+  "torch_implementation_files": 2036,
+  "preserved_prior_runtime": "f9441bab7f45f13fb7274aa192a1a1103335f651"
+}
