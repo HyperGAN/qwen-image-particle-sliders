@@ -46,6 +46,7 @@ def metadata(runtime, bank, stamp, declared):
                 "adapters.py",
                 "checkpoint.py",
                 "contracts.py",
+                "core_profile.py",
                 "infer.py",
                 "projection.py",
                 "runtime.py",

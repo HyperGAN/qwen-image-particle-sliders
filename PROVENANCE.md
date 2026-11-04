@@ -1,12 +1,16 @@
 # Source, model and license provenance
 
-New native PG0.9.1 cohort audited on 2026-10-17. Original model/runtime pins are retained. `backend.lock.json` and its packaged
+Current canonical cohort: core 0.12.0 at `ddb41423bcefc1fe76cd94d0f9b367353b3ea137`,
+released ParticleGAN 0.9.4. Historical S081 sources and receipts are preserved in
+[the old lock](docs/cohorts/qwen-core081.lock.json); use the original product commit
+`eaa753d594c62afefd3337f3f82cb1adfe51b56e` in its isolated environment for old artifacts. The 2026-10-17 audit was an earlier core 0.6.0 stage.
+The separate [HyperGAN/HNDL candidate](docs/hypergan-hndl-candidate.md) does not retarget this cohort. `backend.lock.json` and its packaged
 copy are identical; full commits and all official snapshot hashes are authoritative.
 
 | Source | Pin | Role / license |
 |---|---|---|
-| HyperGAN/particle-sliders | `cdfb80a76b882b4b73861b12f555263bd64ffeb7` | Installable shared core 0.6.0 candidate; MIT |
-| 255BITS/ParticleGAN | `9fc8fb51cba27c26d61f2b6a7d139f55cc726c35` | Released ParticleGAN 0.9.1; MIT |
+| HyperGAN/particle-sliders | `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` | Canonical shared core 0.12.0; MIT |
+| 255BITS/ParticleGAN | `330eb94ee748cdcad131b0275d8de75fd5a7f96f` | Released ParticleGAN 0.9.4; MIT |
 | huggingface/diffusers | `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458` | Native pipeline/transformer/scheduler; Apache-2.0 |
 | QwenLM/Qwen-Image-2.1 | `1993c3a4821f977df0b6dd2661ff5b40239aa55a` | Official requirements and license reference |
 | Qwen/Qwen-Image-2.1 | `d26bb61231c349cf6b7896fa83353113880e1ba3` | Official model snapshot; Qwen research license |
@@ -36,7 +40,7 @@ Official references:
 - [Official model snapshot](https://huggingface.co/Qwen/Qwen-Image-2.1/tree/d26bb61231c349cf6b7896fa83353113880e1ba3)
 - [Qwen license](https://huggingface.co/Qwen/Qwen-Image-2.1/blob/d26bb61231c349cf6b7896fa83353113880e1ba3/LICENSE)
 - [Native Diffusers transformer](https://github.com/huggingface/diffusers/blob/1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458/src/diffusers/models/transformers/transformer_qwenimage21.py)
-- [Shared product contract](https://github.com/HyperGAN/particle-sliders/blob/cdfb80a76b882b4b73861b12f555263bd64ffeb7/docs/shared-core.md)
+- [Shared product contract](https://github.com/HyperGAN/particle-sliders/blob/ddb41423bcefc1fe76cd94d0f9b367353b3ea137/docs/shared-core.md)
 
 The optional `--critic hndl` route executes the shared
 `HNDLConditionalReadoutCritic` built by released HNDL 0.8.2. Its resolved graph,

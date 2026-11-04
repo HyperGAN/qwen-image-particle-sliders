@@ -3,4 +3,6 @@ recursive-include configs *.json
 recursive-include docs *.md *.json
 recursive-include tests *.py
 recursive-include scripts *.py
-include LIFECYCLE.md
+include LIFECYCLE.md PUBLICATION-STATUS.md
+include src/_qwen_build_support.py
+recursive-include src/qwen_image_sliders hypergan_hndl*.py hypergan-hndl.lock.json

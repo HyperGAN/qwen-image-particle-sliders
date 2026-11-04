@@ -1,4 +1,4 @@
-"""Train native Qwen-Image 2.1 responses with the installed ParticleGAN 0.9 API."""
+"""Train native Qwen-Image 2.1 responses with the installed ParticleGAN 0.9.4 API."""
 
 import argparse
 import json

@@ -1,20 +1,25 @@
-For the new common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
+is a distinct prerelease distribution for an isolated environment. Canonical wheels
+exclude candidate modules/lock; default installation uses core0.12.0/PG0.9.4. CI checks that lane;
+modern CPU qualification is a separate explicit test lane.
 
 # Particle Sliders for Qwen-Image 2.1
 
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,
 using `QwenImage21Pipeline` and the pinned shared
-[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/32f6830f6402e85aa77b6631db64fcbbb2131f6b/packages/particle-sliders-core).
+[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/ddb41423bcefc1fe76cd94d0f9b367353b3ea137/packages/particle-sliders-core).
 
 The training CLI executes the installed shared `ConditionalPG09` game with released
-ParticleGAN **0.9.1** and the native `QwenImage21ResponseAdapter`. It trains the actual
+ParticleGAN **0.9.4** and the native `QwenImage21ResponseAdapter`. It trains the actual
 hooked routed maps and 128x4 particle bank on native spatial VAE velocity fields.
 Inference uses the same EMA maps/particles and the native Qwen pipeline at strengths
 **0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
 copied GAN engine.
 
-**Status:** this draft lifecycle runtime passed **26 installed CPU checks**;
+**Status:** canonical PG0.9.4 adoption and bounded CPU checks are described in
+[the current audit](docs/pg094-adoption.md). The historical lifecycle receipt records **26 installed CPU checks**;
 see [qualification status](PUBLICATION-STATUS.md). No pretrained image quality is established;
 see [the core 0.8.1 adoption audit](docs/core081-adoption.md).
 The [prior PR1 audit](docs/pg09-final-core.md) qualifies its original exact core pin.

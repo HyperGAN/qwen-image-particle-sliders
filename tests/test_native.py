@@ -244,7 +244,7 @@ def test_shared_core_updates_actual_bank_and_keeps_base_frozen(checkpointing, pr
         assert seen and all(seen)
         assert game.normalization_records == 6
         assert game.state_dict()["config"]["objective"] == "g_adv+public_prior;d_adv+public_penalty"
-        assert game.state_dict()["config"]["pg_version"] == "0.9.1"
+        assert game.state_dict()["config"]["pg_version"] == "0.9.4"
         assert all(layer.up.weight.grad.abs().sum() > 0 for layer in bank.layers)
         assert any(not torch.equal(v, initial[k]) for k, v in bank.state_dict().items())
         assert all(torch.equal(v, base[k]) for k, v in runtime.model.state_dict().items())

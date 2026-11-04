@@ -97,6 +97,9 @@ class Runtime:
     validation_kind = "official-weight-runtime"
 
     def __init__(self, model_dir=None, *, allow_hub=False, cache_dir=None, device="cpu"):
+        from .core_profile import require_current_core
+
+        require_current_core()
         if not model_dir and not (allow_hub and cache_dir):
             raise ValueError(
                 "provide --model-dir, or explicitly permit a pinned download with --allow-hub --cache-dir"
