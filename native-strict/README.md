@@ -9,8 +9,8 @@ Two explicit profiles retain distinct numerical identities:
 
 | CPU encoder | DiT and VAE | Profile |
 | --- | --- | --- |
-| BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-bf16-encoder-cuda-bf16-dit-vae-math-v1` |
-| FP32 from original BF16 weights; native hidden output explicitly rounded to BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-fp32-encoder-rounded-bf16-cuda-bf16-dit-vae-math-v1` |
+| BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-bf16-pread-encoder-cuda-bf16-dit-vae-math-v2` |
+| FP32 from original BF16 weights; native hidden output explicitly rounded to BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-fp32-pread-encoder-rounded-bf16-cuda-bf16-dit-vae-math-v2` |
 
 FP32 conditioning does not claim identical output to BF16 conditioning. Each
 factory verifies all original assets, loads and checks every actual CPU encoder
@@ -60,3 +60,19 @@ CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 \
 
 The first random-weight native encoder tests use the already staged canonical
 processor/tokenizer metadata. They do not open pretrained weight payloads.
+
+Version0.1.1 uses the native public `from_pretrained(None, config=...,
+state_dict=...)` with lazy safetensors `PySafeSlice` values from positioned-read
+handles. The first full CPU mmap-loader attempt at ec9cd3c exceeded48GiB RSS
+during loading and was stopped before complete weight verification or encoding;
+its v1 artifacts/environment/receipts remain preserved. No retry is implicit.
+The new positioned-read profile requires its own source/environment/frozen plan.
+
+Actual tiny BF16 and FP32 positioned-read loads match the actual native mmap
+loader bit for bit, including original full-prefix output and BF16 transport.
+A model constructed and then cast is an invalid oracle: it also rounds native
+nonpersistent rotary buffers. The new identity records/checks all registered
+buffers, plain tensor/rotary attributes, actual config precision and caller
+default dtype/device. Tensor hashing streams existing CPU memory without
+embedding-sized byte copies. These checks do not establish full-model memory
+fit or authorize another pretrained load.

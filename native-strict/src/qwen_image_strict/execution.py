@@ -9,14 +9,15 @@ def policy(*,conditioning_precision):
     import torch
     from diffusers.models import attention_dispatch as dispatch
     active,fn=dispatch._AttentionBackendRegistry.get_active_backend()
-    flags=dict(deterministic=torch.are_deterministic_algorithms_enabled(),warn_only=torch.is_deterministic_algorithms_warn_only_enabled(),
+    flags=dict(default_dtype=str(torch.get_default_dtype()),default_device=str(torch.get_default_device()),
+        deterministic=torch.are_deterministic_algorithms_enabled(),warn_only=torch.is_deterministic_algorithms_warn_only_enabled(),
         matmul_precision=torch.get_float32_matmul_precision(),TF32=torch.backends.cuda.matmul.allow_tf32,cudnn_TF32=torch.backends.cudnn.allow_tf32,
         cudnn_benchmark=torch.backends.cudnn.benchmark,cudnn_deterministic=torch.backends.cudnn.deterministic,
         fp16_reduction=torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction,bf16_reduction=torch.backends.cuda.matmul.allow_bf16_reduced_precision_reduction,
         flash_sdp=torch.backends.cuda.flash_sdp_enabled(),efficient_sdp=torch.backends.cuda.mem_efficient_sdp_enabled(),cudnn_sdp=torch.backends.cuda.cudnn_sdp_enabled(),
         math_sdp=torch.backends.cuda.math_sdp_enabled(),math_low_precision=torch.backends.cuda.fp16_bf16_reduction_math_sdp_allowed(),
         cublas=os.environ.get('CUBLAS_WORKSPACE_CONFIG'),CPU_threads=torch.get_num_threads(),diffusers_backend=active.value)
-    wanted=dict(deterministic=True,warn_only=False,matmul_precision='highest',TF32=False,cudnn_TF32=False,cudnn_benchmark=False,cudnn_deterministic=True,
+    wanted=dict(default_dtype='torch.float32',default_device='cpu',deterministic=True,warn_only=False,matmul_precision='highest',TF32=False,cudnn_TF32=False,cudnn_benchmark=False,cudnn_deterministic=True,
         fp16_reduction=False,bf16_reduction=False,flash_sdp=False,efficient_sdp=False,cudnn_sdp=False,math_sdp=True,math_low_precision=False,
         cublas=':4096:8',CPU_threads=4,diffusers_backend='native')
     if flags!=wanted or fn is not dispatch._native_attention:
@@ -25,7 +26,8 @@ def policy(*,conditioning_precision):
     if env['TORCH_ALLOW_TF32_CUBLAS_OVERRIDE'] not in (None,'0') or env['NVIDIA_TF32_OVERRIDE'] not in (None,'0') or env['DIFFUSERS_ATTN_BACKEND'] not in (None,'native'):
         raise ValueError('Qwen strict numerical environment override differs')
     return dict(profile=PROFILES[conditioning_precision],conditioning_precision=conditioning_precision,flags=flags,environment=env,conditioning='CPU '+conditioning_precision+' native fullprefix, explicit BF16transport; no padding between rows',
-        transformer='ownedCUDA0 BF16',decoder='ownedCUDA0 BF16 from original FP32 weights',CPU_capability=torch.backends.cpu.get_cpu_capability(),maximum_pixels=512,maximum_encoder_tokens=512)
+        transformer='ownedCUDA0 BF16',decoder='ownedCUDA0 BF16 from original FP32 weights',CPU_capability=torch.backends.cpu.get_cpu_capability(),maximum_pixels=512,maximum_encoder_tokens=512,
+        CPU_loader='native from_pretrained(None, exact config, lazy PySafeSlice state_dict) with safetensors backend=pread; exact all-parameter source-cast verification')
 
 def require_policy(expected):
     if policy(conditioning_precision=expected["conditioning_precision"])!=expected:raise ValueError('Qwen strict numerical identity changed')

@@ -30,4 +30,4 @@ def test_actual_resolved_config_ema_is_disabled():
     from qwen_image_strict.lifecycle import config
     c=config(conditioning_precision='float32')
     assert c.options['ema_decay'] is None
-    assert c.cohort=='qwen-image21-cpu-fp32-encoder-rounded-bf16-cuda-bf16-dit-vae-math-v1'
+    assert c.cohort=='qwen-image21-cpu-fp32-pread-encoder-rounded-bf16-cuda-bf16-dit-vae-math-v2'

@@ -20,7 +20,11 @@ def tensor_digest(value):
     if not torch.isfinite(value).all():
         raise ValueError('nonfinite conditioning/base tensor')
     head = json.dumps([list(value.shape), str(value.dtype)], separators=(',', ':')).encode()
-    return hashlib.sha256(head + value.reshape(-1).view(torch.uint8).numpy().tobytes()).hexdigest()
+    # Keep one tensor resident; hashing must not create two full embedding-sized
+    # bytes copies on top of the FP32 encoder and its source-cast check.
+    result=hashlib.sha256(head)
+    result.update(memoryview(value.reshape(-1).view(torch.uint8).numpy()))
+    return result.hexdigest()
 
 
 def encoding_identity(encoding):
@@ -39,7 +43,7 @@ def verify_parameters(model, directory, *, source_dtype, loaded_dtype, device='c
     else:
         names = []
         for path in sorted(directory.glob('*.safetensors')):
-            with safe_open(path, framework='pt', device='cpu') as f:
+            with safe_open(path, framework='pt', device='cpu', backend='pread') as f:
                 names.extend((key, path.name) for key in f.keys())
         mapping = dict(names)
         if len(mapping) != len(names):
@@ -49,7 +53,7 @@ def verify_parameters(model, directory, *, source_dtype, loaded_dtype, device='c
         raise ValueError('native loaded state keys differ from exact source checkpoint')
     checks = {}
     for filename in sorted(set(mapping.values())):
-        with safe_open(directory / filename, framework='pt', device='cpu') as f:
+        with safe_open(directory / filename, framework='pt', device='cpu', backend='pread') as f:
             for key in sorted(k for k, name in mapping.items() if name == filename):
                 source = f.get_tensor(key)
                 value = actual[key]
@@ -71,6 +75,29 @@ def frozen_state(model):
     return hashlib.sha256(json.dumps(checks, sort_keys=True).encode()).hexdigest()
 
 
+def buffer_identity(model):
+    """Native rotary buffers are not necessarily stored in the checkpoint."""
+    import torch
+    registered={name:dict(device=str(value.device),dtype=str(value.dtype),shape=list(value.shape),
+            sha256=tensor_digest(value)) for name,value in model.named_buffers()}
+    plain={};rotary={}
+    for name,module in model.named_modules():
+        for attr,value in vars(module).items():
+            if isinstance(value,torch.Tensor):
+                plain[name+'.'+attr]=dict(device=str(value.device),dtype=str(value.dtype),shape=list(value.shape),sha256=tensor_digest(value))
+        if type(module).__name__.endswith('RotaryEmbedding'):
+            attrs={key:getattr(module,key) for key in ('rope_type','attention_scaling','mrope_section','max_seq_len_cached','original_max_seq_len') if hasattr(module,key)}
+            attrs['rope_parameters']=getattr(getattr(module,'config',None),'rope_parameters',None)
+            rotary[name]=json.loads(json.dumps(attrs,sort_keys=True))
+    return dict(registered=registered,plain_tensor_attributes=plain,native_rotary_attributes=rotary)
+
+
+def config_precision(model):
+    return dict(dtype=str(getattr(model.config,'dtype',None)),
+        text_dtype=str(getattr(model.config.text_config,'dtype',None)),
+        vision_dtype=str(getattr(model.config.vision_config,'dtype',None)))
+
+
 class CPUConditioner:
     """Own only the CPU encoder; no transformer, VAE or CUDA allocation."""
     def __init__(self, model, processor, scheduler, *, numerical, weights, guard=None):
@@ -83,7 +110,10 @@ class CPUConditioner:
         if any(p.device.type != 'cpu' or p.dtype != dtype or p.requires_grad for p in model.parameters()):
             raise ValueError('native CPU encoder device/precision/frozen state differs')
         require_policy(numerical)
-        self.numerical, self.weights, self.guard = numerical, weights, guard
+        self.numerical, self.guard = numerical, guard
+        self.buffers=buffer_identity(model)
+        self.config_precision=config_precision(model)
+        self.weights=dict(weights,native_buffers=self.buffers,native_config_precision=self.config_precision)
         self.pipe = QwenImage21Pipeline(vae=None, text_encoder=model, processor=processor,
             transformer=None, scheduler=scheduler)
         self.pipe.set_progress_bar_config(disable=True)
@@ -95,6 +125,7 @@ class CPUConditioner:
         import torch
         from diffusers import FlowMatchEulerDiscreteScheduler
         from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
+        from .encoder_loader import load_encoder
         from .assets import inspect_assets
         from .provenance import execution_identity
         if cpu_only and (torch.cuda.is_initialized() or __import__('os').environ.get('CUDA_VISIBLE_DEVICES') != ''):
@@ -110,9 +141,7 @@ class CPUConditioner:
         model = None
         try:
             with initialization():
-                model = Qwen3VLForConditionalGeneration.from_pretrained(directory / 'text_encoder',
-                    dtype=getattr(torch, numerical['conditioning_precision']), device_map='cpu',
-                    attn_implementation='eager', local_files_only=True, low_cpu_mem_usage=True)
+                model = load_encoder(directory / 'text_encoder',dtype=getattr(torch,numerical['conditioning_precision']),guard=guard)
                 model.eval().requires_grad_(False)
                 guard()
                 weights = verify_parameters(model, directory / 'text_encoder',
@@ -131,6 +160,10 @@ class CPUConditioner:
         require_policy(self.numerical)
         if self.guard is not None:
             self.guard()
+        if buffer_identity(self.pipe.text_encoder)!=self.buffers:
+            raise ValueError('actual native encoder rotary/buffer identity changed')
+        if config_precision(self.pipe.text_encoder)!=self.config_precision:
+            raise ValueError('actual native encoder config precision changed')
         config = self.pipe.text_encoder.config
         # Native text+vision must both remain eager; no flash/SDPA override.
         if any(getattr(c, '_attn_implementation', None) != 'eager'

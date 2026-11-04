@@ -56,6 +56,60 @@ def test_loaded_wrong_tensor_refused(tiny):
     with pytest.raises(ValueError,match='parameter differs'):
         verify_parameters(model,directory,source_dtype=torch.bfloat16,loaded_dtype=torch.bfloat16)
 
+@pytest.mark.parametrize('precision',['bfloat16','float32'])
+def test_actual_tiny_native_lazy_pread_loader_matches_original_weights_and_outputs(tiny,precision,monkeypatch):
+    from qwen_image_strict.encoder_loader import load_encoder
+    from qwen_image_strict.conditioning import frozen_state,buffer_identity,config_precision
+    import safetensors
+    from transformers import Qwen3VLForConditionalGeneration
+    model,processor,scheduler,directory=tiny
+    # Compare with the actual native mmap loader, not a model created in FP32
+    # and then .to(BF16): that cast also rounds nonpersistent rotary buffers.
+    default=torch.get_default_dtype()
+    with initialization():
+        model=Qwen3VLForConditionalGeneration.from_pretrained(directory,dtype=getattr(torch,precision),
+            device_map='cpu',attn_implementation='eager',local_files_only=True,low_cpu_mem_usage=True)
+    model.eval().requires_grad_(False)
+    native=safetensors.safe_open;backends=[]
+    def checked(*args,**kwargs):
+        backends.append(kwargs.get('backend'));assert kwargs.get('backend')=='pread'
+        return native(*args,**kwargs)
+    monkeypatch.setattr(safetensors,'safe_open',checked)
+    initial=torch.random.get_rng_state().clone()
+    loaded=load_encoder(directory,dtype=getattr(torch,precision),guard=lambda:None)
+    loaded.eval().requires_grad_(False)
+    assert torch.equal(initial,torch.random.get_rng_state())
+    assert torch.get_default_dtype()==default
+    assert backends and frozen_state(loaded)==frozen_state(model)
+    assert buffer_identity(loaded)==buffer_identity(model)
+    assert config_precision(loaded)==config_precision(model)
+    weights=verify_parameters(loaded,directory,source_dtype=torch.bfloat16,loaded_dtype=getattr(torch,precision))
+    a=CPUConditioner(model,processor,scheduler,numerical=policy(conditioning_precision=precision),weights=weights)
+    b=CPUConditioner(loaded,processor,scheduler,numerical=policy(conditioning_precision=precision),weights=weights)
+    try:
+        actual=a.encode('A blue square.');current=b.encode('A blue square.')
+        assert actual['original_identity']==current['original_identity']
+        assert actual['transport_identity']==current['transport_identity']
+    finally:a.close();b.close()
+
+def test_registered_and_plain_rotary_buffers_refused_after_change(tiny):
+    model,processor,scheduler,directory=tiny
+    weights=verify_parameters(model,directory,source_dtype=torch.bfloat16,loaded_dtype=torch.bfloat16)
+    numerical=policy(conditioning_precision='bfloat16')
+    conditioner=CPUConditioner(model,processor,scheduler,numerical=numerical,weights=weights)
+    rotary=model.model.language_model.rotary_emb
+    try:
+        rotary.original_inv_freq.add_(1)
+        with pytest.raises(ValueError,match='rotary/buffer'):conditioner.encode('A blue square.')
+    finally:conditioner.close()
+
+def test_streamed_tensor_hash_preserves_exact_header_and_payload_bytes():
+    import hashlib,json
+    for value in (torch.tensor(1000.),torch.arange(32).to(torch.bfloat16).reshape(4,8)):
+        header=json.dumps([list(value.shape),str(value.dtype)],separators=(',',':')).encode()
+        expected=hashlib.sha256(header+value.reshape(-1).view(torch.uint8).numpy().tobytes()).hexdigest()
+        assert tensor_digest(value)==expected
+
 def test_pretrained_loader_refuses_before_allocation(monkeypatch):
     import qwen_image_strict.provenance as p
     from transformers import Qwen3VLForConditionalGeneration

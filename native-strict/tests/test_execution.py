@@ -48,3 +48,11 @@ def test_actual_policy_changes_refused(change):
 def test_environment_override_refused(monkeypatch):
     monkeypatch.setenv('TORCH_ALLOW_TF32_CUBLAS_OVERRIDE','1')
     with pytest.raises(ValueError):policy(conditioning_precision='float32')
+
+def test_caller_default_dtype_is_required_and_never_changed():
+    before=torch.get_default_dtype()
+    try:
+        torch.set_default_dtype(torch.float64)
+        with pytest.raises(ValueError,match='numerical'):policy(conditioning_precision='float32')
+        assert torch.get_default_dtype()==torch.float64
+    finally:torch.set_default_dtype(before)
