@@ -39,23 +39,27 @@ def validate(options):
     execution_identity(conditioning_precision=precision)
 
 def preflight(options,request,staged):
-    if set(staged)-{'runtime','before_update','guardian'}:raise ValueError('unknown staged strict Qwen field')
+    if set(staged)-{'runtime','before_update','guardian','evaluation_pairs'}:raise ValueError('unknown staged strict Qwen field')
     for name in ('before_update','guardian'):
         if staged.get(name) is not None and not callable(staged[name]):raise ValueError(name+' must be callable')
     from .inference import check_request
     check_request(options,request)
+    from .evaluation import settings
+    settings(options,staged.get('evaluation_pairs'))
 
-def prepare(options,*,runtime=None,before_update=None,guardian=None):
+def prepare(options,*,runtime=None,before_update=None,guardian=None,evaluation_pairs=None):
     from qwen_image_sliders.contracts import formulation
     from .cache import current_records
     from .game import build_game
     from .native import StrictRuntime,observation,require_live
-    from .inference import specification,render,response
+    from .inference import specification,render
+    from .evaluation import settings,prepare as prepare_evaluation
+    selected_evaluation=settings(options,evaluation_pairs)
     validate(options)
     if runtime is None:
         runtime=StrictRuntime(options['model_dir'],conditioning_precision=options['conditioning_precision'],
             declared_prompts=options['declared_prompts'],expected_gpu_uuid=options['expected_gpu_uuid'],guard=guardian)
-    game=None
+    game=None;evaluation_rows={}
     try:
         require_live(runtime)
         from .assets import inspect_assets
@@ -72,16 +76,17 @@ def prepare(options,*,runtime=None,before_update=None,guardian=None):
         if options.get('gradient_checkpointing',True):runtime.model.enable_gradient_checkpointing()
         game=build_game(runtime,records,stamp,declared,options.get('seed',7),steps=options.get('steps',4),
             **{key:options[key] for key in ('preset','lr','d_lr_mult','prior_lr_mult','critic_kind') if key in options})
+        evaluation_rows=prepare_evaluation(runtime,game.backend,selected_evaluation)
         spec=specification(game.backend,runtime,options)
     except BaseException:
-        runtime.strict_close(game=game)
+        runtime.strict_close(game=game,evaluation_rows=evaluation_rows)
         raise
     def before(context):
         require_live(runtime)
         return before_update(context) if before_update is not None else True
-    return Binding(game,lambda:runtime.strict_close(game=game),render=lambda **kw:render(runtime,game.network,options,**kw),
-        response=lambda **kw:response(runtime,game.backend,**kw),inference=spec,before_update=before,
-        observation=lambda:observation(runtime))
+    return Binding(game,lambda:runtime.strict_close(game=game,evaluation_rows=evaluation_rows),
+        render=lambda **kw:render(runtime,game.network,options,**kw),
+        evaluation_rows=evaluation_rows,inference=spec,before_update=before,observation=lambda:observation(runtime))
 
 CAPABILITIES=Capabilities('routed_particle_gan',render=True,base_precisions=('bfloat16',),render_outputs=('latent','pil'),
     qualification='Separate strict CPU-encoder/CUDA-DiT+VAE candidate; pretrained execution and LR unqualified')
