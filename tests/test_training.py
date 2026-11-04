@@ -182,7 +182,8 @@ def test_resume_rejects_budget_drift_and_historical_ema_before_restore(tmp_path,
 
 
 def test_default_training_exports_live_parameters_without_host_ema(tmp_path, monkeypatch):
-    import particle_sliders.lifecycle as lifecycle
+    from particle_sliders import lifecycle
+
     import qwen_image_sliders.train as trainer
 
     def forbidden(*args, **kwargs):
@@ -197,8 +198,9 @@ def test_default_training_exports_live_parameters_without_host_ema(tmp_path, mon
         live = checkpoint["game"]["network"]
         # All saved adapter tensors are the exact current parameters, never
         # averages with a second history. The routed bank is also shared state.
-        assert all(any(torch.equal(value, current) for current in live.values())
-                   for value in bank_state.values())
+        assert all(
+            any(torch.equal(value, current) for current in live.values()) for value in bank_state.values()
+        )
         assert torch.equal(particles, checkpoint["game"]["prior"]["z"])
         assert meta["training"]["export"] == "raw"
         observed.append(True)

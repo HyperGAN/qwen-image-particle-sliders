@@ -212,8 +212,10 @@ def train(
                 or state.get("metadata") != meta
                 or state.get("run_config") != run_config
             ):
-                raise ValueError("resume base, objective, source, prompts or fixed training budget differs; "
-                                 "historical EMA/v2 checkpoints require their original checkout")
+                raise ValueError(
+                    "resume base, objective, source, prompts or fixed training budget differs; "
+                    "historical EMA/v2 checkpoints require their original checkout"
+                )
             if state["game"]["completed_steps"] >= stop_after:
                 raise ValueError("resume stop-after must exceed the completed checkpoint step")
             game.load_state_dict(state["game"])
