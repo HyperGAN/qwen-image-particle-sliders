@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qwen-image-strict-native-candidate"
-version = "0.1.3"
+version = "0.1.4"
 description = "Separate explicit CPU encoder / strict CUDA-BF16 DiT+VAE QwenImage21 source candidate"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"

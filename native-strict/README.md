@@ -105,3 +105,14 @@ during construction; it does not reuse an external encoder/cache assertion.
 The separate inference backend retains native requests through
 `open_inference(..., operation='response', native_request=...)`. The immutable
 earlier benchmark sources, environments and artifact receipts remain separate.
+
+Version0.1.4 accepts the common public inference `seed` argument for native
+numerical responses. The response has no stochastic sampling; default0 and
+explicit bounded integer seeds produce the same field and preserve caller RNG
+and network state. Invalid seeds and unknown response fields are refused before
+the native forward. The public factory takes no seed, so this validation occurs
+when calling the response, after opening its runtime. The regression uses actual
+`read_inference` → `open_inference(operation='response')` →
+`InferenceSession.response` with training constructors poisoned. Earlier direct
+binding checks did not qualify this public path; the v0.1.3 refusal receipt is
+retained. Full pretrained/GPU public inference remains unqualified.
