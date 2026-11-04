@@ -89,3 +89,19 @@ after a model has returned. A loader exception before it returns a model still
 requires the dedicated worker process to exit and a verified unload receipt.
 Full GPU cleanup and pretrained execution remain unqualified. The frozen
 v0.1.1 one-prompt CPU benchmark keeps its own original source and environment.
+
+Version0.1.3 uses the common cached-row `session.evaluate(index=...,
+split='train', strength=...)` contract for training sessions. Optional staged
+`evaluation_pairs={'development': {'rows': [...], 'seed': 202}}` captures
+observation-only native teachers from declared prompt strings, then prepares
+and snapshots them through the same shared adapter. Geometry, native sampler
+horizon and records per pair inherit the training configuration. Context
+tensors, caller identities, undeclared prompts and budget overrides are refused.
+Prepared teacher/OFF fields must exactly equal the native pipeline captures;
+split checkpoint identity derives from actual source, texts, seed and tensors.
+Observation rows are released with the owned binding. This adds native work
+during construction; it does not reuse an external encoder/cache assertion.
+
+The separate inference backend retains native requests through
+`open_inference(..., operation='response', native_request=...)`. The immutable
+earlier benchmark sources, environments and artifact receipts remain separate.

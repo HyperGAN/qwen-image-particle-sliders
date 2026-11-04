@@ -142,7 +142,7 @@ class StrictRuntime:
         require_live(self)
         return dict(transformer=frozen_state(self.model),vae=frozen_state(self.pipe.vae))
 
-    def strict_close(self, *, game=None, bank=None, network=None):
+    def strict_close(self, *, game=None, bank=None, network=None, evaluation_rows=None):
         import torch
         if getattr(self, '_cleanup_complete', False):
             return
@@ -189,6 +189,8 @@ class StrictRuntime:
             state={key:value for key,value in vars(game).items()
                    if key not in ('backend','provider','network','critic','prior')}
             actions.append(lambda:release_tensors(state))
+        if evaluation_rows:
+            actions.append(lambda:release_tensors(evaluation_rows))
         def allocator():
             gc.collect()
             if owned_cuda and torch.cuda.is_initialized():

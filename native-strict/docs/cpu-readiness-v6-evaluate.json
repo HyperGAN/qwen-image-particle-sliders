@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "qwen_image_strict_native_candidate-0.1.3-py3-none-any.whl": {
+      "bytes": 369795,
+      "sha256": "243bfbc5d40a760467637c7ef841e7e3e6da6797435e5db92bdaf2586556e9a5"
+    },
+    "qwen_image_strict_native_candidate-0.1.3.tar.gz": {
+      "bytes": 372434,
+      "sha256": "214bf2253fdcc336347037606b4fdd27e6f3cc405fd5cad4fabac870c5971210"
+    }
+  },
+  "changes": [
+    "remove mismatched training native-request response callback; use actual core cached-row TrainingSession.evaluate fallback",
+    "optional staged evaluation_pairs accepts declared prompt strings and seed only; all geometry/sampler horizons inherited",
+    "factory captures fresh native teachers and prepares actual shared-adapter evaluation rows; OFF/teacher fields bitwise match native pipeline captures",
+    "derive split checkpoint identity from actual base source/texts/seed/record/prepared tensors; no caller identity/context injection",
+    "release owned prepared evaluation row tensor aliases on close; unchanged native raw inference callback"
+  ],
+  "command": "CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 /ml2/particlesliders-working/lr-work/qwen-evaluate-native-venv/bin/python -m pytest -q --import-mode=importlib /ml2/particlesliders-working/lr-work/qwen-evaluate-native-dist/sdist-check/qwen_image_strict_native_candidate-0.1.3/tests",
+  "installed_environment": "/ml2/particlesliders-working/lr-work/qwen-evaluate-native-venv",
+  "previous_runtime_commit": "72b62b31793b9b5291dc9041adbde47504ea6e55",
+  "qualification": "CPU public evaluation/native software seam only. Asset/device admission stubbed only for actual tiny test factory; no mocked game/evaluate/native math. No full pretrained conditioning/memoryfit/GPU resume/render/LR/quality qualification. Frozen CPUv3/source162d/environment and prior cleanup artifacts remain separate and unchanged.",
+  "runtime_commit": "c97966b362da1732e6789eff30486fe7b35929a2",
+  "schema": "qwen-strict-public-evaluation-source-readiness-v6",
+  "source_identity": {
+    "base_commit": "7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19",
+    "core_commit": "ddb41423bcefc1fe76cd94d0f9b367353b3ea137",
+    "product_index_sha256": "267647dc79258c9206ca920501b115fdc414937bb1a928aef926a982b19e1c5d",
+    "source_lock_sha256": "7ed689f6c26965b05b8771bfaa66060cce17d6054299d7a12dd6120f3322d5a4"
+  },
+  "validation": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "CUDA_initialized": false,
+    "GPU_model_allocated": false,
+    "actual_public_session_tests": "Tiny real Qwen64 native model/shared game/public open_session/evaluate: train/dev indices+strength0,.5,1; adapter.generated bitwise; fullpacket+callerRNG unchanged; split/index/strength refusal; seed resume identity; no context injection; actual native raw callback; owned cached-row cleanup",
+    "base_source_files": 16,
+    "entry_points_per_namespace": 1,
+    "exact_runtime_distributions_verified": 12,
+    "full_CPU_pretrained_model_allocated": false,
+    "installed_CPU_seconds": 10.78,
+    "installed_wheel_tests_from_sdist_passed": 44,
+    "pip_check": "No broken requirements found.",
+    "product_sources_excluding_source_lock": 14,
+    "source_CPU_seconds": 10.14,
+    "source_CPU_tests_passed": 44,
+    "wheel_sdist_python_json_parity_files": 15
+  },
+  "version": "0.1.3"
+}
