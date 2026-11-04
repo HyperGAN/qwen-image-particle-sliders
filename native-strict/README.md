@@ -80,8 +80,9 @@ fit or authorize another pretrained load.
 Version0.1.2 separately restores the original native checkpoint function and
 instance flags when the binding closes. Cleanup attempts every owned release
 action even if a hook removal fails, and can retry failed actions. It moves
-retained response rows, conditioning, nested optimizer history and pending PG
-state to CPU without replacing their tensor aliases; interrupted native VAE
+retained parameters, registered buffers, response rows, conditioning, nested
+optimizer history and pending PG state to CPU without replacing their tensor
+aliases; interrupted native VAE
 feature caches are cleared. Unrelated live models and hooks are left alone.
 Tiny actual native/game CPU checks cover these paths and constructor failures
 after a model has returned. A loader exception before it returns a model still

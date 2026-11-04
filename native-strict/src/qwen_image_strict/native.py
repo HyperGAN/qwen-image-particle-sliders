@@ -165,7 +165,10 @@ class StrictRuntime:
         owned_cuda=any(p.device.type=='cuda' for root in owned.values() for p in root.parameters())
         for root in owned.values():
             def move(root=root):
-                release_tensors(list(root.parameters()))
+                # Module.to may replace registered buffer objects. Move their
+                # original storage first so retained aliases cannot keep CUDA
+                # allocations after the owning module's buffers are replaced.
+                release_tensors([*root.parameters(), *root.buffers()])
                 root.to('cpu')
                 for parameter in root.parameters():
                     parameter.grad=None

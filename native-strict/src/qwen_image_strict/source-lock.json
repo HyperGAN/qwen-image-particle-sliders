@@ -28,7 +28,7 @@
     "game.py": "448a8fde3c4954b553e4a05c25241561544f061ab289c09c1975e437c9e253a0",
     "inference.py": "fae7411be23c5ee0e0d0fef3cb672642194065fe3ae251722a50e6b37a2110ff",
     "lifecycle.py": "a4b6cd9f670247ca3b7d4b2dc6a190c7cdfa45bc853d73e70eca0455ac7316db",
-    "native.py": "3ebb77bbd57e2b8c6f5d61f2cbc09c3cd47e391ce41c27458249bf20f8dd785d",
+    "native.py": "83f76d1a5554f6a2c48c8bdaf4a5d213be7d7d366b6587de48a778a97e3b78ab",
     "provenance.py": "76a0c6a0b2a64ded43927ecac216dfe1d4c0177f831669c383e696d15fbd6488",
     "runtime-lock.json": "d56b0e2139d47c67edca399c0c6504917b85d2172459909dcc79be5bc929eff6"
   }

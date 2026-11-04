@@ -176,3 +176,31 @@ def test_recursive_owned_rows_preserve_aliases_and_do_not_traverse_foreign_objec
     release_tensors(values)
     assert row.target is value and row.row.neutral['embeds'] is value and values['nested'][0]['v'][0] is value
     assert foreign.value.shape==(4,) and torch.equal(latent,torch.ones_like(latent))
+
+
+def test_actual_owned_registered_buffer_alias_reached_before_module_to(monkeypatch):
+    from qwen_image_sliders.tiny import TinyRuntime
+    import qwen_image_strict.cleanup as cleanup
+    with initialization():base=TinyRuntime(41)
+    model=base.model
+    model.register_buffer('owned_alias_probe',torch.arange(4.),persistent=False)
+    retained=model.owned_alias_probe
+    external=torch.nn.Linear(2,2)
+    external.register_buffer('unrelated_buffer',torch.ones(3))
+    unrelated=external.unrelated_buffer
+    runtime=owned(base)
+    reached=[];release=cleanup.release_tensors
+    def track(value,seen=None):
+        if isinstance(value,torch.Tensor):reached.append(id(value))
+        return release(value,seen)
+    monkeypatch.setattr(cleanup,'release_tensors',track)
+    original_to=model.to
+    def move(*args,**kwargs):
+        assert id(retained) in reached,'registered-buffer alias must transfer before Module.to can replace it'
+        return original_to(*args,**kwargs)
+    monkeypatch.setattr(model,'to',move)
+    rng=torch.random.get_rng_state().clone()
+    runtime.strict_close()
+    assert id(retained) in reached and torch.equal(retained,torch.arange(4.))
+    assert external.unrelated_buffer is unrelated and id(unrelated) not in reached
+    assert torch.equal(rng,torch.random.get_rng_state()) and not torch.cuda.is_initialized()
