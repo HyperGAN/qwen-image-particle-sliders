@@ -1,0 +1,62 @@
+# Qwen-Image 2.1 strict native candidate
+
+This separate opt-in package prepares current native learning-rate experiments.
+The release package, historical checkpoints and closed HNDL cohorts retain their
+original source and installation routes. No pretrained execution or rate is
+qualified by the CPU evidence for this candidate.
+
+Two explicit profiles retain distinct numerical identities:
+
+| CPU encoder | DiT and VAE | Profile |
+| --- | --- | --- |
+| BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-bf16-encoder-cuda-bf16-dit-vae-math-v1` |
+| FP32 from original BF16 weights; native hidden output explicitly rounded to BF16 | CUDA BF16, math SDPA | `qwen-image21-cpu-fp32-encoder-rounded-bf16-cuda-bf16-dit-vae-math-v1` |
+
+FP32 conditioning does not claim identical output to BF16 conditioning. Each
+factory verifies all original assets, loads and checks every actual CPU encoder
+parameter against the declared cast, encodes only declared texts with the
+unmodified native pipeline, releases the encoder, then loads and verifies the
+owned CUDA DiT and VAE. Keeping the VAE on CUDA preserves the native pipeline's
+execution-device selection, sampler and decoder. Source FP32 VAE weights are
+explicitly cast to the canonical CUDA BF16 precision.
+
+Current source pins are base `7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19`, core
+`ddb41423bcefc1fe76cd94d0f9b367353b3ea137`, official ParticleGAN 0.9.4, and
+Diffusers `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458`. The source and runtime
+closures refuse changed implementation bytes before native allocation.
+
+The native response is `[1,64,1,32,32]` at 512 pixels, with 4096-wide native text
+conditioning. Each row retains its actual full-prefix length. The existing
+product bank supplies 128 four-dimensional particles and the shared PG game
+owns all GAN math and optimizer/checkpoint behavior. Generator, critic and bank
+rates use `lr`, `d_lr_mult` and `prior_lr_mult`; EMA defaults to disabled.
+
+The proposed unmeasured GPU window is 24 GiB total/23 GiB allocator with a 5 GiB
+global floor. The DiT plus BF16 VAE weight floor is approximately 13.882 GiB;
+training/decoder peaks remain unknown. CPU FP32 encoder staging alone has a
+32.66 GiB parameter floor. A separately reviewed first CPU benchmark requires
+48 GiB process RSS, at least 72 GiB host availability at admission, a 24 GiB host
+floor, four CPU threads, no CUDA, and exactly one prompt. These are resource
+policies, not measured fit guarantees or authorization to launch.
+
+Strict policy requires deterministic errors, highest matmul precision, TF32 and
+reduced-precision reductions disabled, deterministic cuDNN, math-only Torch
+SDPA and the actual native Diffusers dispatch function. Every native forward
+and update rechecks caller flags. Initialization scopes the CPU generator and
+only the owned CUDA generator, restoring caller RNG without global seeding.
+
+Native inference accepts numerical responses and native latent/RGBA rendering;
+it constructs no teacher rows or game. Full pretrained response/render/resume
+qualification remains pending. An artifact requires its exact exported source,
+precision profile and declared prompt set; training cache receipts are never
+used as substitutes for fresh current native parity.
+
+For bounded CPU checks, use the pinned independent environment:
+
+```bash
+CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 \
+  python -m pytest -q tests
+```
+
+The first random-weight native encoder tests use the already staged canonical
+processor/tokenizer metadata. They do not open pretrained weight payloads.
