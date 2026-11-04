@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 import torch
-from particle_sliders.lifecycle import EMA, advance, atomic_save
+from particle_sliders.lifecycle import advance, atomic_save
 from particle_sliders.pg09 import ConditionalPG09
 from particle_sliders.pg09_backends import ResponseRow
 from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
@@ -121,23 +121,6 @@ def step_context(game):
     return advance(game)
 
 
-def _validate_ema(state, bank, particles):
-    expected = bank.state_dict()
-    if not isinstance(state, dict) or state.keys() != expected.keys():
-        raise ValueError("resume EMA keys differ")
-    for key, value in {**state, "particles": particles}.items():
-        wanted = expected.get(key)
-        if key == "particles":
-            wanted = bank.layers[0].up.weight.new_empty(bank.particle_shape)
-        if (
-            not isinstance(value, torch.Tensor)
-            or value.shape != wanted.shape
-            or value.dtype != wanted.dtype
-            or not torch.isfinite(value).all()
-        ):
-            raise ValueError("resume EMA tensor schema or values differ")
-
-
 def train(
     runtime,
     rows,
@@ -222,46 +205,35 @@ def train(
                 }
             )
         )
-        decay = float(stamp.spec["ema"])
-        cloud = torch.nn.ParameterDict({"particles": game.backend.particles})
-        bank_ema, cloud_ema = EMA(bank, decay), EMA(cloud, decay)
-        ema, ema_particles = bank_ema.values, cloud_ema.values["particles"]
         if resume:
             state = torch.load(resume, map_location=game.device, weights_only=True)
             if (
-                state.get("schema") != "qwen-native-pg09-training-v2"
+                state.get("schema") != "qwen-native-pg09-training-v3"
                 or state.get("metadata") != meta
                 or state.get("run_config") != run_config
             ):
-                raise ValueError("resume base, objective, source, prompts or fixed training budget differs")
-            _validate_ema(state["ema"], bank, state["ema_particles"])
+                raise ValueError(
+                    "resume base, objective, source, prompts or fixed training budget differs; "
+                    "historical EMA/v2 checkpoints require their original checkout"
+                )
             if state["game"]["completed_steps"] >= stop_after:
                 raise ValueError("resume stop-after must exceed the completed checkpoint step")
             game.load_state_dict(state["game"])
-            bank_ema.load_state_dict(bank, {"decay": decay, "values": state["ema"]})
-            cloud_ema.load_state_dict(
-                cloud, {"decay": decay, "values": {"particles": state["ema_particles"]}}
-            )
-            ema, ema_particles = bank_ema.values, cloud_ema.values["particles"]
         outdir = Path(outdir)
         outdir.mkdir(parents=True, exist_ok=True)
         stats = None
         while game.completed_steps < stop_after:
             stats = step_context(game)
-            bank_ema.update(bank)
-            cloud_ema.update(cloud)
             with (outdir / "train.jsonl").open("a") as stream:
                 stream.write(json.dumps(stats) + "\n")
             print(json.dumps(stats), flush=True)
         atomic_save(
             outdir / "training.pt",
             {
-                "schema": "qwen-native-pg09-training-v2",
+                "schema": "qwen-native-pg09-training-v3",
                 "metadata": meta,
                 "run_config": run_config,
                 "game": game.state_dict(),
-                "ema": ema,
-                "ema_particles": ema_particles,
             },
         )
         exported = {
@@ -269,15 +241,15 @@ def train(
             "training": {
                 **run_config,
                 "completed_steps": game.completed_steps,
-                "export": "EMA",
-                "ema": decay,
+                "export": "raw",
+                "ema": None,
                 "normalization_records": game.normalization_records,
                 "controls_excluded_from_normalization": True,
                 "response_scale": game.response_scale,
                 "recipe": game.state_dict()["config"]["recipe"],
             },
         }
-        save_adapter(outdir / "adapter.safetensors", ema, ema_particles, exported)
+        save_adapter(outdir / "adapter.safetensors", bank.state_dict(), game.backend.particles, exported)
         (outdir / "run.json").write_text(json.dumps({"metadata": exported, "last": stats}, indent=2) + "\n")
         return exported
     finally:

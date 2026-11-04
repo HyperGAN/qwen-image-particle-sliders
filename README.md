@@ -14,7 +14,7 @@ using `QwenImage21Pipeline` and the pinned shared
 The training CLI executes the installed shared `ConditionalPG09` game with released
 ParticleGAN **0.9.4** and the native `QwenImage21ResponseAdapter`. It trains the actual
 hooked routed maps and 128x4 particle bank on native spatial VAE velocity fields.
-Inference uses the same EMA maps/particles and the native Qwen pipeline at strengths
+Inference uses the same raw trained maps/particles and the native Qwen pipeline at strengths
 **0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
 copied GAN engine.
 
@@ -141,9 +141,11 @@ install `.[hndl]` and choose `--critic hndl`. It is a separate checkpoint archit
 See [FORMULATION.md](FORMULATION.md) for the native response and shared game contract.
 
 `train.jsonl` can be tailed. `adapter.safetensors` and its JSON sidecar contain the
-EMA routed maps/particles and strict provenance. `training.pt` contains the shared game's raw maps, actual particles, critic,
+raw trained routed maps/particles and strict provenance. `training.pt` contains the shared game's raw maps, actual particles, critic,
 optimizers, penalty/prior state, independent RNG streams and balanced sampler state,
-plus the EMA maps and particles. The new v2 format rejects former gmix artifacts.
+without extra EMA state. New v3 training checkpoints reject historical EMA/v2 and
+former gmix training packets; reproduce those with their original checkout. Existing EMA inference artifacts retain their original format and source-pinned
+reader; use their original checkout.
 Installed API source hashes and the actual recipe are recorded; an objective/source
 change requires a new cohort.
 
@@ -156,7 +158,7 @@ qwen-slider-train <original options> --steps 1600 \
   --resume /ml2/qwen-sliders/warm-light/training.pt --outdir /ml2/qwen-sliders/warm-light
 ```
 
-CPU tests compare every checkpoint field and EMA export for uninterrupted versus
+CPU tests compare every checkpoint field and raw export for uninterrupted versus
 resumed updates under both PG presets. This does not establish equivalence across
 hardware or runtime changes. Resume uses `weights_only=True`; inference uses
 safetensors. The former CUDA proof is retained as historical evidence only.

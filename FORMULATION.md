@@ -44,14 +44,19 @@ Training uses a fixed `--steps` recipe budget. `--stop-after` writes a resumable
 checkpoint before that budget is exhausted; resume retains the same budget and
 configuration. The shared checkpoint binds recipe, all native rows/conditions,
 source/runtime/model identity, optimizer and penalty state, row coverage and RNG.
-The product additionally validates its EMA state before restoring the game.
+The current product trainer adds no host EMA or learning-rate schedule. Both
+selected upstream presets disable EMA and keep effective learning rates constant;
+the historical architecture stamp does not override either behavior.
 
-EMA safetensors exports remain separate from raw resumable checkpoints. Inference
+Raw safetensors exports contain the exact trained adapter and particle parameters,
+separate from full resumable checkpoints. Inference
 loads the exported maps and particles into the same hooked bank, then uses the
 native Qwen pipeline. Strength zero bypasses each hook exactly; positive strength
 adds that fraction of the nonlinear residual. This is not an ordinary LoRA.
 
-The new artifact/protocol format is v2. Older gmix/sketch artifacts and checkpoints
-are rejected rather than relabeled. Historical CUDA measurements in this repository
+The inference artifact/protocol remains v2; new raw-only training checkpoints use
+`qwen-native-pg09-training-v3`. Historical EMA/v2 training packets require their
+original source checkout, as do old source-pinned inference artifacts. Older
+gmix/sketch artifacts and checkpoints are rejected rather than relabeled. Historical CUDA measurements in this repository
 belong to the former pinned implementation. New PG0.9.4 pretrained/GPU, full sampler,
 quality and convergence acceptance remain unqualified.
