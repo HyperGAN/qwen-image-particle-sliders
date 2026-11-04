@@ -183,3 +183,7 @@ It never downloads base weights. Real-model acceptance checks remain in
 [docs/real-model-validation.md](docs/real-model-validation.md).
 
 Learning-rate controls and preserved defaults: [LEARNING-RATES.md](LEARNING-RATES.md).
+
+A separate [strict staged native candidate](native-strict/README.md) prepares
+CPU encoder conditioning followed by CUDA BF16 DiT+VAE experiments. Its source
+and tiny CPU checks do not qualify pretrained execution or learning rates.
