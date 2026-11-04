@@ -1,0 +1,52 @@
+{
+  "artifacts": {
+    "qwen_image_strict_native_candidate-0.1.2-py3-none-any.whl": {
+      "bytes": 367619,
+      "sha256": "815ae37d892288f8435ff00502b6c5137b9219777296961c1a25642f8039deff"
+    },
+    "qwen_image_strict_native_candidate-0.1.2.tar.gz": {
+      "bytes": 368513,
+      "sha256": "ed5d3dd75a764b0d65b86cc62252a2329dffde08b0b0b745ff265e76cd7cde4c"
+    }
+  },
+  "changes": [
+    "restore exact original native checkpoint hook/function and instance ownership before releasing owned model",
+    "move retained prepared rows/conditioning and nested optimizer/pending PG state to CPU preserving aliases",
+    "clear interrupted native VAE feature caches and move retained cached aliases to CPU",
+    "attempt all independent owned cleanup actions; report failures and permit retry",
+    "own returned partial native model before eval/verification; dedicate process exit for exceptions inside a library loader before it returns",
+    "sdist includes conftest and source-closure tools",
+    "move actual owned registered buffers in place BEFORE Module.to can replace registered objects, preserving retained buffer aliases; unrelated objects are not traversed"
+  ],
+  "command": "CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 /ml2/particlesliders-working/lr-work/qwen-cleanup-buffer-venv/bin/python -m pytest -q --import-mode=importlib /ml2/particlesliders-working/lr-work/qwen-cleanup-buffer-dist/sdist-check/qwen_image_strict_native_candidate-0.1.2/tests",
+  "immutable_CPU_benchmark_source": "162d44ff642a758f9f7c859a612d6a7f14a89ad6",
+  "installed_environment": "/ml2/particlesliders-working/lr-work/qwen-cleanup-buffer-venv",
+  "preserved_prior_readiness_receipt": "cpu-readiness-v4-cleanup.json",
+  "previous_runtime_commit": "e8284762b4ba8da83c47ca6b76bb79d790ce77ce",
+  "qualification": "CPU source/ownership readiness only. No pretrained memory fit, GPU cleanup/resume/render, rate or image-quality qualification. The immutable v0.1.1 CPU benchmark/source/environment remains separate; no previous packets/cohorts are relabelled.",
+  "runtime_commit": "72b62b31793b9b5291dc9041adbde47504ea6e55",
+  "schema": "qwen-image-strict-native-source-buffer-cleanup-readiness-v5",
+  "source_identity": {
+    "base_commit": "7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19",
+    "core_commit": "ddb41423bcefc1fe76cd94d0f9b367353b3ea137",
+    "product_index_sha256": "80a2fe724673708a5cff1cff1da37e5b5b32ac91b20ee1f9d6084d05a48212cd",
+    "source_lock_sha256": "f4e64f33893bcd8cfb12d758abf7ecf60818b46ce8f06aa7fd21c68b3a5aa5c3"
+  },
+  "validation": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "CUDA_initialized": false,
+    "GPU_model_allocated": false,
+    "base_source_files": 16,
+    "entry_points_per_namespace": 1,
+    "exact_runtime_distributions_verified": 12,
+    "focused_cleanup_source_tests_passed": 8,
+    "focused_cleanup_source_tests_seconds": 4.1,
+    "full_CPU_pretrained_model_allocated": false,
+    "installed_tests_seconds": 9.61,
+    "installed_wheel_tests_from_sdist_passed": 35,
+    "pip_check": "No broken requirements found.",
+    "product_sources_excluding_source_lock": 13,
+    "wheel_sdist_python_json_parity_files": 14
+  },
+  "version": "0.1.2"
+}

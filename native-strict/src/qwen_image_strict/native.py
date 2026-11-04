@@ -11,6 +11,7 @@ from .assets import inspect_assets
 from .conditioning import CPUConditioner, verify_parameters, encoding_identity, frozen_state
 from .execution import admission, initialization, pixels, prompts, require_host, require_policy
 from .provenance import execution_identity
+from .cleanup import attempt_all, checkpoint_restore, release_tensors
 
 
 def require_live(runtime):
@@ -49,6 +50,8 @@ class StrictRuntime:
         if guard is None or not callable(guard):
             raise ValueError('strict native construction needs an active resource/lifetime guardian')
         self.guard, self.closed, self.handles, self.pipe = guard, False, [], None
+        self._cleanup_complete = False
+        self._checkpoint_restore = None
         self.device = torch.device('cuda:0')
         declared_prompts = prompts(declared_prompts)
         # Exact source, full selected asset hashes and CPU policy precede both
@@ -78,14 +81,14 @@ class StrictRuntime:
             with torch.cuda.device(0), initialization(device='cuda:0'):
                 model = QwenImage21Transformer2DModel.from_pretrained(directory/'transformer',
                     torch_dtype=torch.bfloat16, device_map='cuda:0', local_files_only=True, low_cpu_mem_usage=True)
-                model.eval().requires_grad_(False)
                 self._partial_model = model
+                model.eval().requires_grad_(False)
                 self.transformer_weights = verify_parameters(model, directory/'transformer', source_dtype=torch.bfloat16,
                     loaded_dtype=torch.bfloat16, device='cuda:0')
                 vae = AutoencoderKLQwenImage21.from_pretrained(directory/'vae',torch_dtype=torch.bfloat16,
                     device_map='cuda:0',local_files_only=True,low_cpu_mem_usage=True)
-                vae.eval().requires_grad_(False)
                 self._partial_vae = vae
+                vae.eval().requires_grad_(False)
                 self.vae_weights = verify_parameters(vae, directory/'vae',source_dtype=torch.float32,
                     loaded_dtype=torch.bfloat16,device='cuda:0')
                 self.pipe = QwenImage21Pipeline(vae=vae, text_encoder=None, processor=processor,
@@ -93,6 +96,10 @@ class StrictRuntime:
                 self.pipe.set_progress_bar_config(disable=True)
                 if self.pipe.config.sample_sigmas is not None:
                     raise ValueError('base native scheduler required')
+            # The shared response adapter replaces the native checkpoint hook
+            # once lifecycle preparation enables it. Retain the original flags
+            # and exact instance ownership before either operation.
+            self._checkpoint_restore = checkpoint_restore(model)
             self.base_identity = dict(execution=self.strict_execution, assets=self.strict_assets,
                 conditioning=self.conditioning_identity, encoder_weights=self.encoder_weights,
                 transformer_weights=self.transformer_weights, vae_weights=self.vae_weights,
@@ -102,9 +109,7 @@ class StrictRuntime:
             for root in (self.model, self.pipe.vae, *self.model.transformer_blocks):
                 self.handles.append(root.register_forward_pre_hook(lambda *_: require_live(self)))
         except BaseException:
-            if encoder is not None:
-                encoder.close()
-            self.strict_close()
+            attempt_all(([encoder.close] if encoder is not None else []) + [self.strict_close])
             raise
 
     @property
@@ -139,39 +144,62 @@ class StrictRuntime:
 
     def strict_close(self, *, game=None, bank=None, network=None):
         import torch
-        if self.closed:
+        if getattr(self, '_cleanup_complete', False):
             return
         self.closed=True
-        for handle in self.handles:
-            handle.remove()
-        self.handles.clear()
+        actions = [handle.remove for handle in reversed(self.handles)]
+        if self._checkpoint_restore is not None:
+            actions.append(self._checkpoint_restore)
         if game is not None:
             bank=game.backend.adapter
         if bank is not None:
-            bank.close()
+            actions.append(bank.close)
         roots=[getattr(self,'_partial_model',None),getattr(self,'_partial_vae',None)]
         if self.pipe is not None:
             roots.extend((self.pipe.transformer,self.pipe.vae))
         if game is not None:
-            roots.extend((game.network,game.critic))
+            roots.extend((game.network,game.critic,game.prior))
         roots.extend((bank,network))
-        with torch.no_grad():
-            for root in {id(x):x for x in roots if isinstance(x,torch.nn.Module)}.values():
+        owned={id(x):x for x in roots if isinstance(x,torch.nn.Module)}
+        vaes={id(x) for x in (getattr(self,'_partial_vae',None),getattr(self.pipe,'vae',None)) if x is not None}
+        owned_cuda=any(p.device.type=='cuda' for root in owned.values() for p in root.parameters())
+        for root in owned.values():
+            def move(root=root):
+                # Module.to may replace registered buffer objects. Move their
+                # original storage first so retained aliases cannot keep CUDA
+                # allocations after the owning module's buffers are replaced.
+                release_tensors([*root.parameters(), *root.buffers()])
                 root.to('cpu')
                 for parameter in root.parameters():
                     parameter.grad=None
-            if game is not None:
-                # Optimizer states retain CUDA tensors even after modules move.
-                for value in vars(game).values():
-                    if isinstance(value,torch.optim.Optimizer):
-                        for state in value.state.values():
-                            for key,tensor in state.items():
-                                if isinstance(tensor,torch.Tensor):state[key]=tensor.cpu()
-            for root in roots:
-                rope=getattr(root,'pos_embed',None)
-                if rope is not None and hasattr(rope,'freqs'):
-                    rope.freqs=[value.cpu() if isinstance(value,torch.Tensor) else value for value in rope.freqs]
+            actions.append(move)
+            # Qwen VAE decode clears these caches only on a successful forward.
+            if id(root) in vaes and callable(getattr(root,'clear_cache',None)):
+                actions.append(lambda root=root:release_tensors(
+                    {key:getattr(root,key,None) for key in ('_feat_map','_enc_feat_map')}))
+                actions.append(root.clear_cache)
+            rope=getattr(root,'pos_embed',None)
+            if rope is not None and hasattr(rope,'freqs'):
+                actions.append(lambda rope=rope:release_tensors(rope.freqs))
+        if game is not None:
+            # PreparedResponse/ResponseRow fields, targets, conditions, pending
+            # optimizer constraints and nested history may outlive the binding.
+            # Preserve tensor/Parameter aliases while releasing their storage.
+            game._failed=True
+            state={key:value for key,value in vars(game).items()
+                   if key not in ('backend','provider','network','critic','prior')}
+            actions.append(lambda:release_tensors(state))
+        def allocator():
+            gc.collect()
+            if owned_cuda and torch.cuda.is_initialized():
+                # Only the owned device; selected-device context and RNG remain
+                # unchanged, and unrelated live model tensors are untouched.
+                with torch.cuda.device(self.device):
+                    torch.cuda.empty_cache()
+        actions.append(allocator)
+        attempt_all(actions)
+        self.handles.clear()
+        self._checkpoint_restore=None
         self.pipe=None
         self._partial_model=self._partial_vae=None
-        gc.collect()
-        # No empty_cache/set_device: unrelated caller-owned CUDA state is untouched.
+        self._cleanup_complete=True

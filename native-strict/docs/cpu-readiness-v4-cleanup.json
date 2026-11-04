@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "qwen_image_strict_native_candidate-0.1.2-py3-none-any.whl": {
+      "bytes": 367507,
+      "sha256": "f8b76bc6029185e7328ddcb1d2a1aa00db4c63635be87540e58f90c8a485fe45"
+    },
+    "qwen_image_strict_native_candidate-0.1.2.tar.gz": {
+      "bytes": 368156,
+      "sha256": "f4743315973bc2631340ffbecc5ca17453b54773f50b5853cbb1fdf5fffd73cc"
+    }
+  },
+  "changes": [
+    "restore exact original native checkpoint hook/function and instance ownership before releasing owned model",
+    "move retained prepared rows/conditioning and nested optimizer/pending PG state to CPU preserving aliases",
+    "clear interrupted native VAE feature caches and move retained cached aliases to CPU",
+    "attempt all independent owned cleanup actions; report failures and permit retry",
+    "own returned partial native model before eval/verification; dedicate process exit for exceptions inside a library loader before it returns",
+    "sdist includes conftest and source-closure tools"
+  ],
+  "command": "CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 /ml2/particlesliders-working/lr-work/qwen-cleanup-venv/bin/python -m pytest -q --import-mode=importlib /ml2/particlesliders-working/lr-work/qwen-cleanup-final-dist/sdist-check/qwen_image_strict_native_candidate-0.1.2/tests",
+  "installed_environment": "/ml2/particlesliders-working/lr-work/qwen-cleanup-venv",
+  "previous_runtime_commit": "162d44ff642a758f9f7c859a612d6a7f14a89ad6",
+  "qualification": "CPU source/ownership readiness only. No pretrained memory fit, GPU cleanup/resume/render, rate or image-quality qualification. The immutable v0.1.1 CPU benchmark/source/environment remains separate; no previous packets/cohorts are relabelled.",
+  "runtime_commit": "e8284762b4ba8da83c47ca6b76bb79d790ce77ce",
+  "schema": "qwen-image-strict-native-source-cleanup-readiness-v4",
+  "source_identity": {
+    "base_commit": "7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19",
+    "core_commit": "ddb41423bcefc1fe76cd94d0f9b367353b3ea137",
+    "product_index_sha256": "c4680bb3ae191c9861b2569329749db95209b0dc607b24465dc5cc6ef4c44a66",
+    "source_lock_sha256": "78eca549aad754d52976d920cf18f8e7d2f4f8cfe25035a24453b79c8d7c6869"
+  },
+  "validation": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "CUDA_initialized": false,
+    "GPU_model_allocated": false,
+    "base_source_files": 16,
+    "entry_points_per_namespace": 1,
+    "exact_runtime_distributions_verified": 12,
+    "full_CPU_pretrained_model_allocated": false,
+    "installed_tests_seconds": 13.1,
+    "installed_wheel_tests_from_sdist_passed": 34,
+    "pip_check": "No broken requirements found.",
+    "product_sources_excluding_source_lock": 13,
+    "source_CPU_tests_passed": 34,
+    "source_CPU_tests_seconds": 8.81,
+    "wheel_sdist_python_json_parity_files": 14
+  },
+  "version": "0.1.2"
+}
