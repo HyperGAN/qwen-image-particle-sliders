@@ -1,21 +1,28 @@
 {
-  "backend": "qwen",
-  "cohort": "qwen-new-owned-run",
-  "options": {
-    "steps": 128,
-    "device": "cuda:0",
-    "model_dir": "/path/to/staged/model",
-    "rows": [
-      {
-        "neutral": "A woman with neat hair.",
-        "positive": "A woman with wild spiky hair."
-      },
-      {
-        "neutral": "A man with neat hair.",
-        "positive": "A man with wild spiky hair."
-      }
-    ],
-    "height": 512,
-    "width": 512
+  "schema": "particle-slider-train-v1",
+  "profile": "training_profile.json",
+  "training": {
+    "backend": "qwen",
+    "cohort": "qwen-new-owned-run",
+    "options": {
+      "steps": 128,
+      "device": "cuda:0",
+      "model_dir": "/path/to/staged/model",
+      "rows": [
+        {
+          "neutral": "A woman with neat hair.",
+          "positive": "A woman with wild spiky hair."
+        },
+        {
+          "neutral": "A man with neat hair.",
+          "positive": "A man with wild spiky hair."
+        }
+      ],
+      "height": 512,
+      "width": 512
+    }
+  },
+  "execution": {
+    "runner": "local"
   }
 }
