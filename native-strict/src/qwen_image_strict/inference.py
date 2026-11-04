@@ -43,10 +43,11 @@ def render(runtime,network,options,*,prompt,strength,seed,images=None,**native):
     with observation(runtime),network.scaled(strength):
         return runtime.sample(runtime.encode(prompt),seed=seed,**defaults)
 
-def response(runtime,adapter,*,strength,prompt,latent,timestep,**unused):
+def response(runtime,adapter,*,strength,prompt,latent,timestep,seed=0,**unused):
     import torch
     from .native import observation
     from qwen_image_sliders.train import _condition
+    if type(seed) is not int or not 0<=seed<2**63-100:raise ValueError('bounded native response seed required')
     if unused:raise ValueError('unknown numerical response argument')
     check_request(dict(declared_prompts=runtime.conditioning),dict(operation='response',native=dict(prompt=prompt,latent=latent,timestep=timestep)))
     with observation(runtime),torch.no_grad(),adapter.network.scaled(strength):

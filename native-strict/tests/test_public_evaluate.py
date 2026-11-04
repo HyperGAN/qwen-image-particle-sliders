@@ -155,3 +155,58 @@ def test_actual_raw_inference_callback_keeps_native_request_contract(public_fact
         actual=bound.response(strength=.5,prompt=TRAIN[0]['neutral'],latent=latent,timestep=timestep)
         assert calls and torch.equal(actual,expected)
     finally:handle.remove();bound.close()
+
+
+def test_actual_public_read_open_response_seed_contract_state_RNG_and_no_training(public_factory,monkeypatch,tmp_path):
+    from particle_sliders.inference import read_inference,open_inference
+    from particle_sliders.pg09 import _hash
+    from qwen_image_strict import inference,native,cache,game,lifecycle,evaluation
+    from particle_sliders import pg09,pg09_readout_critic
+    # Explicit tiny native CPU fixture admission only. Public serialization,
+    # factory, native readout, AdapterBank and observation transactions are real.
+    monkeypatch.setattr(inference,'validate',lambda *a:None)
+    backend=replace(inference.BACKEND,validate=inference.validate)
+    monkeypatch.setattr(inference,'BACKEND',backend)
+    make,runtime_factory=public_factory;runtime,session=make()
+    artifact=tmp_path/'native-raw.pt'
+    try:
+        session.step();expected=session.evaluate(0,strength=.5,seed=7)
+        row=session.game.rows[0].row
+        request=dict(prompt=TRAIN[0]['neutral'],latent=row.latent.detach().clone(),timestep=row.timestep.detach().clone())
+        session.export_inference(artifact,selection='raw')
+    finally:session.close()
+    packet=read_inference(artifact);packet_before=_hash(packet)
+    fresh=runtime_factory();monkeypatch.setattr(native,'StrictRuntime',lambda *a,**k:fresh)
+    def forbidden(*a,**k):raise AssertionError('public inference reached training construction')
+    for module,name in [(cache,'capture'),(cache,'current_records'),(game,'build_game'),(lifecycle,'prepare'),(evaluation,'prepare'),
+        (pg09.ConditionalPG09,'__init__'),(pg09_readout_critic.ConditionalReadoutCritic,'__init__')]:
+        monkeypatch.setattr(module,name,forbidden)
+    calls=[];handle=fresh.model.register_forward_hook(lambda *a:calls.append(True))
+    try:
+        with open_inference(packet,backend=backend,operation='response',native_request=request,
+                options=dict(model_dir='/CPU-fixture',expected_gpu_uuid='GPU-72c1b506-891d-b8bc-b353-e020585e1c47')) as loaded:
+            before=_hash(loaded.binding.network.state_dict());base_before=_hash(fresh.model.state_dict())
+            rng=torch.random.get_rng_state().clone()
+            for seed in (None,0,7,19,2**63-101):
+                options={} if seed is None else dict(seed=seed)
+                actual=loaded.response(**request,strength=.5,**options)
+                assert calls and torch.equal(actual,expected)
+                assert _hash(loaded.binding.network.state_dict())==before and _hash(fresh.model.state_dict())==base_before
+                assert torch.equal(torch.random.get_rng_state(),rng)
+            count=len(calls)
+            for bad in (True,-1,2**63-100):
+                # Core rejects bool while setting its scoped RNG before the
+                # product callback; the product itself rejects all five bad
+                # seed types/ranges below before any native forward.
+                with pytest.raises((ValueError,RuntimeError)):loaded.response(**request,seed=bad)
+            with pytest.raises(ValueError):loaded.response(**request,unexpected=True)
+            assert len(calls)==count
+            assert _hash(loaded.binding.network.state_dict())==before and _hash(fresh.model.state_dict())==base_before
+            assert torch.equal(torch.random.get_rng_state(),rng) and _hash(packet)==packet_before
+    finally:handle.remove()
+
+
+@pytest.mark.parametrize('seed',[True,1.0,None,-1,2**63-100])
+def test_bad_native_response_seed_refuses_before_forward(seed):
+    from qwen_image_strict.inference import response
+    with pytest.raises(ValueError,match='seed'):response(None,None,strength=1.,prompt='',latent=None,timestep=None,seed=seed)
