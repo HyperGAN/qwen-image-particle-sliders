@@ -32,3 +32,19 @@ def test_active_diffusers_dispatch_is_bound(monkeypatch):
     active,fn=old()
     monkeypatch.setattr(d._AttentionBackendRegistry,'get_active_backend',lambda:(active,lambda *a:None))
     with pytest.raises(ValueError,match='dispatch'):policy(conditioning_precision='float32')
+
+@pytest.mark.parametrize('change', [
+    lambda:torch.use_deterministic_algorithms(True,warn_only=True),
+    lambda:torch.set_float32_matmul_precision('high'),
+    lambda:setattr(torch.backends.cudnn,'benchmark',True),
+    lambda:setattr(torch.backends.cuda.matmul,'allow_bf16_reduced_precision_reduction',True),
+    lambda:torch.backends.cuda.enable_flash_sdp(True),
+    lambda:torch.set_num_threads(3),
+])
+def test_actual_policy_changes_refused(change):
+    change()
+    with pytest.raises(ValueError,match='numerical'):policy(conditioning_precision='float32')
+
+def test_environment_override_refused(monkeypatch):
+    monkeypatch.setenv('TORCH_ALLOW_TF32_CUBLAS_OVERRIDE','1')
+    with pytest.raises(ValueError):policy(conditioning_precision='float32')

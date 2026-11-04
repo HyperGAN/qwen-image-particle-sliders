@@ -52,8 +52,11 @@ def verify_sources():
 
 def selected_files(dist, package):
     if package == "torch":
-        return [f for f in dist.files or () if str(f) in {
-            "torch/__init__.py", "torch/lib/libtorch_cuda.so", "torch/lib/libc10_cuda.so"}]
+        # CPU conditioning executes libtorch_cpu and the Python dispatcher too.
+        # Bind all Torch Python/native implementation files, including versioned
+        # OpenMP libraries, rather than reusing a CUDA-only library inventory.
+        return [f for f in dist.files or () if str(f).startswith('torch/') and
+                (str(f).endswith('.py') or str(f).startswith('torch/lib/') or str(f).endswith('.so'))]
     return [f for f in dist.files or () if str(f).startswith((package + "/", package + ".libs/"))
             and (str(f).endswith(".py") or str(f).endswith(".so"))]
 

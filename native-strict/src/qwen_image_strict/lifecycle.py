@@ -58,6 +58,14 @@ def prepare(options,*,runtime=None,before_update=None,guardian=None):
     game=None
     try:
         require_live(runtime)
+        from .assets import inspect_assets
+        from .provenance import execution_identity
+        expected_assets=inspect_assets(options['model_dir'],full_hashes=False)
+        expected_assets['full_weight_hashes_verified']=True
+        if (runtime.strict_execution!=execution_identity(conditioning_precision=options['conditioning_precision'])
+                or runtime.strict_assets!=expected_assets
+                or set(runtime.conditioning)!=set(options['declared_prompts'])):
+            raise ValueError('staged strict runtime source/precision/assets/declared conditioning differs')
         records,cache_identity=current_records(runtime,options)
         runtime.current_cache_identity=cache_identity
         stamp,declared=formulation(batch=options.get('batch',2),lr=options.get('lr'))

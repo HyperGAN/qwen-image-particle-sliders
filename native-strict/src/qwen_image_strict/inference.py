@@ -68,6 +68,8 @@ def validate(options,spec):
         raise ValueError('strict inference original assets/protocol differs before allocation')
     if spec.identity['model'].get('execution')!=profile['execution'] or spec.identity['model'].get('assets')!=profile['assets']:
         raise ValueError('strict inference base identity differs before allocation')
+    if set(spec.identity['model'].get('conditioning',{}))!=set(profile['declared_prompts']):
+        raise ValueError('strict inference declared conditioning differs before allocation')
 
 def preflight(options,request,spec):
     check_request(spec.configuration,request)
