@@ -1,4 +1,4 @@
-"""Run S081 tests against a non-editable installed wheel, outside the checkout."""
+"""Run canonical PG094 tests against a non-editable installed wheel, outside the checkout."""
 
 import json
 import subprocess

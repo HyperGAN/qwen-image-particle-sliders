@@ -1,6 +1,6 @@
 """Build a separate candidate profile from a verified core wheel/public commit.
 
-The default pyproject and S081 source tree are never rewritten. The resulting
+The default pyproject and canonical source tree are never rewritten. The resulting
 distinct prerelease wheel binds one exact reviewed core and registers only qwen-hndl.
 Default/public promotion is a separate review; --public-core verifies live sources.
 """
@@ -116,7 +116,9 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     changes = {
         original: "particle-sliders-core[hypergan-hndl] @ " + core_url,
         'name = "qwen-image-particle-sliders"': 'name = "qwen-image-particle-sliders-modern-candidate"',
-        'version = "0.2.0"': 'version = "' + profile["product_version"] + '"',
+        'version = "' + document["project"]["version"] + '"': 'version = "'
+        + profile["product_version"]
+        + '"',
         'requires-python = ">=3.11"': 'requires-python = ">=3.11,<3.15"',
         "hndl==0.8.2": "hndl==0.10.0",
         'qwen-slider-train = "qwen_image_sliders.train:main"\n': "",
@@ -135,7 +137,8 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
     package_init = destination / "src/qwen_image_sliders/__init__.py"
     package_init.write_text(
         package_init.read_text().replace(
-            '__version__ = "0.2.0"', '__version__ = "' + profile["product_version"] + '"'
+            '__version__ = "' + document["project"]["version"] + '"',
+            '__version__ = "' + profile["product_version"] + '"',
         )
         + "\nfrom importlib.metadata import PackageNotFoundError as _Missing, distribution as _distribution\n"
         + 'try:\n    _distribution("qwen-image-particle-sliders")\n'

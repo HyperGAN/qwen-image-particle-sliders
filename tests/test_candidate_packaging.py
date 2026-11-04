@@ -91,3 +91,31 @@ def test_public_candidate_rejects_unlocked_recursive_data(monkeypatch):
     monkeypatch.setattr(builder, "_public_bytes", response)
     with pytest.raises(ValueError, match="recursive source/data inventory differs"):
         builder.verified_public_core(profile)
+
+
+def test_candidate_metadata_transformation_survives_canonical_version_bump(tmp_path, monkeypatch):
+    import tomllib
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "candidate_builder", root / "scripts/build_hypergan_hndl_candidate.py"
+    )
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    # Only the source-verification transport is mocked; metadata staging is real.
+    monkeypatch.setattr(
+        builder,
+        "verified_public_core",
+        lambda profile: (
+            "git+https://github.com/HyperGAN/particle-sliders.git@"
+            + profile["core_commit"]
+            + "#subdirectory=packages/particle-sliders-core"
+        ),
+    )
+    destination = tmp_path / "candidate"
+    receipt = builder.stage(root, destination, public_core=True)
+    metadata = tomllib.loads(receipt["pyproject"])["project"]
+    assert metadata["name"] == "qwen-image-particle-sliders-modern-candidate"
+    assert metadata["version"] == "0.3.0a2"
+    assert "qwen-slider-train" not in metadata["scripts"]
+    assert '__version__ = "0.3.0a2"' in (destination / "src/qwen_image_sliders/__init__.py").read_text()

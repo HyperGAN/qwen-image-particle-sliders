@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qwen-image-particle-sliders"
-version = "0.2.0"
+version = "0.3.0"
 description = "Particle Sliders for Qwen-Image 2.1 using the shared HyperGAN core"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -14,7 +14,7 @@ dependencies = [
   "torch>=2.6,<3", "torchvision>=0.21,<1", "numpy>=1.26", "pillow>=13.0.0", "safetensors>=0.8,<1",
   "transformers==5.17.0", "accelerate>=1,<2", "huggingface-hub>=1.32,<2",
   "diffusers @ git+https://github.com/huggingface/diffusers.git@1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458",
-  "particle-sliders-core @ git+https://github.com/HyperGAN/particle-sliders.git@32f6830f6402e85aa77b6631db64fcbbb2131f6b#subdirectory=packages/particle-sliders-core",
+  "particle-sliders-core @ git+https://github.com/HyperGAN/particle-sliders.git@ddb41423bcefc1fe76cd94d0f9b367353b3ea137#subdirectory=packages/particle-sliders-core",
 ]
 
 [project.optional-dependencies]

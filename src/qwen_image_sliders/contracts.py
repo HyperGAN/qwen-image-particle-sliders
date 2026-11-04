@@ -44,6 +44,9 @@ def file_digest(path):
 
 
 def formulation(*, batch=1, g_lr=None, declared=None):
+    from .core_profile import require_current_core
+
+    require_current_core()
     stamp = winning_formulation()
     config = stamp.as_dict()
     if declared is not None:

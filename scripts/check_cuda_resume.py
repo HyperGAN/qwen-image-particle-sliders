@@ -1,4 +1,4 @@
-"""Offline native CPU PG0.9.1 resume proof (historical command name retained)."""
+"""Offline native CPU PG0.9.4 resume proof (historical command name retained)."""
 
 import argparse
 import hashlib

@@ -37,8 +37,8 @@ def test_stable_wheel_excludes_modern_runtime_and_dirty_build_artifacts(tmp_path
         assert "qwen_image_sliders/backend.lock.json" in names
         (meta,) = [name for name in names if name.endswith(".dist-info/METADATA")]
         metadata = BytesParser().parsebytes(archive.read(meta))
-        assert metadata["Name"] == "qwen-image-particle-sliders" and metadata["Version"] == "0.2.0"
+        assert metadata["Name"] == "qwen-image-particle-sliders" and metadata["Version"] == "0.3.0"
         (core,) = [
             value for value in metadata.get_all("Requires-Dist") if value.startswith("particle-sliders-core")
         ]
-        assert "32f6830f6402e85aa77b6631db64fcbbb2131f6b" in core
+        assert "ddb41423bcefc1fe76cd94d0f9b367353b3ea137" in core

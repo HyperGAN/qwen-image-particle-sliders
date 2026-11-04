@@ -1,3 +1,8 @@
+The canonical source dependency is now core0.12.0/official ParticleGAN0.9.4 at
+`ddb41423bcefc1fe76cd94d0f9b367353b3ea137`. [Current CPU adoption](docs/pg094-adoption.md)
+records this fresh cohort. The receipt below is historical core0.8.1 evidence.
+It is not rewritten, and no existing weights are relabeled or retrained.
+
 # Publication and qualification status
 
 Public main was inspected on 2026-10-31 at

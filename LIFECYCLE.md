@@ -1,13 +1,9 @@
 # Qwen Image 2.1 common lifecycle
 
-Exact tested shared pin: `32f6830f6402e85aa77b6631db64fcbbb2131f6b` / core 0.8.1.
-The historical runtime receipt records **26 installed CPU checks**; the pin is publicly reachable
-through merged common-core PR144 ancestry. Product PR1 is merged; source publication
-does not establish a package or pretrained-model release. See
-[qualification status](PUBLICATION-STATUS.md).
-The original source-only adoption audit and outstanding native gates are recorded in
-[docs/core081-adoption.md](docs/core081-adoption.md). The prior core 0.7.0 source
-pass is preserved at `bf8a6c160153c80f7c4155f96ed3f943114615d7`.
+Canonical shared pin: `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` / core0.12.0 / ParticleGAN0.9.4.
+See [the current CPU adoption audit](docs/pg094-adoption.md). This is a fresh source
+cohort. The historical 26-check receipt and core0.8.1 adoption notes remain historical
+and do not qualify this pin. Old runs retain their original loaders and source locks.
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
 The core owns preparation dispatch, updates, EMA, checkpoints, export,
@@ -19,7 +15,7 @@ the core owns the exact released GAN dependency.
 
 ```python
 from particle_sliders.lifecycle import SessionConfig, open_session
-config = SessionConfig('qwen', 'new-qwen-core081-cpu-v1', dummy=True, steps=4,
+config = SessionConfig('qwen', 'new-qwen-pg094-cpu-v1', dummy=True, steps=4,
     height=32, width=32, trajectory_steps=4, records_per_pair=2, ema_decay=.9,
     rows=[dict(neutral='a red cup', positive='a shiny red cup'),
           dict(neutral='a blue bowl', positive='a shiny blue bowl')])
@@ -92,6 +88,6 @@ It is a distinct prerelease distribution, `qwen-image-particle-sliders-modern-ca
 for a separate environment. The stable wheel excludes its modules/lock. The candidate
 registers `qwen-hndl` for shared sessions and native-only raw/EMA v2 export/inference.
 V2 records training geometry and both trajectory/training step budgets; incompatible
-render contexts refuse. Normal CI qualifies S081 only; modern CPU checks are an
+render contexts refuse. Normal CI qualifies canonical PG094 only; modern CPU checks are an
 explicit manual lane. The active modern core pin is `a794e3b4a8813b012f2c4faa3da82b78d4a90214`; default promotion and
 pretrained/GPU qualification remain separate review decisions.
