@@ -1,0 +1,51 @@
+{
+  "schema": "qwen-strict-public-response-source-readiness-v7",
+  "version": "0.1.4",
+  "runtime_commit": "20674cdd989a4c31ca306db999c1f4a269ac3f43",
+  "previous_runtime_commit": "c97966b362da1732e6789eff30486fe7b35929a2",
+  "installed_environment": "/ml2/particlesliders-working/lr-work/qwen-response-native-venv",
+  "source_identity": {
+    "core": {
+      "commit": "ddb41423bcefc1fe76cd94d0f9b367353b3ea137",
+      "profile": "official-PG0.9.4-auto"
+    },
+    "base_commit": "7486f21604e60cc1f3dfa0b8ebfd190a5df8ca19",
+    "product_index_sha256": "f031590c1e791fd8a0df571fcc472606fe91d761759b1a40da4a717bccd8a48b",
+    "source_lock_sha256": "f1b25bdbf4eeca15a322dd30ac5d3b5df10cdbe60175039ddf20f2e8d6e12e63"
+  },
+  "artifacts": {
+    "qwen_image_strict_native_candidate-0.1.4.tar.gz": {
+      "bytes": 373870,
+      "sha256": "b3858ce68afb3fdc3cf0bcc989f8445198322818cd90a7d69a796ce009555f00"
+    },
+    "qwen_image_strict_native_candidate-0.1.4-py3-none-any.whl": {
+      "bytes": 370118,
+      "sha256": "8b0afec569ca9f6563867dea10d926be20c359318dc2a7a63b7d6314cb244bfe"
+    }
+  },
+  "changes": [
+    "accept common inference seed argument with native bounded integer policy; response field remains deterministic",
+    "actual read_inference/open_inference/InferenceSession.response regression, poisoned cache/game/critic constructors",
+    "implicit default0 and explicit0/7/19/maximum bounded seed give identical native outputs with full network/base state and caller RNG preserved",
+    "invalid seed and unknown fields refuse before native forward; factory API has no seed so validation occurs on response invocation"
+  ],
+  "validation": {
+    "source_CPU_tests_passed": 50,
+    "source_CPU_seconds": 12.4,
+    "installed_wheel_tests_from_sdist_passed": 50,
+    "installed_CPU_seconds": 11.34,
+    "wheel_sdist_python_json_parity_files": 15,
+    "exact_runtime_distributions_verified": 12,
+    "CUDA_VISIBLE_DEVICES": "",
+    "CUDA_initialized": false,
+    "full_CPU_pretrained_model_allocated": false,
+    "GPU_model_allocated": false,
+    "entry_points_per_namespace": {
+      "particle_sliders.image_backends": 1,
+      "particle_sliders.inference_backends": 1
+    }
+  },
+  "command": "CUDA_VISIBLE_DEVICES='' CUBLAS_WORKSPACE_CONFIG=:4096:8 /ml2/particlesliders-working/lr-work/qwen-response-native-venv/bin/python -m pytest -q --import-mode=importlib /ml2/particlesliders-working/lr-work/qwen-response-native-dist/sdist-check/qwen_image_strict_native_candidate-0.1.4/tests",
+  "prior_failure": "/mnt/nvme/sliders/experiments/lr-standardization-20261104/qwen-image/public-response-seed-refusal-v1.json",
+  "qualification": "Actual tiny native/public software seam only; asset/device admission labeled as CPU fixture. Earlier direct binding checks did not qualify public responses; no prior full pretrained raw qualification. Full pretrained CPU/GPU/resume/render/LR/quality remain unqualified. Original frozen CPUv3/source162d/environment and all prior artifacts remain unchanged."
+}
