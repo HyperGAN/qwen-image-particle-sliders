@@ -30,7 +30,7 @@ def assert_same(left, right):
 
 
 @pytest.mark.parametrize("preset", ["bispf", "bispf_optimized"])
-def test_exact_cpu_resume_and_ema_inference(tmp_path, preset):
+def test_exact_cpu_resume_and_raw_inference(tmp_path, preset):
     rows = load_prompts()
     full, split = tmp_path / "full", tmp_path / "split"
     meta = train(TinyRuntime(), rows, full, steps=4, preset=preset)
@@ -41,6 +41,10 @@ def test_exact_cpu_resume_and_ema_inference(tmp_path, preset):
         torch.load(split / "training.pt", weights_only=True),
     )
     assert file_digest(full / "adapter.safetensors") == file_digest(split / "adapter.safetensors")
+    packet = torch.load(full / "training.pt", weights_only=True)
+    assert packet["schema"] == "qwen-native-pg09-training-v3"
+    assert "ema" not in packet and "ema_particles" not in packet
+    assert meta["training"]["export"] == "raw" and meta["training"]["ema"] is None
     assert meta["quality_validated"] is False
     assert meta["validation_kind"] == "tiny-native-random-weights-synthetic-text"
     assert meta["formulation"]["architecture_id"] == "gmix"
@@ -149,7 +153,7 @@ def test_failed_build_restores_native_checkpoint_context_and_hooks(tmp_path, mon
         assert getattr(module, "_gradient_checkpointing_func", None) is function
 
 
-def test_resume_rejects_budget_drift_and_corrupt_ema_before_restore(tmp_path, monkeypatch):
+def test_resume_rejects_budget_drift_and_historical_ema_before_restore(tmp_path, monkeypatch):
     import qwen_image_sliders.train as trainer
 
     rows = load_prompts()
@@ -158,7 +162,8 @@ def test_resume_rejects_budget_drift_and_corrupt_ema_before_restore(tmp_path, mo
     with pytest.raises(ValueError, match="fixed training budget"):
         train(TinyRuntime(), rows, tmp_path / "wrong-budget", steps=5, resume=checkpoint)
     packet = torch.load(checkpoint, weights_only=True)
-    packet["ema_particles"][0, 0] = float("nan")
+    packet["schema"] = "qwen-native-pg09-training-v2"
+    packet["ema_particles"] = torch.full((128, 4), float("nan"))
     bad = tmp_path / "bad-ema.pt"
     torch.save(packet, bad)
     calls = []
@@ -174,6 +179,34 @@ def test_resume_rejects_budget_drift_and_corrupt_ema_before_restore(tmp_path, mo
         train(runtime, rows, tmp_path / "wrong-ema", steps=4, resume=bad)
     assert not calls
     assert not any(module._forward_hooks for module in runtime.model.modules())
+
+
+def test_default_training_exports_live_parameters_without_host_ema(tmp_path, monkeypatch):
+    import particle_sliders.lifecycle as lifecycle
+    import qwen_image_sliders.train as trainer
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("the pure training path must not construct host EMA")
+
+    monkeypatch.setattr(lifecycle, "EMA", forbidden)
+    original = trainer.save_adapter
+    observed = []
+
+    def verify_live(path, bank_state, particles, meta):
+        checkpoint = torch.load(tmp_path / "training.pt", weights_only=True)
+        live = checkpoint["game"]["network"]
+        # All saved adapter tensors are the exact current parameters, never
+        # averages with a second history. The routed bank is also shared state.
+        assert all(any(torch.equal(value, current) for current in live.values())
+                   for value in bank_state.values())
+        assert torch.equal(particles, checkpoint["game"]["prior"]["z"])
+        assert meta["training"]["export"] == "raw"
+        observed.append(True)
+        return original(path, bank_state, particles, meta)
+
+    monkeypatch.setattr(trainer, "save_adapter", verify_live)
+    train(TinyRuntime(), load_prompts(), tmp_path, steps=2)
+    assert observed == [True]
 
 
 def test_hndl_critic_executes_shared_native_gan_and_resumes(tmp_path):
