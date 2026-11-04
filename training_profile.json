@@ -1,0 +1,21 @@
+{
+  "schema": "particle-slider-profile-v1",
+  "name": "qwen-source",
+  "product": "qwen-image-particle-sliders",
+  "config_kind": "session",
+  "backend": "qwen",
+  "interface": "image",
+  "status": "source_only",
+  "runtime": {
+    "python": "python3"
+  },
+  "capabilities": {
+    "resume": true,
+    "periodic_checkpoint": true,
+    "check": true
+  },
+  "default_checkpoint_every": 32,
+  "evidence": "src/qwen_image_sliders/lifecycle.py",
+  "status_reason": "PG 0.9.1 with the existing 128-by-4 bank. Native training qualification remains separate from the CPU/source tests.",
+  "source_revision": "eaa753d594c62afefd3337f3f82cb1adfe51b56e"
+}
