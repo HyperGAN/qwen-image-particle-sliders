@@ -181,3 +181,5 @@ The CI workflow installs pinned source dependencies on CPU, runs native/unit tes
 builds a wheel, then installs and exercises the wheel outside the source tree.
 It never downloads base weights. Real-model acceptance checks remain in
 [docs/real-model-validation.md](docs/real-model-validation.md).
+
+Learning-rate controls and preserved defaults: [LEARNING-RATES.md](LEARNING-RATES.md).

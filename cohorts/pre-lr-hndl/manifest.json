@@ -1,0 +1,9 @@
+{
+  "source_commit": "e9eb88ccb88ebc5ea5a36f6b4fab946e6fbd11a6",
+  "files": {
+    "src/qwen_image_sliders/contracts.py": "ae37f20ce97d7c4c06783a0b3f299ccbd761da0e956a93a01937b84084383152",
+    "src/qwen_image_sliders/lifecycle.py": "852a153b97d47c8a2cbe96cdfbdc44a57ed1005351db002ad87576a65eff87e0",
+    "src/qwen_image_sliders/train.py": "b87ac7d74079afacc0cb1c4cb47161779257dd284657205b4ee1de03e278c6bc",
+    "src/qwen_image_sliders/checkpoint.py": "0ac867df4567c1c5c5da7a93b38d485e83a8c1f83132789ae5f320e0930a5c90"
+  }
+}

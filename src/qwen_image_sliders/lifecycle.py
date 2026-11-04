@@ -16,6 +16,9 @@ _TRAIN = {
     "trajectory_steps",
     "records_per_pair",
     "g_lr",
+    "lr",
+    "d_lr_mult",
+    "prior_lr_mult",
     "preset",
     "critic_kind",
     "gradient_checkpointing",
@@ -213,7 +216,10 @@ def validate(options):
     if any(type(options.get(key, 32)) is not int for key in ("height", "width")):
         raise ValueError("Qwen height and width must be integers")
     validate_shape(options.get("height", 32), options.get("width", 32))
-    formulation(batch=options.get("batch", 2), g_lr=options.get("g_lr"))
+    from .learning_rates import resolve_alias
+
+    rates = resolve_alias(**{key: options.get(key) for key in ("lr", "g_lr", "d_lr_mult", "prior_lr_mult")})
+    formulation(batch=options.get("batch", 2), lr=rates.get("lr"))
     if options.get("critic_kind", "readout") not in ("readout", "hndl"):
         raise ValueError("unsupported Qwen critic")
     if options.get("base_precision", _base_precision(options)) != _base_precision(options):
@@ -264,7 +270,12 @@ def prepare(options, *, runtime=None, admission=None):
                     ]
                 },
             )
-        stamp, declared = formulation(batch=options.get("batch", 2), g_lr=options.get("g_lr"))
+        from .learning_rates import resolve_alias
+
+        rates = resolve_alias(
+            **{key: options.get(key) for key in ("lr", "g_lr", "d_lr_mult", "prior_lr_mult")}
+        )
+        stamp, declared = formulation(batch=options.get("batch", 2), lr=rates.get("lr"))
         if options.get("gradient_checkpointing", False):
             runtime.model.enable_gradient_checkpointing()
         game = build_game(
@@ -276,7 +287,7 @@ def prepare(options, *, runtime=None, admission=None):
             **{
                 key: value
                 for key, value in options.items()
-                if key in {"steps", "preset", "g_lr", "critic_kind"}
+                if key in {"steps", "preset", "g_lr", "lr", "d_lr_mult", "prior_lr_mult", "critic_kind"}
             },
         )
         from .inference import specification

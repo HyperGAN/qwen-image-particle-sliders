@@ -6,3 +6,6 @@ recursive-include scripts *.py
 include LIFECYCLE.md PUBLICATION-STATUS.md
 include src/_qwen_build_support.py
 recursive-include src/qwen_image_sliders hypergan_hndl*.py hypergan-hndl.lock.json
+
+recursive-include cohorts/pre-lr-hndl *.py *.json
+include LEARNING-RATES.md
