@@ -43,9 +43,11 @@ def file_digest(path):
     return result.hexdigest()
 
 
-def formulation(*, batch=1, g_lr=None, declared=None):
+def formulation(*, batch=1, g_lr=None, lr=None, declared=None):
     from .core_profile import require_current_core
 
+    from .learning_rates import resolve_alias
+    g_lr = resolve_alias(lr=lr, g_lr=g_lr).get("lr")
     require_current_core()
     stamp = winning_formulation()
     config = stamp.as_dict()

@@ -60,9 +60,14 @@ def build_game(
     steps=4,
     preset="bispf_optimized",
     g_lr=None,
+    lr=None,
+    d_lr_mult=None,
+    prior_lr_mult=None,
     critic_kind="readout",
 ):
     """Bind the real hooked bank once; losses, sampling, optimizers and state are shared."""
+    from .learning_rates import resolve_alias
+    rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     torch.manual_seed(seed)
     edits = []
     for record in records:
@@ -106,7 +111,7 @@ def build_game(
             total_steps=steps,
             batch_size=int(declared["adv_batch"]),
             seed=seed,
-            recipe_overrides={"lr": g_lr} if g_lr is not None else None,
+            recipe_overrides=rates,
             sampling="balanced",
         )
         game.normalization_records = len(edits)
@@ -134,6 +139,9 @@ def train(
     trajectory_steps=4,
     records_per_pair=2,
     g_lr=None,
+    lr=None,
+    d_lr_mult=None,
+    prior_lr_mult=None,
     resume=None,
     gradient_checkpointing=False,
     preset="bispf_optimized",
@@ -154,7 +162,9 @@ def train(
         raise ValueError("unsupported critic architecture")
     if type(seed) is not int or not 0 <= seed < 2**63 - 100:
         raise ValueError("invalid seed")
-    stamp, declared = formulation(batch=batch, g_lr=g_lr)
+    from .learning_rates import resolve_alias
+    rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
+    stamp, declared = formulation(batch=batch, lr=rates.get("lr"))
     records = paired_records(
         runtime,
         rows,
@@ -181,7 +191,7 @@ def train(
             seed,
             steps=steps,
             preset=preset,
-            g_lr=g_lr,
+            **rates,
             critic_kind=critic_kind,
         )
         bank = game.backend.adapter
@@ -202,6 +212,7 @@ def train(
                     "steps": steps,
                     "preset": preset,
                     "critic_kind": critic_kind,
+                    "recipe_overrides": rates,
                 }
             )
         )
@@ -282,6 +293,9 @@ def main(argv=None):
     parser.add_argument(
         "--g-lr", type=float, help="PG base learning rate, including derived critic/prior rates"
     )
+    parser.add_argument("--lr", type=float, help="PG base/G rate; alias --g-lr retained")
+    parser.add_argument("--d-lr-mult", type=float, help="D rate = lr * multiplier")
+    parser.add_argument("--prior-lr-mult", type=float, help="routed bank rate = lr * multiplier")
     parser.add_argument("--height", type=int, default=512)
     parser.add_argument("--width", type=int, default=512)
     parser.add_argument("--trajectory-steps", type=int, default=40)
@@ -295,7 +309,9 @@ def main(argv=None):
         parser.error("steps must be positive and batch must be in [2,512]")
     if args.stop_after is not None and not 1 <= args.stop_after <= args.steps:
         parser.error("stop-after must be between one and the fixed steps budget")
-    formulation(batch=args.batch, g_lr=args.g_lr)
+    from .learning_rates import resolve_alias
+    rates = resolve_alias(lr=args.lr, g_lr=args.g_lr, d_lr_mult=args.d_lr_mult, prior_lr_mult=args.prior_lr_mult)
+    formulation(batch=args.batch, lr=rates.get("lr"))
     if not args.dummy:
         validate_shape(args.height, args.width)
     trajectory_steps = 4 if args.dummy else args.trajectory_steps
@@ -325,7 +341,7 @@ def main(argv=None):
         steps=args.steps,
         seed=args.seed,
         batch=args.batch,
-        g_lr=args.g_lr,
+        **rates,
         height=args.height,
         width=args.width,
         trajectory_steps=args.trajectory_steps,

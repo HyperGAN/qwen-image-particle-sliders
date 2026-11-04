@@ -47,6 +47,7 @@ def metadata(runtime, bank, stamp, declared):
                 "checkpoint.py",
                 "contracts.py",
                 "core_profile.py",
+                "learning_rates.py",
                 "infer.py",
                 "projection.py",
                 "runtime.py",
