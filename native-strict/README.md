@@ -76,3 +76,15 @@ buffers, plain tensor/rotary attributes, actual config precision and caller
 default dtype/device. Tensor hashing streams existing CPU memory without
 embedding-sized byte copies. These checks do not establish full-model memory
 fit or authorize another pretrained load.
+
+Version0.1.2 separately restores the original native checkpoint function and
+instance flags when the binding closes. Cleanup attempts every owned release
+action even if a hook removal fails, and can retry failed actions. It moves
+retained response rows, conditioning, nested optimizer history and pending PG
+state to CPU without replacing their tensor aliases; interrupted native VAE
+feature caches are cleared. Unrelated live models and hooks are left alone.
+Tiny actual native/game CPU checks cover these paths and constructor failures
+after a model has returned. A loader exception before it returns a model still
+requires the dedicated worker process to exit and a verified unload receipt.
+Full GPU cleanup and pretrained execution remain unqualified. The frozen
+v0.1.1 one-prompt CPU benchmark keeps its own original source and environment.
