@@ -134,6 +134,15 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         source = source.replace(before, after)
     tomllib.loads(source)
     (destination / "pyproject.toml").write_text(source)
+    # Borrowed validation/native loaders must admit this candidate's own exact
+    # closure rather than the canonical distribution's independently pinned lock.
+    for name in ("contracts.py", "runtime.py"):
+        path = destination / "src/qwen_image_sliders" / name
+        text = path.read_text()
+        before = "from .core_profile import require_current_core"
+        if text.count(before) != 1:
+            raise ValueError("canonical admission changed; review candidate isolation")
+        path.write_text(text.replace(before, "from .hypergan_hndl import _shared as require_current_core"))
     package_init = destination / "src/qwen_image_sliders/__init__.py"
     package_init.write_text(
         package_init.read_text().replace(

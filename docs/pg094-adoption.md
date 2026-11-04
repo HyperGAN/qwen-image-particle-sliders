@@ -33,6 +33,9 @@ The HyperGAN/HNDL0.10 candidate from PR3 remains a separately built distribution
 with its own exact profile and manual qualification lane. Canonical wheels exclude
 those modules and that lock. The optional canonical readout critic uses HNDL0.8.2
 in its own supported environment; these HNDL families cannot co-install.
+Candidate staging binds the borrowed formulation/native-loader admission calls to
+the candidate's existing strict `_shared` gate, preserving its independently
+pinned core closure rather than imposing the canonical lock on that environment.
 
 The other process's `feat/unified-training-command-20261104` branch is preserved.
 Its `training_profile.json` can select this newly installed backend with the merged
@@ -53,7 +56,7 @@ optional HNDL0.8.2, using CPU Torch2.14.1/torchvision0.29.1. `pip check` reporte
 no broken requirements. The core's VCS install receipt resolves exactly to `ddb41423`.
 
 - Installed non-editable wheel, outside the checkout:
-  `python scripts/check_installed_contracts.py`: **93 passed, 4 skipped**.
+  `python scripts/check_installed_contracts.py`: **94 passed, 4 skipped**.
   The skips retain the separate modern-candidate environment gate.
 - Additional candidate packaging transformation regression after the version bump:
   **5 passed** in `tests/test_candidate_packaging.py`; only public-source verification

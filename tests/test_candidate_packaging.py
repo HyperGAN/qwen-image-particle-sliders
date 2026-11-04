@@ -119,3 +119,7 @@ def test_candidate_metadata_transformation_survives_canonical_version_bump(tmp_p
     assert metadata["version"] == "0.3.0a2"
     assert "qwen-slider-train" not in metadata["scripts"]
     assert '__version__ = "0.3.0a2"' in (destination / "src/qwen_image_sliders/__init__.py").read_text()
+    for name in ("contracts.py", "runtime.py"):
+        source = (destination / "src/qwen_image_sliders" / name).read_text()
+        assert "from .hypergan_hndl import _shared as require_current_core" in source
+        assert "from .core_profile import require_current_core" not in source
