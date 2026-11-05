@@ -145,7 +145,9 @@ See [FORMULATION.md](FORMULATION.md) for the native response and shared game con
 `train.jsonl` can be tailed. `adapter.safetensors` and its JSON sidecar contain the
 raw trained routed maps/particles and strict provenance. `training.pt` contains the shared game's raw maps, actual particles, critic,
 optimizers, penalty/prior state, independent RNG streams and balanced sampler state,
-without extra EMA state. New v3 training checkpoints reject historical EMA/v2 and
+without extra EMA state. Current lifecycle configurations also set `ema_decay=None`;
+use RAW evaluation and `selection="raw"` exports, without EMA comparisons.
+New v3 training checkpoints reject historical EMA/v2 and
 former gmix training packets; reproduce those with their original checkout. Existing EMA inference artifacts retain their original format and source-pinned
 reader; use their original checkout.
 Installed API source hashes and the actual recipe are recorded; an objective/source

@@ -2,13 +2,17 @@
 
 # Qwen Image 2.1 common lifecycle
 
+Current and new runs disable EMA explicitly with `ema_decay=None` and use RAW
+for training evaluation, export and inference. Do not create EMA comparisons.
+Historical EMA artifacts and their recorded tests keep their original loaders.
+
 Canonical shared pin: `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` / core0.12.0 / ParticleGAN0.9.4.
 See [the current CPU adoption audit](docs/pg094-adoption.md). This is a fresh source
 cohort. The historical 26-check receipt and core0.8.1 adoption notes remain historical
 and do not qualify this pin. Old runs retain their original loaders and source locks.
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
-The core owns preparation dispatch, updates, EMA, checkpoints, export,
+The core owns preparation dispatch, updates, checkpoints, export,
 evaluation and cleanup. The product factory owns native loading/conditioning,
 geometry and sampler differences. This is a new source cohort; keep original
 pinned runs and receipts with their original loaders.
@@ -18,7 +22,7 @@ the core owns the exact released GAN dependency.
 ```python
 from particle_sliders.lifecycle import SessionConfig, open_session
 config = SessionConfig('qwen', 'new-qwen-pg094-cpu-v1', dummy=True, steps=4,
-    height=32, width=32, trajectory_steps=4, records_per_pair=2, ema_decay=.9,
+    height=32, width=32, trajectory_steps=4, records_per_pair=2, ema_decay=None,
     rows=[dict(neutral='a red cup', positive='a shiny red cup'),
           dict(neutral='a blue bowl', positive='a shiny blue bowl')])
 with open_session(config) as session:
@@ -26,8 +30,8 @@ with open_session(config) as session:
     session.checkpoint('new-run/training.pt')
 with open_session(config, resume='new-run/training.pt') as session:
     session.train()
-    session.export('new-run/adapter.pt', selection='ema')
-    session.export_inference('new-run/native.pt', selection='ema')
+    session.export('new-run/adapter.pt', selection='raw')
+    session.export_inference('new-run/native.pt', selection='raw')
 ```
 
 Strengths remain [0,1]; reference-image conditioning is unsupported.
