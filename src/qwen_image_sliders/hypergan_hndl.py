@@ -164,8 +164,19 @@ class QwenHNDLCritic(nn.Module):
         return self.field(response.squeeze(2), condition)
 
 
-def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_optimized", g_lr=None,
-               lr=None, d_lr_mult=None, prior_lr_mult=None):
+def build_game(
+    runtime,
+    records,
+    *,
+    seed=7,
+    steps=4,
+    batch=2,
+    preset="bispf_optimized",
+    g_lr=None,
+    lr=None,
+    d_lr_mult=None,
+    prior_lr_mult=None,
+):
     """Construct a fresh, explicitly distinct game; caller closes backend.adapter.
 
     No response reshaping is performed before shared domain admission. This is
@@ -174,9 +185,9 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
     from particle_sliders.pg09 import ConditionalPG09
     from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
 
+    from .learning_rates import resolve_alias
     from .train import response_rows
 
-    from .learning_rates import resolve_alias
     rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     _, _, _, identity = _shared()
     if type(batch) is not int or not 2 <= batch <= 512:

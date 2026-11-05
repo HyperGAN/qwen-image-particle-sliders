@@ -24,19 +24,28 @@ def test_installed_shared_sources_match_the_entire_locked_cohort():
 
 def test_source_guard_refuses_changed_and_extra_core_data_before_native_use(tmp_path, monkeypatch):
     import shutil
+
     from qwen_image_sliders import core_profile
+
     core = distribution("particle-sliders-core")
     for package in ("particle_sliders", "concept_slider_core"):
-        shutil.copytree(core.locate_file(package), tmp_path / package,
-                        ignore=shutil.ignore_patterns("__pycache__"))
+        shutil.copytree(
+            core.locate_file(package), tmp_path / package, ignore=shutil.ignore_patterns("__pycache__")
+        )
+
     class CopiedCore:
         def __getattr__(self, name):
             return getattr(core, name)
+
         def locate_file(self, relative):
             return tmp_path / relative
+
     original_distribution = core_profile.distribution
-    monkeypatch.setattr(core_profile, "distribution", lambda name:
-                        CopiedCore() if name == "particle-sliders-core" else original_distribution(name))
+    monkeypatch.setattr(
+        core_profile,
+        "distribution",
+        lambda name: CopiedCore() if name == "particle-sliders-core" else original_distribution(name),
+    )
     path = tmp_path / "particle_sliders/pg095_release.json"
     original = path.read_bytes()
     path.write_bytes(original + b"\n")

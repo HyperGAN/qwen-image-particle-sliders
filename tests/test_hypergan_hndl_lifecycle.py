@@ -246,8 +246,8 @@ def test_exported_training_context_controls_defaults_and_refuses_changes(monkeyp
 
 
 def test_current_hndl_common_rates_reach_actual_optimizer_groups():
-    with BACKEND.open(config(lr=2e-5, d_lr_mult=3., prior_lr_mult=4.)) as session:
-        rates = {g['role']: g['lr'] for g in session.game.opt_g.param_groups}
-        assert rates == {'generator': 2e-5, 'prior': 2e-5 * 4.}
-        assert all(g['lr'] == 2e-5 * 3. for g in session.game.opt_d.param_groups)
-        assert session.game._signature['pg_version'] == '0.9.5'
+    with BACKEND.open(config(lr=2e-5, d_lr_mult=3.0, prior_lr_mult=4.0)) as session:
+        rates = {g["role"]: g["lr"] for g in session.game.opt_g.param_groups}
+        assert rates == {"generator": 2e-5, "prior": 2e-5 * 4.0}
+        assert all(g["lr"] == 2e-5 * 3.0 for g in session.game.opt_d.param_groups)
+        assert session.game._signature["pg_version"] == "0.9.5"
