@@ -1,3 +1,5 @@
+> Current adoption: [published PG0.9.5 / core0.13.0](docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
+
 # Qwen Image 2.1 common lifecycle
 
 Canonical shared pin: `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` / core0.12.0 / ParticleGAN0.9.4.

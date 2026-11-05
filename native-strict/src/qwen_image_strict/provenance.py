@@ -32,7 +32,7 @@ def verify_sources():
     import qwen_image_sliders
     from qwen_image_sliders.core_profile import require_current_core
     require_current_core()
-    core = {"commit": CORE, "profile": "official-PG0.9.4-auto"}
+    core = {"commit": CORE, "profile": "official-PG0.9.5-auto"}
     require_origin("particle-sliders-core", "https://github.com/HyperGAN/particle-sliders.git", CORE,
                    "packages/particle-sliders-core")
     base = require_origin("qwen-image-particle-sliders", "https://github.com/HyperGAN/qwen-image-particle-sliders.git", BASE)

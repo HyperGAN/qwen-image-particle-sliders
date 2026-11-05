@@ -9,7 +9,7 @@ import tomllib
 import zipfile
 from pathlib import Path
 
-TARGET = "a794e3b4a8813b012f2c4faa3da82b78d4a90214"
+TARGET = "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423"
 PREFIX = "packages/particle-sliders-core/"
 
 
@@ -42,8 +42,8 @@ def regenerate(repository, wheel, destination):
     record = {
         **previous,
         "schema": "qwen-hypergan-hndl-candidate-v2",
-        "profile": "qwen-image21-hypergan-hndl-v3",
-        "product_version": "0.3.0a2",
+        "profile": "qwen-image21-hypergan-hndl-pg095-v1",
+        "product_version": "0.3.0a3",
         "core_commit": TARGET,
         "core_version": metadata["project"]["version"],
         "core_roots": ["concept_slider_core", "particle_sliders"],

@@ -13,7 +13,7 @@ def test_candidate_builder_rejects_unverified_core_before_writing_profile(tmp_pa
     )
     builder = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(builder)
-    wheel = tmp_path / "particle_sliders_core-0.12.0-py3-none-any.whl"
+    wheel = tmp_path / "particle_sliders_core-0.13.0-py3-none-any.whl"
     wheel.write_bytes(b"unqualified replacement")
     destination = tmp_path / "profile"
     with pytest.raises(ValueError, match="exact reviewed candidate artifact"):
@@ -68,7 +68,7 @@ def test_public_candidate_rejects_unlocked_recursive_data(monkeypatch):
     spec.loader.exec_module(builder)
     document = b"verified package metadata"
     profile = {
-        "core_commit": "a794e3b4a8813b012f2c4faa3da82b78d4a90214",
+        "core_commit": "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423",
         "core_pyproject_sha256": hashlib.sha256(document).hexdigest(),
         "core_src_tree": "a" * 40,
         "core_source_sha256": {"particle_sliders/LICENSE": "b" * 64},
@@ -116,9 +116,9 @@ def test_candidate_metadata_transformation_survives_canonical_version_bump(tmp_p
     receipt = builder.stage(root, destination, public_core=True)
     metadata = tomllib.loads(receipt["pyproject"])["project"]
     assert metadata["name"] == "qwen-image-particle-sliders-modern-candidate"
-    assert metadata["version"] == "0.3.0a2"
+    assert metadata["version"] == "0.3.0a3"
     assert "qwen-slider-train" not in metadata["scripts"]
-    assert '__version__ = "0.3.0a2"' in (destination / "src/qwen_image_sliders/__init__.py").read_text()
+    assert '__version__ = "0.3.0a3"' in (destination / "src/qwen_image_sliders/__init__.py").read_text()
     for name in ("contracts.py", "runtime.py"):
         source = (destination / "src/qwen_image_sliders" / name).read_text()
         assert "from .hypergan_hndl import _shared as require_current_core" in source

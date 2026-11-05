@@ -41,4 +41,4 @@ def test_stable_wheel_excludes_modern_runtime_and_dirty_build_artifacts(tmp_path
         (core,) = [
             value for value in metadata.get_all("Requires-Dist") if value.startswith("particle-sliders-core")
         ]
-        assert "ddb41423bcefc1fe76cd94d0f9b367353b3ea137" in core
+        assert "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423" in core

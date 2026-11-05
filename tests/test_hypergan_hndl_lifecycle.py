@@ -6,8 +6,8 @@ from copy import deepcopy
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE012") != "1":
-    pytest.skip("separate core 0.12 / HyperGAN / HNDL environment required", allow_module_level=True)
+if os.environ.get("QWEN_TEST_CORE013") != "1":
+    pytest.skip("separate core 0.13 / HyperGAN / HNDL environment required", allow_module_level=True)
 
 from particle_sliders.inference import open_inference
 from particle_sliders.lifecycle import CheckpointError, SessionConfig
@@ -58,7 +58,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
         assert _hash(raw["network"]) != _hash(ema["network"])
         packet = training.export_inference(tmp_path / "native.pt", selection=selection)
         assert training.checkpoint()["sha256"] == before
-        assert packet["origin"]["pg_version"] == "0.9.4"
+        assert packet["origin"]["pg_version"] == "0.9.5"
         assert "rows" not in packet["specification"]["configuration"]
         assert "game_signature" not in packet["specification"]["identity"]
         assert set(packet) == {"schema", "specification", "origin", "selection", "network", "sha256"}
@@ -168,7 +168,7 @@ def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
     from particle_sliders.lifecycle import backend
 
     package = distribution("qwen-image-particle-sliders-modern-candidate")
-    assert package.version == "0.3.0a2"
+    assert package.version == "0.3.0a3"
     import qwen_image_sliders
 
     assert qwen_image_sliders.__version__ == package.version
@@ -243,3 +243,11 @@ def test_exported_training_context_controls_defaults_and_refuses_changes(monkeyp
     changed["sha256"] = _hash({key: value for key, value in changed.items() if key != "sha256"})
     with pytest.raises(ValueError, match="training context differs"):
         open_inference(changed)
+
+
+def test_current_hndl_common_rates_reach_actual_optimizer_groups():
+    with BACKEND.open(config(lr=2e-5, d_lr_mult=3.0, prior_lr_mult=4.0)) as session:
+        rates = {g["role"]: g["lr"] for g in session.game.opt_g.param_groups}
+        assert rates == {"generator": 2e-5, "prior": 2e-5 * 4.0}
+        assert all(g["lr"] == 2e-5 * 3.0 for g in session.game.opt_d.param_groups)
+        assert session.game._signature["pg_version"] == "0.9.5"

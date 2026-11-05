@@ -1,4 +1,4 @@
-"""Opt-in Qwen binding for the separately installed core 0.12 HNDL cohort.
+"""Opt-in Qwen binding for the separately installed core 0.13 HNDL cohort.
 
 The shared package owns the graphs, source admission and complete GAN update.
 This product owns native Qwen projection attachment and spatial field binding.
@@ -16,7 +16,7 @@ from torch import nn
 from .adapters import target_modules
 from .contracts import file_digest, validate_strength
 
-PROFILE = "qwen-image21-hypergan-hndl-v3"
+PROFILE = "qwen-image21-hypergan-hndl-pg095-v1"
 
 
 def _shared():
@@ -28,9 +28,9 @@ def _shared():
     )
 
     product_sources = isolated_runtime()
-    if version("particle-sliders-core") != "0.12.0":
+    if version("particle-sliders-core") != "0.13.0":
         raise RuntimeError(
-            "Qwen HNDL requires a separate qualified core 0.12.0 environment; keep S081 intact"
+            "Qwen HNDL requires a separate qualified core 0.13.0 environment; keep S081 intact"
         )
     profile = json.loads(files(__package__).joinpath("hypergan-hndl.lock.json").read_text())
     if profile["profile"] != PROFILE or version("particlegan") != profile["particlegan_version"]:
@@ -164,7 +164,19 @@ class QwenHNDLCritic(nn.Module):
         return self.field(response.squeeze(2), condition)
 
 
-def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_optimized", g_lr=None):
+def build_game(
+    runtime,
+    records,
+    *,
+    seed=7,
+    steps=4,
+    batch=2,
+    preset="bispf_optimized",
+    g_lr=None,
+    lr=None,
+    d_lr_mult=None,
+    prior_lr_mult=None,
+):
     """Construct a fresh, explicitly distinct game; caller closes backend.adapter.
 
     No response reshaping is performed before shared domain admission. This is
@@ -173,8 +185,10 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
     from particle_sliders.pg09 import ConditionalPG09
     from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
 
+    from .learning_rates import resolve_alias
     from .train import response_rows
 
+    rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     _, _, _, identity = _shared()
     if type(batch) is not int or not 2 <= batch <= 512:
         raise ValueError("batch must be an integer in [2,512]")
@@ -218,7 +232,7 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
             total_steps=steps,
             batch_size=batch,
             seed=seed,
-            recipe_overrides={"lr": g_lr} if g_lr is not None else None,
+            recipe_overrides=rates or None,
             sampling="balanced",
         )
         game.normalization_records = len(edits)
