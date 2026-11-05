@@ -63,7 +63,7 @@ def prepare(options, *, runtime=None, admission=None):
             **{
                 key: value
                 for key, value in options.items()
-                if key in {"seed", "steps", "batch", "preset", "g_lr"}
+                if key in {"seed", "steps", "batch", "preset", "g_lr", "lr", "d_lr_mult", "prior_lr_mult"}
             },
         )
         native_spec = specification(

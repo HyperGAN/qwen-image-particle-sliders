@@ -42,8 +42,8 @@ def regenerate(repository, wheel, destination):
     record = {
         **previous,
         "schema": "qwen-hypergan-hndl-candidate-v2",
-        "profile": "qwen-image21-hypergan-hndl-v3",
-        "product_version": "0.3.0a2",
+        "profile": "qwen-image21-hypergan-hndl-pg095-v1",
+        "product_version": "0.3.0a3",
         "core_commit": TARGET,
         "core_version": metadata["project"]["version"],
         "core_roots": ["concept_slider_core", "particle_sliders"],

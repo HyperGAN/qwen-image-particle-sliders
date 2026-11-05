@@ -8,7 +8,7 @@ from importlib.metadata import PackageNotFoundError, distribution
 from pathlib import Path
 
 DIST = "qwen-image-particle-sliders-modern-candidate"
-VERSION = "0.3.0a2"
+VERSION = "0.3.0a3"
 
 
 def check_core_inventory(profile):

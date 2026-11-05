@@ -127,7 +127,8 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         "backend.lock.json",
     ):
         shutil.copyfile(root / name, destination / name)
-    # Current PG0.9.5 uses current runtime; historical closed archive is unchanged.
+    # Ship the original archive unchanged, without restoring it into this095 cohort.
+    shutil.copytree(root / "cohorts/pre-lr-hndl", destination / "cohorts/pre-lr-hndl")
     source = (root / "pyproject.toml").read_text()
     document = tomllib.loads(source)
     (original,) = [

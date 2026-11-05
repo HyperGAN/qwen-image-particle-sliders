@@ -8,7 +8,7 @@ import sys
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE012") != "1":
+if os.environ.get("QWEN_TEST_CORE013") != "1":
     pytest.skip("separate modern prerelease environment required", allow_module_level=True)
 
 from qwen_image_sliders.hypergan_hndl import QwenHNDLBank, _shared, build_game

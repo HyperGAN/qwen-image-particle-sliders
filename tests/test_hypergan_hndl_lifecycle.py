@@ -6,8 +6,8 @@ from copy import deepcopy
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE012") != "1":
-    pytest.skip("separate core 0.12 / HyperGAN / HNDL environment required", allow_module_level=True)
+if os.environ.get("QWEN_TEST_CORE013") != "1":
+    pytest.skip("separate core 0.13 / HyperGAN / HNDL environment required", allow_module_level=True)
 
 from particle_sliders.inference import open_inference
 from particle_sliders.lifecycle import CheckpointError, SessionConfig
@@ -243,3 +243,11 @@ def test_exported_training_context_controls_defaults_and_refuses_changes(monkeyp
     changed["sha256"] = _hash({key: value for key, value in changed.items() if key != "sha256"})
     with pytest.raises(ValueError, match="training context differs"):
         open_inference(changed)
+
+
+def test_current_hndl_common_rates_reach_actual_optimizer_groups():
+    with BACKEND.open(config(lr=2e-5, d_lr_mult=3., prior_lr_mult=4.)) as session:
+        rates = {g['role']: g['lr'] for g in session.game.opt_g.param_groups}
+        assert rates == {'generator': 2e-5, 'prior': 2e-5 * 4.}
+        assert all(g['lr'] == 2e-5 * 3. for g in session.game.opt_d.param_groups)
+        assert session.game._signature['pg_version'] == '0.9.5'

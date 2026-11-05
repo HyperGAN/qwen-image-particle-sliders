@@ -16,7 +16,7 @@ from torch import nn
 from .adapters import target_modules
 from .contracts import file_digest, validate_strength
 
-PROFILE = "qwen-image21-hypergan-hndl-v3"
+PROFILE = "qwen-image21-hypergan-hndl-pg095-v1"
 
 
 def _shared():
@@ -164,7 +164,8 @@ class QwenHNDLCritic(nn.Module):
         return self.field(response.squeeze(2), condition)
 
 
-def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_optimized", g_lr=None):
+def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_optimized", g_lr=None,
+               lr=None, d_lr_mult=None, prior_lr_mult=None):
     """Construct a fresh, explicitly distinct game; caller closes backend.adapter.
 
     No response reshaping is performed before shared domain admission. This is
@@ -175,6 +176,8 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
 
     from .train import response_rows
 
+    from .learning_rates import resolve_alias
+    rates = resolve_alias(lr=lr, g_lr=g_lr, d_lr_mult=d_lr_mult, prior_lr_mult=prior_lr_mult)
     _, _, _, identity = _shared()
     if type(batch) is not int or not 2 <= batch <= 512:
         raise ValueError("batch must be an integer in [2,512]")
@@ -218,7 +221,7 @@ def build_game(runtime, records, *, seed=7, steps=4, batch=2, preset="bispf_opti
             total_steps=steps,
             batch_size=batch,
             seed=seed,
-            recipe_overrides={"lr": g_lr} if g_lr is not None else None,
+            recipe_overrides=rates or None,
             sampling="balanced",
         )
         game.normalization_records = len(edits)

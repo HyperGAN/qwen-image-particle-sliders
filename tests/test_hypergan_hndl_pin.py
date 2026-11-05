@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE012") != "1":
+if os.environ.get("QWEN_TEST_CORE013") != "1":
     pytest.skip("separate modern candidate environment required", allow_module_level=True)
 
 from particle_sliders.inference import open_inference

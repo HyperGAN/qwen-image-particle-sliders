@@ -1,4 +1,4 @@
-"""Installed source/profile contracts for the canonical PG094 environment."""
+"""Installed source/profile contracts for the canonical PG095 environment."""
 
 import importlib
 from importlib.metadata import distribution, version
@@ -22,24 +22,32 @@ def test_installed_shared_sources_match_the_entire_locked_cohort():
     require_current_core()
 
 
-def test_source_guard_refuses_changed_and_extra_core_data_before_native_use():
+def test_source_guard_refuses_changed_and_extra_core_data_before_native_use(tmp_path, monkeypatch):
+    import shutil
+    from qwen_image_sliders import core_profile
     core = distribution("particle-sliders-core")
-    path = Path(core.locate_file("particle_sliders/pg094_release.json"))
+    for package in ("particle_sliders", "concept_slider_core"):
+        shutil.copytree(core.locate_file(package), tmp_path / package,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+    class CopiedCore:
+        def __getattr__(self, name):
+            return getattr(core, name)
+        def locate_file(self, relative):
+            return tmp_path / relative
+    original_distribution = core_profile.distribution
+    monkeypatch.setattr(core_profile, "distribution", lambda name:
+                        CopiedCore() if name == "particle-sliders-core" else original_distribution(name))
+    path = tmp_path / "particle_sliders/pg095_release.json"
     original = path.read_bytes()
-    try:
-        path.write_bytes(original + b"\n")
-        with pytest.raises(RuntimeError, match="shared source differs"):
-            require_current_core()
-    finally:
-        path.write_bytes(original)
+    path.write_bytes(original + b"\n")
+    with pytest.raises(RuntimeError, match="shared source differs"):
+        require_current_core()
+    path.write_bytes(original)
     extra = path.with_name("_qwen_unqualified_resource.json")
-    assert not extra.exists()
-    try:
-        extra.write_text("{}\n")
-        with pytest.raises(RuntimeError, match="source inventory differs"):
-            require_current_core()
-    finally:
-        extra.unlink()
+    extra.write_text("{}\n")
+    with pytest.raises(RuntimeError, match="source inventory differs"):
+        require_current_core()
+    extra.unlink()
     require_current_core()
 
 

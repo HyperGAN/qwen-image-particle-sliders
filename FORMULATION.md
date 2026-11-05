@@ -1,3 +1,5 @@
+> Current adoption: [published PG0.9.5 / core0.13.0](docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
+
 # Shared PG0.9.4 game and native Qwen wiring
 
 The public training command executes `particle_sliders.pg09.ConditionalPG09`.
