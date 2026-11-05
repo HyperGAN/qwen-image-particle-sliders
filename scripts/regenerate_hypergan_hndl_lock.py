@@ -9,7 +9,7 @@ import tomllib
 import zipfile
 from pathlib import Path
 
-TARGET = "a794e3b4a8813b012f2c4faa3da82b78d4a90214"
+TARGET = "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423"
 PREFIX = "packages/particle-sliders-core/"
 
 

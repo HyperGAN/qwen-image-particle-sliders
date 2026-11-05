@@ -49,7 +49,7 @@ def test_exact_cpu_resume_and_raw_inference(tmp_path, preset):
     assert meta["validation_kind"] == "tiny-native-random-weights-synthetic-text"
     assert meta["formulation"]["architecture_id"] == "gmix"
     assert meta["protocol"]["engine"] == "particle_sliders.pg09.ConditionalPG09"
-    assert meta["shared_api"]["particlegan_version"] == "0.9.4"
+    assert meta["shared_api"]["particlegan_version"] == "0.9.5"
     kwargs = {"seed": 42, "height": 32, "width": 32, "steps": 4, "output_type": "latent"}
     runtime = TinyRuntime()
     vanilla = runtime.sample(runtime.encode("A cup."), **kwargs)

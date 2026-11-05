@@ -24,7 +24,7 @@ from qwen_image_sliders.tiny import TinyRuntime
 
 def test_exact_recursive_source_and_data_admission():
     profile = json.loads(files("qwen_image_sliders").joinpath("hypergan-hndl.lock.json").read_text())
-    assert profile["core_commit"] == "a794e3b4a8813b012f2c4faa3da82b78d4a90214"
+    assert profile["core_commit"] == "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423"
     assert "concept_slider_core/__init__.py" in profile["core_source_sha256"]
     assert "particle_sliders/LICENSE" in profile["core_source_sha256"]
     _, _, _, identity = _shared()

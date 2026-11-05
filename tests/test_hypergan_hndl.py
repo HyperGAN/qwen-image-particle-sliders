@@ -53,7 +53,7 @@ def test_real_shared_graphs_own_gradients_and_exact_resume(preset, checkpointing
         assert game.response_shape == (1, 8, 1, 2, 2)
         assert game.backend.model_identity["qwen_hndl_profile"] == PROFILE
         assert game.backend.model_identity["shared_builder"]["hndl_version"] == "0.10.0"
-        assert game.state_dict()["config"]["pg_version"] == "0.9.4"
+        assert game.state_dict()["config"]["pg_version"] == "0.9.5"
         owned = [parameter for group in game.opt_g.param_groups for parameter in group["params"]]
         assert len(owned) == len({id(parameter) for parameter in owned})
         assert {id(parameter) for parameter in owned} == {

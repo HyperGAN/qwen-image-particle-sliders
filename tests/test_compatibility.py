@@ -12,13 +12,13 @@ from qwen_image_sliders.core_profile import require_current_core
 
 def test_installed_shared_sources_match_the_entire_locked_cohort():
     pins = lock()
-    assert version("particle-sliders-core") == pins["core"]["version"] == "0.12.0"
-    assert version("particlegan") == pins["particlegan"]["version"] == "0.9.4"
+    assert version("particle-sliders-core") == pins["core"]["version"] == "0.13.0"
+    assert version("particlegan") == pins["particlegan"]["version"] == "0.9.5"
     core = distribution("particle-sliders-core")
     for relative, expected in pins["core"]["source_sha256"].items():
         assert file_digest(core.locate_file(relative)) == expected, relative
-    assert len(pins["core"]["source_sha256"]) == 574
-    assert pins["particlegan"]["source_profile"] == "release-0.9.4"
+    assert len(pins["core"]["source_sha256"]) == 577
+    assert pins["particlegan"]["source_profile"] == "release-0.9.5"
     require_current_core()
 
 

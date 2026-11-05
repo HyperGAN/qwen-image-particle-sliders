@@ -58,7 +58,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
         assert _hash(raw["network"]) != _hash(ema["network"])
         packet = training.export_inference(tmp_path / "native.pt", selection=selection)
         assert training.checkpoint()["sha256"] == before
-        assert packet["origin"]["pg_version"] == "0.9.4"
+        assert packet["origin"]["pg_version"] == "0.9.5"
         assert "rows" not in packet["specification"]["configuration"]
         assert "game_signature" not in packet["specification"]["identity"]
         assert set(packet) == {"schema", "specification", "origin", "selection", "network", "sha256"}

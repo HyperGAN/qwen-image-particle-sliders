@@ -1,3 +1,5 @@
+> **Current source: core0.13.0 / published ParticleGAN0.9.5.** This is a fresh cohort; older versioned evidence below remains historical. See [adoption and compatibility](docs/pg095-adoption.md). No native PG0.9.5 result is claimed.
+
 For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
 The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
 is a distinct prerelease distribution for an isolated environment. Canonical wheels

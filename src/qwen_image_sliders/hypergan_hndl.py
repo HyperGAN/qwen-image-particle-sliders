@@ -1,4 +1,4 @@
-"""Opt-in Qwen binding for the separately installed core 0.12 HNDL cohort.
+"""Opt-in Qwen binding for the separately installed core 0.13 HNDL cohort.
 
 The shared package owns the graphs, source admission and complete GAN update.
 This product owns native Qwen projection attachment and spatial field binding.
@@ -28,9 +28,9 @@ def _shared():
     )
 
     product_sources = isolated_runtime()
-    if version("particle-sliders-core") != "0.12.0":
+    if version("particle-sliders-core") != "0.13.0":
         raise RuntimeError(
-            "Qwen HNDL requires a separate qualified core 0.12.0 environment; keep S081 intact"
+            "Qwen HNDL requires a separate qualified core 0.13.0 environment; keep S081 intact"
         )
     profile = json.loads(files(__package__).joinpath("hypergan-hndl.lock.json").read_text())
     if profile["profile"] != PROFILE or version("particlegan") != profile["particlegan_version"]:
