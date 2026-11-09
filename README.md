@@ -1,4 +1,4 @@
-> **Current source: core0.13.0 / published ParticleGAN0.9.5.** This is a fresh cohort; older versioned evidence below remains historical. See [adoption and compatibility](docs/pg095-adoption.md). No native PG0.9.5 result is claimed.
+> **Current source: core0.13.0 / published ParticleGAN0.9.5.** This is a fresh cohort; older versioned evidence below remains historical. See [adoption and compatibility](docs/pg095-adoption.md). No native PG0.9.5 result is claimed for this package's default cohort.
 
 For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
 The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
@@ -7,6 +7,14 @@ exclude candidate modules/lock; default installation uses core0.12.0/PG0.9.4. CI
 modern CPU qualification is a separate explicit test lane.
 
 # Particle Sliders for Qwen-Image 2.1
+
+**Saved finished-output recommendation:** use the existing **Warm Amber
+G0.012 RAW32** checkpoint in its captured native profile (four-case mean
+ON−OFF **0.0027492051012814045**). No additional fresh confirmation is required.
+See [the scope and exact options](docs/finished-output-learning-rates.md) and
+[portable comparison](docs/finished-output-rate.json). This is a source-bound
+research result, not a migration or new qualification of the default cohort.
+
 
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,

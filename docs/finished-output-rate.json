@@ -1,0 +1,89 @@
+{
+  "schema": "particle-slider-scoped-finished-output-rate-guidance-v1",
+  "as_of": "2026-11-09",
+  "product_id": "qwen-image-particle-sliders",
+  "concept": "Warm Amber",
+  "selection_metric": "Equal-case arithmetic mean of intended-effect intensity ON minus exact matched OFF in finished images; higher wins.",
+  "comparison_policy": "Retain negative gains, native zeros and exact ties. Technical failures are missing evidence, not zero. No teacher-SSE, preservation, beauty, confidence or completion selector/tiebreak. Reuse completed searches, checkpoints, proofs, outputs and first scores; no additional fresh confirmation or worse-arm completion.",
+  "status": "best_tested_selected_from_existing_intended_effect_scores",
+  "common_rate_overrides": {
+    "lr": 0.012,
+    "d_lr_mult": 1.5000000000000002,
+    "prior_lr_mult": 2.5,
+    "ema_decay": null
+  },
+  "product_option_fragment": {
+    "lr": 0.012,
+    "d_lr_mult": 1.5000000000000002,
+    "prior_lr_mult": 2.5,
+    "ema_decay": null
+  },
+  "actual_rates": {
+    "G": 0.012,
+    "D": 0.018000000000000002,
+    "bank": 0.03
+  },
+  "profile": {
+    "training_updates": 32,
+    "render_resolution": 512,
+    "base_precision": "bfloat16",
+    "render_steps": 40,
+    "CFG": 1,
+    "KV_cache": false,
+    "particle_bank_shape": [
+      128,
+      4
+    ]
+  },
+  "primary": {
+    "training_updates": 32,
+    "cases": 4,
+    "mean_gain": 0.0027492051012814045,
+    "candidate_means": [
+      {
+        "G": 0.0012,
+        "mean_gain": 0.0001280301560958229
+      },
+      {
+        "G": 0.004,
+        "mean_gain": -0.0007108609812955059
+      },
+      {
+        "G": 0.012,
+        "mean_gain": 0.0027492051012814045
+      },
+      {
+        "G": 0.036,
+        "mean_gain": 0.0018785006056229276
+      }
+    ],
+    "per_case_gains": {
+      "dev0-seed202": -0.0007678059240182238,
+      "dev0-seed203": 0.002680619557698568,
+      "dev1-seed202": 0.00345727118353049,
+      "dev1-seed203": 0.0056267355879147845
+    }
+  },
+  "weight_EMA": null,
+  "measurement_kind": "Frozen model instrument (SigLIP2), not human or statistical validation.",
+  "scope": "Warm Amber; existing RAW32 full-bank cohort, native512 BF16/40steps/CFG1/noKV, original two DEV prompts times two seeds; fixed D/bank, model instrument only. No additional fresh confirmation is required. No default change or global/joint optimum.",
+  "additional_fresh_confirmation_required": false,
+  "package_defaults_changed": false,
+  "selected_checkpoint_availability": "Private retained RAW checkpoint, not included in this repository or newly released by this documentation.",
+  "source_records": [
+    {
+      "role": "primary_result",
+      "name": "result.json",
+      "bytes": 54681,
+      "sha256": "fa5c0e3653c4898f73cb02327919e3e38a2d9f6670706fced8c23c4e44779668",
+      "availability": "Retained campaign evidence; not bundled as a public artifact download."
+    },
+    {
+      "role": "primary_decision",
+      "name": "root-existing-four-arm-RAW32-selection-v1.json",
+      "bytes": 4040,
+      "sha256": "9f16a067cd48eed02bdf1b96ad1e438c9cb2052871bf6e6d1e2de6f2f55d0366",
+      "availability": "Retained campaign evidence; not bundled as a public artifact download."
+    }
+  ]
+}

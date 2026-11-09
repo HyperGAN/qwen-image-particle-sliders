@@ -1,5 +1,13 @@
 # Learning rates
 
+Current finished-output decision and sole selection method:
+[scoped learning-rate guide](docs/finished-output-learning-rates.md) and
+[portable rates/case scores](docs/finished-output-rate.json). Use RAW weights,
+no weight EMA, equal-case intended-effect ON−matched OFF, and reuse completed
+work; no additional fresh confirmation. The option/default and CPU integration
+descriptions below retain their own source-cohort scope.
+
+
 Current training accepts optional `lr` (generator/base rate), `d_lr_mult` (critic multiplier), and `prior_lr_mult` (routed particle-bank multiplier). Omitted values retain the existing recipe defaults. Inputs must be finite positive numbers; booleans are rejected. The shared ParticleGAN recipe constructs every optimizer: D = `lr * d_lr_mult`; particle bank = `lr * prior_lr_mult`.
 
 For the default `bispf_optimized` preset, this product keeps G = **0.012**, D multiplier = **1.5**, particle multiplier = **2.5**. These are defaults, not a claim of native LR calibration. Selecting `bispf` uses that official preset's existing values (base 0.00425, D multiplier 1, particle multiplier 2). 
@@ -8,6 +16,15 @@ Common interface: put the same keys in session `options`, for example `"lr": 0.0
 
 Rates become part of the exact shared recipe and checkpoint configuration. Start a fresh cohort/output for a changed rate; resume requires the original rate recipe. Do not relabel a historical packet. The separate closed HNDL build retains its pre-LR borrowed modules through checksum-verified `cohorts/pre-lr-hndl` archival build routing; this change does not retune that cohort or rewrite its source hashes.
 
-Native calibration compares identical initialized state, data, stochastic streams, precision, declared schedule horizons and completed-update budgets on the actual pretrained model. Select and independently confirm rates using only held-out raw teacher/student relative SSE: cast student, teacher and neutral to FP64 before subtraction, pool positions within each example, divide by that example's teacher-edit energy, then average examples equally. Keep the teacher-only valid/excluded set fixed across candidates; zero-energy examples remain undefined, and student failures never remove examples. See the [common LR protocol](https://github.com/HyperGAN/particle-sliders/blob/main/packages/particle-sliders-core/LEARNING-RATE-CONTRACT.md).
-
-Preservation/no-edit drift, late/weak-field scores and native media outputs are optional diagnostics; they cannot select, reject or delay a rate. After the native mechanical proof, candidate endpoint net displacement is diagnostic too. Retain exact source/model/data/numerical identity, actual optimizer-rate, finite native-update, checkpoint-continuation and raw-response replay checks. Tiny CPU software checks are not native LR evidence.
+For the current saved Warm Amber comparison, G0.012 RAW32 is best tested.
+Rank only the equal-case arithmetic mean intended-effect ON−matched OFF in
+finished images. Retain negative gains, zeros and ties; technical failures are
+missing evidence, not zero. Teacher/student relative SSE is diagnostic only;
+older FP64 subtraction, teacher-energy normalization and equal-example pooling
+instructions describe that diagnostic, not the current selector. Preservation,
+beauty, confidence, net displacement and completion cannot select or break ties.
+Reuse the existing completed search/RAWs/outputs/first scores, with no additional
+fresh confirmation. Exact source/recipe identity, legitimate FULL continuation
+and RAW export semantics remain required; tiny CPU checks are not native
+finished-output evidence. The linked upstream historical contract does not
+supersede this current selection policy.
