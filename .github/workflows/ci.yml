@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m ruff check src tests scripts
           python -m ruff format --check src tests scripts
-          python -m pytest -q
+          python -m pytest -q --ignore=tests/test_cached_fresh95.py
           python scripts/check_cuda_resume.py --dummy --outdir outputs/resume-ci
           qwen-slider-train --dummy --steps 4 --gradient-checkpointing --outdir outputs/ci
           qwen-slider-infer --dummy --adapter outputs/ci/adapter.safetensors --prompt 'A ceramic cup.' --out outputs/ci/latents.pt
@@ -45,3 +45,15 @@ jobs:
           qwen-slider-infer --help
           qwen-slider-preflight
           qwen-slider-train --dummy --steps 2 --outdir /tmp/qwen-wheel-smoke
+      - name: Test FOUR opt-in cases against the genuine installed wheel
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+        run: |
+          python -I -B scripts/check_cached_fresh95_installed.py --fixture "$GITHUB_WORKSPACE/tests/test_cached_fresh95.py" --work "$RUNNER_TEMP/qwen-fresh95-installed"
+      - name: Retain installed-wheel opt-in software results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-fresh95-installed-software-${{ matrix.python }}
+          path: ${{ runner.temp }}/qwen-fresh95-installed/reports
+          if-no-files-found: ignore
