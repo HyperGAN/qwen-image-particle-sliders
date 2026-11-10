@@ -15,7 +15,7 @@ from qwen_image_sliders.lifecycle import _validate_runtime
 
 from . import PROFILE, ownership, policy
 from .cache import load_cache, to_device
-from .configuration import configuration
+from ._configuration import configuration
 from .ownership import Owner
 from .util import equal, new_directory, read_packet, save_packet, write_json
 

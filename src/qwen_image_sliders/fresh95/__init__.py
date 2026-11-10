@@ -22,6 +22,6 @@ def save_prepared_cache(*args, **kwargs):
 
 
 def configuration(*args, **kwargs):
-    from .configuration import configuration as make
+    from ._configuration import configuration as make
 
     return make(*args, **kwargs)
