@@ -199,3 +199,14 @@ Learning-rate controls and preserved defaults: [LEARNING-RATES.md](LEARNING-RATE
 A separate [strict staged native candidate](native-strict/README.md) prepares
 CPU encoder conditioning followed by CUDA BF16 DiT+VAE experiments. Its source
 and tiny CPU checks do not qualify pretrained execution or learning rates.
+
+
+## Opt-in cached fresh initialization
+
+The additional Python API in [FRESH95.md](FRESH95.md) starts a deliberately new
+cohort from authenticated, already-completed native PreparedResponse data and
+provides strict new-profile FULL resume and RAW inference. Four installed CPU
+software checks passed with one tiny update; native cache availability,
+pretrained/CUDA/full-image execution and public packaging remain unqualified.
+Existing entrypoints, saved recommendations, rate defaults and cohorts keep
+their original behavior.
