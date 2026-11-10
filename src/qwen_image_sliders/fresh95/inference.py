@@ -9,8 +9,8 @@ from particle_sliders.pg09_backends import ResponseRow
 from qwen_image_sliders.lifecycle import _observation, _render_native, _validate_render
 
 from . import PROFILE, ownership
+from ._configuration import configuration
 from .cache import validate_row
-from .configuration import configuration
 from .training import RAW_SCHEMA, Owner, ReceiptBackend, admit, attach, receipt_valid
 from .util import canonical, equal, read_packet
 

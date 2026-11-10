@@ -240,7 +240,7 @@ def save_prepared_cache(path, *, runtime, config, prepared, teacher_origins, cac
     row. The returned binding records input provenance; it is not qualification
     or an assertion that this function itself observed any native output.
     """
-    from .configuration import configuration
+    from ._configuration import configuration
 
     ownership.require()
     if configuration(**config) != config:
