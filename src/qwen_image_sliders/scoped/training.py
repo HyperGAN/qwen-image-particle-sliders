@@ -5,12 +5,12 @@ from copy import deepcopy
 from pathlib import Path
 
 import torch
-from particle_sliders.pg09 import ConditionalPG09
-from particle_sliders.pg09_images import QwenImage21ResponseAdapter
-from particle_sliders.pg09_readout_critic import ConditionalReadoutCritic
+from particle_sliders.engine import ConditionalParticleGAN
+from particle_sliders.readout_critic import ConditionalReadoutCritic
 
 from qwen_image_sliders.adapters import AdapterBank
 from qwen_image_sliders.contracts import formulation
+from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
 from qwen_image_sliders.lifecycle import _validate_runtime
 
 from . import PROFILE, ownership, policy
@@ -19,8 +19,8 @@ from .cache import load_cache, to_device
 from .ownership import Owner
 from .util import equal, new_directory, read_packet, save_packet, write_json
 
-FULL_SCHEMA = "QwenImage21-explicit-cached-fresh95-v1-FULL"
-RAW_SCHEMA = "QwenImage21-explicit-cached-fresh95-v1-RAW"
+FULL_SCHEMA = "QwenImage21-explicit-cached-scoped-v1-FULL"
+RAW_SCHEMA = "QwenImage21-explicit-cached-scoped-v1-RAW"
 ARCHITECTURE = "canonical-readout-v1"
 
 
@@ -213,7 +213,7 @@ class Training(Owner):
                 self.initialization = deepcopy(packet["initialization"])
             self.backend = ReceiptBackend(native, self.initialization, sources, cache_identity)
             calibrated = cache_identity["calibration"]
-            self.game = ConditionalPG09(
+            self.game = ConditionalParticleGAN(
                 self.backend,
                 prepared,
                 critic,

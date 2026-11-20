@@ -1,6 +1,6 @@
-"""Opt-in cached Qwen-Image2.1 fresh95 APIs; old registrations stay unchanged."""
+"""Opt-in cached Qwen-Image2.1 scoped APIs; old registrations stay unchanged."""
 
-PROFILE = "qwen-image21-explicit-cached-fresh95-v1"
+PROFILE = "qwen-image21-explicit-cached-scoped-v1"
 
 
 def open_training(*args, **kwargs):

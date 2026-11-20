@@ -92,7 +92,7 @@ def _load_runtime(local):
 
 
 def prepare(options, spec):
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
 
     _shared()  # Exact source admission before touching native model/runtime state.
     validate(options, spec)

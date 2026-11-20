@@ -13,7 +13,7 @@ def test_candidate_builder_rejects_unverified_core_before_writing_profile(tmp_pa
     )
     builder = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(builder)
-    wheel = tmp_path / "particle_sliders_core-0.13.0-py3-none-any.whl"
+    wheel = tmp_path / "particle_sliders_core-0.15.1-py3-none-any.whl"
     wheel.write_bytes(b"unqualified replacement")
     destination = tmp_path / "profile"
     with pytest.raises(ValueError, match="exact reviewed candidate artifact"):
@@ -68,7 +68,7 @@ def test_public_candidate_rejects_unlocked_recursive_data(monkeypatch):
     spec.loader.exec_module(builder)
     document = b"verified package metadata"
     profile = {
-        "core_commit": "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423",
+        "core_commit": "c13890f8e2a1ecf1dc8eb9f2a37f9187cb9fea78",
         "core_pyproject_sha256": hashlib.sha256(document).hexdigest(),
         "core_src_tree": "a" * 40,
         "core_source_sha256": {"particle_sliders/LICENSE": "b" * 64},

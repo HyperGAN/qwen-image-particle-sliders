@@ -32,7 +32,7 @@ def test_dispatcher_plan_check_periodic_checkpoint_resume_and_v2(tmp_path):
             "width": 32,
             "trajectory_steps": 4,
             "records_per_pair": 2,
-            "ema_decay": 0.9,
+            "ema_decay": None,
             "rows": [
                 {"neutral": "a red cup", "positive": "a shiny red cup"},
                 {"neutral": "a blue bowl", "positive": "a shiny blue bowl"},
@@ -69,10 +69,10 @@ def test_dispatcher_plan_check_periodic_checkpoint_resume_and_v2(tmp_path):
     assert plan["training"]["options"]["dummy"] is True
     run("train", "--check")
     first, resumed = tmp_path / "first", tmp_path / "resumed"
-    run("train", "--out", first, "--stop-after", 1, "--selection", "ema", "--export-format", "both")
+    run("train", "--out", first, "--stop-after", 1, "--selection", "raw", "--export-format", "both")
     checkpoint = first / "artifacts/checkpoints/step-000001/training.pt"
     assert checkpoint.is_file()
-    run("train", "--out", resumed, "--resume", checkpoint, "--selection", "ema", "--export-format", "both")
+    run("train", "--out", resumed, "--resume", checkpoint, "--selection", "raw", "--export-format", "both")
     assert json.loads((resumed / "result.json").read_text())["completed_steps"] == 2
     packet = torch.load(resumed / "artifacts/adapter-v2.pt", weights_only=True)
     assert packet["specification"]["configuration"]["dummy"] is True

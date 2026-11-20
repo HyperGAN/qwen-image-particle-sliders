@@ -1,15 +1,16 @@
-"""Train native Qwen-Image 2.1 responses with the installed ParticleGAN 0.9.5 API."""
+"""Train native Qwen-Image 2.1 responses with the installed ParticleGAN 0.11.0 API."""
 
 import argparse
 import json
 from pathlib import Path
 
 import torch
+from particle_sliders.backends import ResponseRow
+from particle_sliders.engine import ConditionalParticleGAN
 from particle_sliders.lifecycle import advance, atomic_save
-from particle_sliders.pg09 import ConditionalPG09
-from particle_sliders.pg09_backends import ResponseRow
-from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
-from particle_sliders.pg09_readout_critic import ConditionalReadoutCritic
+from particle_sliders.readout_critic import ConditionalReadoutCritic
+
+from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter, image_condition_features
 
 from .adapters import AdapterBank
 from .checkpoint import metadata, save_adapter
@@ -92,7 +93,7 @@ def build_game(
         prepared = [adapter.prepare(row) for row in response_rows(runtime, records)]
         conditions = image_condition_features(prepared)
         if critic_kind == "hndl":
-            from particle_sliders.pg09_hndl import HNDLConditionalReadoutCritic
+            from particle_sliders.hndl_critic import HNDLConditionalReadoutCritic
 
             critic_class = HNDLConditionalReadoutCritic
         elif critic_kind == "readout":
@@ -100,7 +101,7 @@ def build_game(
         else:
             raise ValueError("unsupported critic architecture")
         critic = critic_class(prepared[0].target.numel(), conditions.shape[1]).to(runtime.device)
-        game = ConditionalPG09(
+        game = ConditionalParticleGAN(
             adapter,
             prepared,
             critic,

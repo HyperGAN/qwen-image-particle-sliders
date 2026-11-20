@@ -1,4 +1,4 @@
-"""Opt-in Qwen binding for the separately installed core 0.13 HNDL cohort.
+"""Opt-in Qwen binding for the separately installed current HNDL cohort.
 
 The shared package owns the graphs, source admission and complete GAN update.
 This product owns native Qwen projection attachment and spatial field binding.
@@ -16,7 +16,7 @@ from torch import nn
 from .adapters import target_modules
 from .contracts import file_digest, validate_strength
 
-PROFILE = "qwen-image21-hypergan-hndl-pg095-v1"
+PROFILE = "qwen-image21-hypergan-hndl-engine-v1"
 
 
 def _shared():
@@ -28,9 +28,9 @@ def _shared():
     )
 
     product_sources = isolated_runtime()
-    if version("particle-sliders-core") != "0.13.0":
+    if version("particle-sliders-core") != "0.15.1":
         raise RuntimeError(
-            "Qwen HNDL requires a separate qualified core 0.13.0 environment; keep S081 intact"
+            "Qwen HNDL requires a separate qualified core 0.15.1 environment; keep S081 intact"
         )
     profile = json.loads(files(__package__).joinpath("hypergan-hndl.lock.json").read_text())
     if profile["profile"] != PROFILE or version("particlegan") != profile["particlegan_version"]:
@@ -43,10 +43,18 @@ def _shared():
             module_origin("particle-sliders-core", name, relative)
         if file_digest(core.locate_file(relative)) != expected:
             raise ValueError("Qwen HNDL shared source differs: " + relative)
-    from particle_sliders.fibo_hndl import HNDLFieldCritic, HNDLParticleProjection, verified_builder
+    from qwen_image_sliders.fibo_hndl import HNDLFieldCritic, HNDLParticleProjection, verified_builder
 
     builder, identity = verified_builder()
     loaded_dependency_origins()
+    if (
+        identity["hypergan_commit"] != profile["hypergan_commit"]
+        or identity["hndl_version"] != profile["hndl_version"]
+    ):
+        raise ValueError("Qwen HNDL builder differs from the reviewed candidate")
+    from .core_profile import require_current_core
+
+    require_current_core()
     return (
         HNDLFieldCritic,
         HNDLParticleProjection,
@@ -182,8 +190,9 @@ def build_game(
     No response reshaping is performed before shared domain admission. This is
     a bounded API integration, not pretrained/GPU or convergence qualification.
     """
-    from particle_sliders.pg09 import ConditionalPG09
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
+    from particle_sliders.engine import ConditionalParticleGAN
+
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter, image_condition_features
 
     from .learning_rates import resolve_alias
     from .train import response_rows
@@ -220,7 +229,7 @@ def build_game(
         prepared = [adapter.prepare(row) for row in response_rows(runtime, records)]
         conditions = image_condition_features(prepared)
         critic = QwenHNDLCritic(tuple(prepared[0].target.shape), conditions.shape[1]).to(runtime.device)
-        game = ConditionalPG09(
+        game = ConditionalParticleGAN(
             adapter,
             prepared,
             critic,

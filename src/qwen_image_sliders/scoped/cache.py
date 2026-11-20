@@ -6,13 +6,14 @@ from copy import deepcopy
 from dataclasses import dataclass, fields
 
 import torch
-from particle_sliders.pg09_backends import PreparedResponse, ResponseRow
-from particle_sliders.pg09_images import image_condition_features
+from particle_sliders.backends import PreparedResponse, ResponseRow
+
+from qwen_image_sliders.image_bindings import image_condition_features
 
 from . import ownership
 from .util import Checkpoint, canonical, equal, read_packet, save_packet, tree
 
-SCHEMA = "QwenImage21-completed-native-PreparedResponse-cache-fresh95-v1"
+SCHEMA = "QwenImage21-completed-native-PreparedResponse-cache-scoped-v1"
 PROVENANCE = "QwenImage21-completed-PreparedResponse-provenance-v1"
 TEACHER_KEYS = ("rows", "seed", "height", "width", "trajectory_steps", "records_per_pair")
 

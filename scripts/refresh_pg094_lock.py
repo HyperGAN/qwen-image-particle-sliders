@@ -26,10 +26,10 @@ def main():
     args = parser.parse_args()
     core = metadata.distribution("particle-sliders-core")
     direct = json.loads(core.read_text("direct_url.json") or "{}")
-    if core.version != "0.13.0" or direct.get("vcs_info", {}).get("commit_id") != args.core_commit:
-        raise ValueError("install the exact reviewed public VCS core0.13.0 commit first")
-    if metadata.version("particlegan") != "0.9.5":
-        raise ValueError("install released ParticleGAN0.9.5 first")
+    if core.version != "0.15.1" or direct.get("vcs_info", {}).get("commit_id") != args.core_commit:
+        raise ValueError("install the exact reviewed public VCS core0.15.1 commit first")
+    if metadata.version("particlegan") != "0.11.0":
+        raise ValueError("install released ParticleGAN0.11.0 first")
     root = Path(__file__).resolve().parents[1]
     document = json.loads((root / "backend.lock.json").read_text())
     for key in ("wheel_sha256", "sdist_sha256", "canonical_receipt_sha256"):

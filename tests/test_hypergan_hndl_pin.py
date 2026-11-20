@@ -10,12 +10,12 @@ from pathlib import Path
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE013") != "1":
+if os.environ.get("QWEN_TEST_HNDL") != "1":
     pytest.skip("separate modern candidate environment required", allow_module_level=True)
 
+from particle_sliders.engine import _hash
 from particle_sliders.inference import open_inference
 from particle_sliders.lifecycle import CheckpointError
-from particle_sliders.pg09 import _hash
 from test_hypergan_hndl_lifecycle import BACKEND, config
 
 from qwen_image_sliders.hypergan_hndl import QwenHNDLBank, _shared, build_game
@@ -24,7 +24,7 @@ from qwen_image_sliders.tiny import TinyRuntime
 
 def test_exact_recursive_source_and_data_admission():
     profile = json.loads(files("qwen_image_sliders").joinpath("hypergan-hndl.lock.json").read_text())
-    assert profile["core_commit"] == "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423"
+    assert profile["core_commit"] == "c13890f8e2a1ecf1dc8eb9f2a37f9187cb9fea78"
     assert "concept_slider_core/__init__.py" in profile["core_source_sha256"]
     assert "particle_sliders/LICENSE" in profile["core_source_sha256"]
     _, _, _, identity = _shared()
@@ -36,7 +36,7 @@ def test_exact_recursive_source_and_data_admission():
 def test_recursive_resource_tamper_refuses_before_native_use(tamper):
     core = distribution("particle-sliders-core")
     if tamper == "resource_bytes":
-        path = Path(core.locate_file("particle_sliders/fibo_projection.hndl"))
+        path = Path(core.locate_file("particle_sliders/engine_release.json"))
         original = path.read_bytes()
         try:
             path.write_bytes(original + b"\n# unqualified resource change\n")
@@ -132,7 +132,7 @@ def test_product_close_failure_is_retryable_and_does_not_skip_runtime_cleanup(ki
     else:
         with BACKEND.open(config()) as training:
             training.step()
-            packet = training.export_inference(selection="ema")
+            packet = training.export_inference(selection="raw")
         monkeypatch.setattr(native, "_load_runtime", lambda local: runtime)
         banks = []
         original_init = QwenHNDLBank.__init__

@@ -1,4 +1,4 @@
-"""Run separately with QWEN_TEST_CORE013=1 and the exact modern shared cohort."""
+"""Run separately with QWEN_TEST_HNDL=1 and the exact modern shared cohort."""
 
 import os
 from copy import deepcopy
@@ -6,7 +6,7 @@ from copy import deepcopy
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE013") != "1":
+if os.environ.get("QWEN_TEST_HNDL") != "1":
     pytest.skip("separate core 0.13 / HyperGAN / HNDL environment required", allow_module_level=True)
 
 from qwen_image_sliders.hypergan_hndl import PROFILE, build_game
@@ -53,7 +53,7 @@ def test_real_shared_graphs_own_gradients_and_exact_resume(preset, checkpointing
         assert game.response_shape == (1, 8, 1, 2, 2)
         assert game.backend.model_identity["qwen_hndl_profile"] == PROFILE
         assert game.backend.model_identity["shared_builder"]["hndl_version"] == "0.10.0"
-        assert game.state_dict()["config"]["pg_version"] == "0.9.5"
+        assert game.state_dict()["config"]["pg_version"] == "0.11.0"
         owned = [parameter for group in game.opt_g.param_groups for parameter in group["params"]]
         assert len(owned) == len({id(parameter) for parameter in owned})
         assert {id(parameter) for parameter in owned} == {
@@ -121,7 +121,7 @@ def test_failed_game_construction_restores_borrowed_projections(monkeypatch):
     def fail(*args, **kwargs):
         raise RuntimeError("injected shared game refusal")
 
-    monkeypatch.setattr(pg09, "ConditionalPG09", fail)
+    monkeypatch.setattr(pg09, "ConditionalParticleGAN", fail)
     with pytest.raises(RuntimeError, match="injected shared game refusal"):
         build_game(runtime, captured)
     assert all(module.forward == before[name] for name, module in runtime.model.named_modules())

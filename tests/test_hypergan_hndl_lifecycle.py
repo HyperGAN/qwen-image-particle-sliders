@@ -1,4 +1,4 @@
-"""Modern native-only raw/EMA lifecycle; separate exact candidate environment."""
+"""Modern native-only RAW lifecycle; separate exact candidate environment."""
 
 import os
 from copy import deepcopy
@@ -6,12 +6,12 @@ from copy import deepcopy
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE013") != "1":
-    pytest.skip("separate core 0.13 / HyperGAN / HNDL environment required", allow_module_level=True)
+if os.environ.get("QWEN_TEST_HNDL") != "1":
+    pytest.skip("separate current core / HyperGAN / HNDL environment required", allow_module_level=True)
 
+from particle_sliders.engine import _hash
 from particle_sliders.inference import open_inference
 from particle_sliders.lifecycle import CheckpointError, SessionConfig
-from particle_sliders.pg09 import _hash
 
 from qwen_image_sliders.hypergan_hndl_inference import INFERENCE_BACKEND
 from qwen_image_sliders.hypergan_hndl_lifecycle import BACKEND
@@ -25,7 +25,7 @@ def config(**options):
         **{
             "dummy": True,
             "steps": 4,
-            "ema_decay": 0.5,
+            "ema_decay": None,
             "height": 32,
             "width": 32,
             "trajectory_steps": 4,
@@ -39,12 +39,11 @@ def config(**options):
     )
 
 
-@pytest.mark.parametrize("selection", ["raw", "ema"])
 @pytest.mark.parametrize("checkpointing", [False, True])
 def test_native_only_restores_selected_values_and_exact_render_without_training(
-    selection, checkpointing, monkeypatch, tmp_path
+    checkpointing, monkeypatch, tmp_path
 ):
-    from particle_sliders import pg09
+    from particle_sliders import engine
 
     from qwen_image_sliders import hypergan_hndl, hypergan_hndl_lifecycle, teachers
 
@@ -53,12 +52,11 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
         assert torch.equal(opening_rng, torch.get_rng_state())
         training.train(stop_after=3)
         before = training.checkpoint()["sha256"]
-        raw = training.export_inference(selection="raw")
-        ema = training.export_inference(selection="ema")
-        assert _hash(raw["network"]) != _hash(ema["network"])
-        packet = training.export_inference(tmp_path / "native.pt", selection=selection)
+        with pytest.raises(ValueError, match="raw|RAW"):
+            training.export_inference(selection="ema")
+        packet = training.export_inference(tmp_path / "native.pt", selection="raw")
         assert training.checkpoint()["sha256"] == before
-        assert packet["origin"]["pg_version"] == "0.9.5"
+        assert packet["origin"]["pg_version"] == "0.11.0"
         assert "rows" not in packet["specification"]["configuration"]
         assert "game_signature" not in packet["specification"]["identity"]
         assert set(packet) == {"schema", "specification", "origin", "selection", "network", "sha256"}
@@ -77,7 +75,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
     def forbidden(*args, **kwargs):
         pytest.fail("native-only inference reconstructed training")
 
-    monkeypatch.setattr(pg09.ConditionalPG09, "__init__", forbidden)
+    monkeypatch.setattr(engine.ConditionalParticleGAN, "__init__", forbidden)
     monkeypatch.setattr(torch.optim.Optimizer, "__init__", forbidden)
     monkeypatch.setattr(hypergan_hndl.QwenHNDLCritic, "__init__", forbidden)
     monkeypatch.setattr(hypergan_hndl_lifecycle, "build_game", forbidden)
@@ -85,7 +83,7 @@ def test_native_only_restores_selected_values_and_exact_render_without_training(
     before_rng = torch.get_rng_state().clone()
     with open_inference(tmp_path / "native.pt") as inference:
         assert torch.equal(before_rng, torch.get_rng_state())
-        assert inference.selection == selection
+        assert inference.selection == "raw"
         assert not any(hasattr(inference, name) for name in ("game", "critic", "rows", "optimizer"))
         assert _hash(inference.binding.network.state_dict()) == _hash(packet["network"])
         for strength, value in expected.items():
@@ -102,7 +100,7 @@ def test_native_refusal_preserves_managed_runtime_and_owned_values(corruption, m
 
     with BACKEND.open(config()) as training:
         training.step()
-        packet = training.export_inference(selection="ema")
+        packet = training.export_inference(selection="raw")
     packet = deepcopy(packet)
     if corruption == "checksum":
         packet["sha256"] = "0" * 64
@@ -141,11 +139,11 @@ def test_native_refusal_preserves_managed_runtime_and_owned_values(corruption, m
         assert bank.strength == 0 and bank._particles is None
 
 
-def test_modern_session_checkpoint_restores_exact_raw_and_ema():
+def test_modern_session_checkpoint_restores_exact_raw():
     with BACKEND.open(config()) as full:
         full.train()
         expected = full.checkpoint()
-        expected_ema = full.export_inference(selection="ema")
+        expected_raw = full.export_inference(selection="raw")
     with BACKEND.open(config()) as partial:
         partial.train(stop_after=2)
         checkpoint = partial.checkpoint()
@@ -153,7 +151,7 @@ def test_modern_session_checkpoint_restores_exact_raw_and_ema():
         resumed.restore(checkpoint)
         resumed.train()
         assert resumed.checkpoint()["sha256"] == expected["sha256"]
-        assert resumed.export_inference(selection="ema")["sha256"] == expected_ema["sha256"]
+        assert resumed.export_inference(selection="raw")["sha256"] == expected_raw["sha256"]
 
 
 def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
@@ -183,7 +181,7 @@ def test_candidate_distribution_registers_only_its_modern_product_entrypoints():
         Requirement(value) for value in package.requires if Requirement(value).name == "particle-sliders-core"
     ]
     profile = json.loads(files("qwen_image_sliders").joinpath("hypergan-hndl.lock.json").read_text())
-    assert core.extras == {"hypergan-hndl"}
+    assert not core.extras
     assert core.url == (
         "git+https://github.com/HyperGAN/particle-sliders.git@"
         + profile["core_commit"]
@@ -250,4 +248,4 @@ def test_current_hndl_common_rates_reach_actual_optimizer_groups():
         rates = {g["role"]: g["lr"] for g in session.game.opt_g.param_groups}
         assert rates == {"generator": 2e-5, "prior": 2e-5 * 4.0}
         assert all(g["lr"] == 2e-5 * 3.0 for g in session.game.opt_d.param_groups)
-        assert session.game._signature["pg_version"] == "0.9.5"
+        assert session.game._signature["pg_version"] == "0.11.0"

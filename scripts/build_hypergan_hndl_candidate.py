@@ -22,7 +22,10 @@ from pathlib import Path
 
 def verified_core(path, profile):
     path = path.resolve(strict=True)
-    if hashlib.sha256(path.read_bytes()).hexdigest() != profile["core_wheel_sha256"]:
+    if (
+        not profile["core_wheel_sha256"]
+        or hashlib.sha256(path.read_bytes()).hexdigest() != profile["core_wheel_sha256"]
+    ):
         raise ValueError("core wheel differs from the exact reviewed candidate artifact")
     with zipfile.ZipFile(path) as archive:
         (name,) = [name for name in archive.namelist() if name.endswith(".dist-info/METADATA")]
@@ -62,7 +65,7 @@ def verified_public_core(profile):
     if (
         tree.get("truncated")
         or tree.get("sha") != profile["core_src_tree"]
-        or paths != set(profile["core_source_sha256"])
+        or paths != set(profile.get("core_git_src_paths", profile["core_source_sha256"]))
     ):
         raise ValueError("public core recursive source/data inventory differs from the reviewed closure")
 
@@ -127,7 +130,7 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         "backend.lock.json",
     ):
         shutil.copyfile(root / name, destination / name)
-    # Ship the original archive unchanged, without restoring it into this095 cohort.
+    # Ship the original archive unchanged, without restoring it into the current cohort.
     shutil.copytree(root / "cohorts/pre-lr-hndl", destination / "cohorts/pre-lr-hndl")
     source = (root / "pyproject.toml").read_text()
     document = tomllib.loads(source)
@@ -135,7 +138,13 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         value for value in document["project"]["dependencies"] if value.startswith("particle-sliders-core ")
     ]
     changes = {
-        original: "particle-sliders-core[hypergan-hndl] @ " + core_url,
+        original: (
+            "particle-sliders-core @ "
+            + core_url
+            + '",\n  "hndl==0.10.0'
+            + '",\n  "hypergan @ git+https://github.com/HyperGAN/HyperGAN.git@'
+            + profile["hypergan_commit"]
+        ),
         'name = "qwen-image-particle-sliders"': 'name = "qwen-image-particle-sliders-modern-candidate"',
         'version = "' + document["project"]["version"] + '"': 'version = "'
         + profile["product_version"]
@@ -146,7 +155,7 @@ def stage(root, destination, core_wheel=None, *, public_core=False):
         'qwen-slider-infer = "qwen_image_sliders.infer:main"\n': "",
         'qwen = "qwen_image_sliders.lifecycle:BACKEND"': 'qwen-hndl = "qwen_image_sliders.hypergan_hndl_lifecycle:BACKEND"',
         'qwen = "qwen_image_sliders.inference:INFERENCE_BACKEND"': 'qwen-hndl = "qwen_image_sliders.hypergan_hndl_inference:INFERENCE_BACKEND"',
-        'qwen_image_sliders = ["backend.lock.json", "prompts.json"]': 'qwen_image_sliders = ["*.json"]',
+        'qwen_image_sliders = ["backend.lock.json", "prompts.json"]': 'qwen_image_sliders = ["*.json", "*.hndl"]',
         '[tool.setuptools.cmdclass]\nbuild_py = "_qwen_build_support.StableBuildPy"\n': "",
     }
     for before, after in changes.items():

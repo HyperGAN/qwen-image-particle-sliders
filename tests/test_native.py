@@ -96,8 +96,8 @@ def test_variable_length_native_microbatches_preserve_individual_forward():
 
 def test_native_response_matches_captured_teachers_and_supports_unmasked_text():
     from diffusers import QwenImage21Pipeline
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
 
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
     from qwen_image_sliders.train import response_rows
 
     runtime = TinyRuntime()
@@ -125,8 +125,8 @@ def test_native_response_matches_captured_teachers_and_supports_unmasked_text():
 @pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16], ids=["fp32", "bf16"])
 def test_rectangular_response_preserves_raw_times_and_each_prompt_mask(dtype, monkeypatch):
     from diffusers import QwenImage21Pipeline
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
 
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
     from qwen_image_sliders.train import response_rows
 
     runtime = TinyRuntime()
@@ -219,7 +219,7 @@ def test_shared_binding_captures_checkpoint_scale_after_response_context_exits()
 @pytest.mark.parametrize("preset", ["bispf", "bispf_optimized"])
 @pytest.mark.parametrize("checkpointing", [False, True])
 def test_shared_core_updates_actual_bank_and_keeps_base_frozen(checkpointing, preset):
-    from particle_sliders.pg09 import ConditionalPG09
+    from particle_sliders.engine import ConditionalParticleGAN
 
     runtime = TinyRuntime()
     captured = records(runtime)
@@ -236,7 +236,7 @@ def test_shared_core_updates_actual_bank_and_keeps_base_frozen(checkpointing, pr
         lambda module, args: seen.append(args[1] is particles)
     )
     try:
-        assert isinstance(game, ConditionalPG09)
+        assert isinstance(game, ConditionalParticleGAN)
         assert game.prior.z is particles
         for i in range(1, 5):
             stats = step_context(game)
@@ -244,7 +244,7 @@ def test_shared_core_updates_actual_bank_and_keeps_base_frozen(checkpointing, pr
         assert seen and all(seen)
         assert game.normalization_records == 6
         assert game.state_dict()["config"]["objective"] == "g_adv+public_prior;d_adv+public_penalty"
-        assert game.state_dict()["config"]["pg_version"] == "0.9.5"
+        assert game.state_dict()["config"]["pg_version"] == "0.11.0"
         assert all(layer.up.weight.grad.abs().sum() > 0 for layer in bank.layers)
         assert any(not torch.equal(v, initial[k]) for k, v in bank.state_dict().items())
         assert all(torch.equal(v, base[k]) for k, v in runtime.model.state_dict().items())
