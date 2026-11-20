@@ -22,7 +22,7 @@ owned CUDA DiT and VAE. Keeping the VAE on CUDA preserves the native pipeline's
 execution-device selection, sampler and decoder. Source FP32 VAE weights are
 explicitly cast to the canonical CUDA BF16 precision.
 
-Current source pins are base `a0090e51a819adaae2890038767dd39c9a231928`, core
+Current source pins are base `95704c27d76168aec1ceeefe70c0346084a8db2d`, core
 `3dd672a7f9b8c169daef90fd63e4bb42b9ddc423`, official ParticleGAN 0.9.5, and
 Diffusers `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458`. The source and runtime
 closures refuse changed implementation bytes before native allocation.

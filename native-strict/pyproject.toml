@@ -10,7 +10,9 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = {file = "LICENSE"}
 dependencies = [
- "qwen-image-particle-sliders @ git+https://github.com/HyperGAN/qwen-image-particle-sliders.git@a0090e51a819adaae2890038767dd39c9a231928",
+ "qwen-image-particle-sliders @ git+https://github.com/HyperGAN/qwen-image-particle-sliders.git@95704c27d76168aec1ceeefe70c0346084a8db2d",
+ "hndl==0.10.0",
+ "hypergan @ git+https://github.com/HyperGAN/HyperGAN.git@5f368a3770cf5bdae0448995c9f76e29af8049f7",
  "torch==2.9.1", "torchvision==0.24.1", "transformers==5.17.0", "accelerate==1.15.0",
  "safetensors==0.8.0", "Pillow==13.0.0", "numpy==2.5.4", "huggingface-hub==1.33.0",
  "tokenizers==0.23.3",
