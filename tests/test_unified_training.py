@@ -10,7 +10,7 @@ import torch
 def test_dispatcher_plan_check_periodic_checkpoint_resume_and_v2(tmp_path):
     profile = {
         "schema": "particle-slider-profile-v1",
-        "name": "qwen-pg094-fixture",
+        "name": "qwen-engine-fixture",
         "product": "qwen-image-particle-sliders",
         "config_kind": "session",
         "backend": "qwen",
@@ -24,7 +24,7 @@ def test_dispatcher_plan_check_periodic_checkpoint_resume_and_v2(tmp_path):
     profile_path.write_text(json.dumps(profile))
     config = {
         "backend": "qwen",
-        "cohort": "qwen-pg094-dispatcher-fixture-v1",
+        "cohort": "qwen-engine-dispatcher-fixture-v1",
         "options": {
             "dummy": True,
             "steps": 2,

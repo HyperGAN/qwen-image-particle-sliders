@@ -39,9 +39,9 @@ def main():
         version=core.version,
         source_sha256=closure("particle_sliders") | closure("concept_slider_core"),
         source_map_scope="all installed non-cache core package source/data files",
-        qualification="canonical native PG095 source cohort; CPU fixture qualification only",
+        qualification="canonical native engine source cohort; CPU fixture qualification only",
     )
-    release = json.loads(Path(core.locate_file("particle_sliders/pg095_release.json")).read_text())
+    release = json.loads(Path(core.locate_file("particle_sliders/engine_release.json")).read_text())
     document["particlegan"].update(
         commit=release["source_commit"],
         version=release["version"],

@@ -60,7 +60,7 @@ def main():
     assert len(set(hashes.values())) == len(set(adapter_hashes.values())) == 1
     assert not torch.cuda.is_initialized()
     report = {
-        "schema": "qwen-native-pg091-cpu-resume-v2",
+        "schema": "qwen-native-engine-cpu-resume-v1",
         "status": "passed",
         "preset": args.preset,
         "steps": 4,

@@ -21,7 +21,7 @@ the core owns the exact released GAN dependency.
 
 ```python
 from particle_sliders.lifecycle import SessionConfig, open_session
-config = SessionConfig('qwen', 'new-qwen-pg094-cpu-v1', dummy=True, steps=4,
+config = SessionConfig('qwen', 'new-qwen-engine-cpu-v1', dummy=True, steps=4,
     height=32, width=32, trajectory_steps=4, records_per_pair=2, ema_decay=None,
     rows=[dict(neutral='a red cup', positive='a shiny red cup'),
           dict(neutral='a blue bowl', positive='a shiny blue bowl')])

@@ -112,7 +112,7 @@ def test_real_shared_graphs_own_gradients_and_exact_resume(preset, checkpointing
 
 
 def test_failed_game_construction_restores_borrowed_projections(monkeypatch):
-    from particle_sliders import pg09
+    from particle_sliders import engine
 
     runtime = TinyRuntime()
     captured = paired_records(runtime, load_prompts(), seed=7, height=32, width=32, trajectory_steps=4)
@@ -121,7 +121,7 @@ def test_failed_game_construction_restores_borrowed_projections(monkeypatch):
     def fail(*args, **kwargs):
         raise RuntimeError("injected shared game refusal")
 
-    monkeypatch.setattr(pg09, "ConditionalParticleGAN", fail)
+    monkeypatch.setattr(engine, "ConditionalParticleGAN", fail)
     with pytest.raises(RuntimeError, match="injected shared game refusal"):
         build_game(runtime, captured)
     assert all(module.forward == before[name] for name, module in runtime.model.named_modules())

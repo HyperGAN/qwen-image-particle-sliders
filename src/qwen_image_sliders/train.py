@@ -222,7 +222,7 @@ def train(
         if resume:
             state = torch.load(resume, map_location=game.device, weights_only=True)
             if (
-                state.get("schema") != "qwen-native-pg09-training-v3"
+                state.get("schema") != "qwen-native-engine-training-v1"
                 or state.get("metadata") != meta
                 or state.get("run_config") != run_config
             ):
@@ -244,7 +244,7 @@ def train(
         atomic_save(
             outdir / "training.pt",
             {
-                "schema": "qwen-native-pg09-training-v3",
+                "schema": "qwen-native-engine-training-v1",
                 "metadata": meta,
                 "run_config": run_config,
                 "game": game.state_dict(),

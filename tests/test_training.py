@@ -42,7 +42,7 @@ def test_exact_cpu_resume_and_raw_inference(tmp_path, preset):
     )
     assert file_digest(full / "adapter.safetensors") == file_digest(split / "adapter.safetensors")
     packet = torch.load(full / "training.pt", weights_only=True)
-    assert packet["schema"] == "qwen-native-pg09-training-v3"
+    assert packet["schema"] == "qwen-native-engine-training-v1"
     assert "ema" not in packet and "ema_particles" not in packet
     assert meta["training"]["export"] == "raw" and meta["training"]["ema"] is None
     assert meta["quality_validated"] is False

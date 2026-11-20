@@ -64,7 +64,7 @@ This profile's text-state allowance is **230,686,720 bytes** (0.215 GiB): bounde
 - [src/qwen_image_sliders/runtime.py](src/qwen_image_sliders/runtime.py)
 - [src/qwen_image_sliders/adapters.py](src/qwen_image_sliders/adapters.py)
 - [src/qwen_image_sliders/train.py](src/qwen_image_sliders/train.py)
-- [src/qwen_image_sliders/fresh95/cache.py](src/qwen_image_sliders/fresh95/cache.py)
+- [src/qwen_image_sliders/scoped/cache.py](src/qwen_image_sliders/scoped/cache.py)
 - [Captured architecture, published file/index sizes and arithmetic](docs/memory/source-facts.json) retains exact model revisions, metadata SHA256s and direct Hugging Face config URLs. No weights were downloaded or opened for this calculation.
 - Optimizer facts: the pinned ParticleGAN0.9.5 `recipes.py` (`bcap`/`bispf_optimized`, lines1435–1451), `optim/dualnorm.py` momentum/state branch, and `optim/direction_blend.py` FP64 normals. These are part of the dependency selected by the repository's existing core lock; their source facts are recorded in the combined calculation report.
 

@@ -64,7 +64,7 @@ ORIGINAL = {
     },
     "tiny.py": {"bytes": 2940, "sha256": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031"},
     "train.py": {
-        "bytes": 13903,
-        "sha256": "f8062849914200b152f8dc3314a94aeab07a8f3843d8362251e75bf2aa1a0f12",
+        "bytes": 13907,
+        "sha256": "c50ce7ae0237ee72093a0b888eb87b76c74168e20558fb549f8397e47eaa9678",
     },
 }
