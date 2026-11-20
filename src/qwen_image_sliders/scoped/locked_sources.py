@@ -14,8 +14,8 @@ ORIGINAL = {
         "sha256": "2b352ad662e6fbbcef9753ad47141adc2edcd74fae58335618384fab5cc0f17e",
     },
     "checkpoint.py": {
-        "bytes": 4230,
-        "sha256": "0a6bb82bc9e65c9d39e3b1a27dcb1434db4c30932c9bc1d308ae8cef6190161d",
+        "bytes": 4231,
+        "sha256": "4eae2164747742b9a13d3327319b5b269b5f94dce2eee9856cad7e3b903faab0",
     },
     "contracts.py": {
         "bytes": 2886,
@@ -26,13 +26,13 @@ ORIGINAL = {
         "sha256": "61fc439b1e2f3836517c5217cdcb2bbf952030ac23763b39aa3c402ed1a05a97",
     },
     "image_bindings.py": {
-        "bytes": 20935,
-        "sha256": "63337e024c27dd41860269f89f6f636bc3fcd222871aa87c9ec457aa0341a8f9",
+        "bytes": 21947,
+        "sha256": "c19405983f48c4207d239c6433f1bcbe72bcf7f3d024542b7d8e4caecc1b86c8",
     },
     "infer.py": {"bytes": 4092, "sha256": "5e6f3fdbd5636b82c9f7accdb3c74e1432abf50e3d7b7a3fe94ecea97dd166f4"},
     "inference.py": {
-        "bytes": 6566,
-        "sha256": "9d4f53b1038b734bdc3b84ea7ed6abec630d959368e8b369dab6cd5db39af220",
+        "bytes": 6567,
+        "sha256": "491f085fb915e3edfb5d2d795e8283fdb73596e65ac2e2763a08445a4fb7c0eb",
     },
     "learning_rates.py": {
         "bytes": 1068,
@@ -51,20 +51,20 @@ ORIGINAL = {
         "sha256": "1c46388dff31a09b84682719d41b20756e15a1405ec5c467da9a0f54df94f88a",
     },
     "qwen_native.py": {
-        "bytes": 1064,
-        "sha256": "3ecfceb5b3bda5db985dfc07fe9811c2188e80a46f9bd463beac434369779610",
+        "bytes": 1066,
+        "sha256": "01f7571e68f8b893f2c309de9d6085a15388a1f0c4293795b9cf1cf3322febe8",
     },
     "runtime.py": {
         "bytes": 7432,
         "sha256": "408409b3c1d7510874d4e4b029bf35ab1dd0cf7bfb42f6dc0019ea9953ba3373",
     },
     "teachers.py": {
-        "bytes": 4451,
-        "sha256": "837cb0afc6cf39ce595c059d26956a39a8b668b133f1616799516788d354344b",
+        "bytes": 4452,
+        "sha256": "5c2be423f260f9bf20d723244263dbb8ba05f73027789fc8a181bff35f639ef6",
     },
     "tiny.py": {"bytes": 2940, "sha256": "bf7e432da104a7b40b050a8017ec09a85f315ae3db427cd263c925d932222031"},
     "train.py": {
-        "bytes": 13902,
-        "sha256": "94c5d15614064406294802a28e0d1c0ccae0b762dd7860126c40ed5d176af84d",
+        "bytes": 13903,
+        "sha256": "f8062849914200b152f8dc3314a94aeab07a8f3843d8362251e75bf2aa1a0f12",
     },
 }

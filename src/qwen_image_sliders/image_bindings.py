@@ -8,6 +8,7 @@ load weights, dispatch a process, or call a historical trainer.
 
 from contextlib import contextmanager
 from copy import deepcopy
+from typing import ClassVar
 
 import torch
 from particle_sliders.backends import (
@@ -68,7 +69,7 @@ class ImageResponseAdapter(FrozenResponseAdapter):
     pack/unpack functions. No arbitrary vector is reinterpreted as an image.
     """
 
-    conventions = {
+    conventions: ClassVar[dict[str, str]] = {
         "qwen_image21": "model t=raw_t/1000; native unpatched VAE latent flow velocity",
         "iris": "raw model t=1000*sigma; pixel-space RGB flow velocity",
         "sana": "raw scheduler t multiplied by config.timestep_scale; flow velocity",

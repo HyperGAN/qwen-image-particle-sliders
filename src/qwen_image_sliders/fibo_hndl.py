@@ -63,15 +63,15 @@ def verified_builder():
         raise ValueError("Fibo requires the exact clean HyperGAN develop build provenance")
     if any(_sha(hypergan_root / name) != digest for name, digest in expected["hypergan"].items()):
         raise ValueError("Fibo HyperGAN builder closure differs from the reviewed runtime")
-    identity = dict(
-        profile=PROFILE,
-        hndl_version="0.10.0",
-        hypergan_commit="5f368a3770cf5bdae0448995c9f76e29af8049f7",
-        hypergan_build_provenance_sha256=_sha(provenance),
-        runtime_sources_sha256=_sha(ROOT / "fibo_hndl_010_sources.json"),
-        projection_sha256=_sha(ROOT / "fibo_projection.hndl"),
-        critic_sha256=_sha(ROOT / "fibo_critic.hndl"),
-    )
+    identity = {
+        "profile": PROFILE,
+        "hndl_version": "0.10.0",
+        "hypergan_commit": "5f368a3770cf5bdae0448995c9f76e29af8049f7",
+        "hypergan_build_provenance_sha256": _sha(provenance),
+        "runtime_sources_sha256": _sha(ROOT / "fibo_hndl_010_sources.json"),
+        "projection_sha256": _sha(ROOT / "fibo_projection.hndl"),
+        "critic_sha256": _sha(ROOT / "fibo_critic.hndl"),
+    }
     return build_network, identity
 
 
