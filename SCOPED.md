@@ -72,3 +72,23 @@ finally:
 Owners use explicit `.close()`; they are not context managers. Use fresh immutable output directories and artifact paths. Fresh refuses a saved packet; resume requires an exact new-profile FULL. Ordinary original component constructors still run. Fresh then applies public ParticleGAN deterministic orthogonal initialization once before optimizers, preserving original Parameter objects and native weights. The active AdapterBank down constructor uses Kaiming `a=sqrt(5)`: its target variance is `1/(3*fan_in)`. Down QR retains that scale; UP remains zero/KEEP. The existing128x4 bank receives its declared R2 initialization at target standard deviation0.02. The original router/readout and ConditionalReadoutCritic remain constructor KEEP. No replacement layer, extra bank or pretrained initializer is introduced. FULL0/RAW0 and the receipt are saved before update1.
 
 FULL resume skips the fresh initializer and restores the whole typed network/bank/critic/optimizers/sampling/exposure/model-RNG state, retaining the original initialization receipt and exact cache identity. It does not migrate or reinitialize a completed legacy cohort. RAW restores only the adapter/bank state and skips cache loading, critic/game/optimizer construction and the fresh initializer. Responses retain native scale0..1 and the original row geometry. The optional `inferred.render(...)` route delegates to the original native consumer; the new profile's pretrained/full-image/public-wheel execution is unqualified by these CPU response checks. No pretrained weights or new finished-output LR result are supplied here.
+
+## Scheduled strength
+
+Pass an open scoped RAW inference owner and one gain per native Euler step.
+The sampler applies `strength * gain` to its routed adapter on that step.
+Keep every effective strength within `[0, 1]`. The result includes the
+actual native sigmas, including the terminal sigma, and the applied strengths.
+
+```python
+from qwen_image_sliders.scheduled_inference import render
+
+images, receipt = render(inferred, prompt=prompt, seed=7, steps=4,
+                         strength=0.5, step_gains=[1.5, 1.5, 0.5, 0.5],
+                         height=512, width=512, output_type="pil")
+```
+
+Use the recorded native sigma intervals when constructing a matched-dose
+schedule. The tiny native fixture reproduces the original latent bytes at
+constant strength. Finished-image effect is pending a pretrained comparison.
+[Shared qualification guide](https://github.com/HyperGAN/particle-sliders/blob/main/docs/strength-schedules.md)
