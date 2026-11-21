@@ -42,14 +42,14 @@ def test_exact_cpu_resume_and_raw_inference(tmp_path, preset):
     )
     assert file_digest(full / "adapter.safetensors") == file_digest(split / "adapter.safetensors")
     packet = torch.load(full / "training.pt", weights_only=True)
-    assert packet["schema"] == "qwen-native-pg09-training-v3"
+    assert packet["schema"] == "qwen-native-engine-training-v1"
     assert "ema" not in packet and "ema_particles" not in packet
     assert meta["training"]["export"] == "raw" and meta["training"]["ema"] is None
     assert meta["quality_validated"] is False
     assert meta["validation_kind"] == "tiny-native-random-weights-synthetic-text"
     assert meta["formulation"]["architecture_id"] == "gmix"
-    assert meta["protocol"]["engine"] == "particle_sliders.pg09.ConditionalPG09"
-    assert meta["shared_api"]["particlegan_version"] == "0.9.5"
+    assert meta["protocol"]["engine"] == "particle_sliders.engine.ConditionalParticleGAN"
+    assert meta["shared_api"]["particlegan_version"] == "0.11.1"
     kwargs = {"seed": 42, "height": 32, "width": 32, "steps": 4, "output_type": "latent"}
     runtime = TinyRuntime()
     vanilla = runtime.sample(runtime.encode("A cup."), **kwargs)
@@ -144,7 +144,7 @@ def test_failed_build_restores_native_checkpoint_context_and_hooks(tmp_path, mon
     def fail(*args, **kwargs):
         raise RuntimeError("injected common game failure")
 
-    monkeypatch.setattr(trainer, "ConditionalPG09", fail)
+    monkeypatch.setattr(trainer, "ConditionalParticleGAN", fail)
     with pytest.raises(RuntimeError, match="injected common game failure"):
         train(runtime, load_prompts(), tmp_path, gradient_checkpointing=True)
     assert not any(module._forward_hooks for module in runtime.model.modules())
@@ -167,13 +167,13 @@ def test_resume_rejects_budget_drift_and_historical_ema_before_restore(tmp_path,
     bad = tmp_path / "bad-ema.pt"
     torch.save(packet, bad)
     calls = []
-    original = trainer.ConditionalPG09.load_state_dict
+    original = trainer.ConditionalParticleGAN.load_state_dict
 
     def observed(game, state):
         calls.append(True)
         return original(game, state)
 
-    monkeypatch.setattr(trainer.ConditionalPG09, "load_state_dict", observed)
+    monkeypatch.setattr(trainer.ConditionalParticleGAN, "load_state_dict", observed)
     runtime = TinyRuntime()
     with pytest.raises(ValueError, match="EMA"):
         train(runtime, rows, tmp_path / "wrong-ema", steps=4, resume=bad)
@@ -213,7 +213,7 @@ def test_default_training_exports_live_parameters_without_host_ema(tmp_path, mon
 
 def test_hndl_critic_executes_shared_native_gan_and_resumes(tmp_path):
     pytest.importorskip("hndl")
-    from particle_sliders.pg09_hndl import HNDLConditionalReadoutCritic
+    from particle_sliders.hndl_critic import HNDLConditionalReadoutCritic
 
     from qwen_image_sliders.teachers import paired_records
     from qwen_image_sliders.train import build_game, step_context

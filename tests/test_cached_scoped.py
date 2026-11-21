@@ -1,7 +1,7 @@
 """FOUR NEW AUTHORED UNRUN cases; real random tiny Qwen model, synthetic retained data.
 
 No pretrained/model download, paired teacher capture or adapter.prepare. Exactly
-ONE original ConditionalPG09 update across the complete file (third node only).
+ONE original ConditionalParticleGAN update across the complete file (third node only).
 These fixtures establish no pretrained/native-render or LR qualification.
 """
 
@@ -10,10 +10,10 @@ from pathlib import Path
 
 import pytest
 import torch
-from particle_sliders.pg09_backends import PreparedResponse, ResponseRow
-from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+from particle_sliders.backends import PreparedResponse, ResponseRow
 
-from qwen_image_sliders.fresh95 import (
+from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
+from qwen_image_sliders.scoped import (
     configuration,
     open_inference,
     open_training,
@@ -22,8 +22,8 @@ from qwen_image_sliders.fresh95 import (
     save_prepared_cache,
     training,
 )
-from qwen_image_sliders.fresh95.cache import CacheBinding, prepared_digest
-from qwen_image_sliders.fresh95.util import Checkpoint, equal, file_pin
+from qwen_image_sliders.scoped.cache import CacheBinding, prepared_digest
+from qwen_image_sliders.scoped.util import Checkpoint, equal, file_pin
 from qwen_image_sliders.tiny import TinyRuntime
 
 
@@ -126,7 +126,7 @@ def test_new_cached_fresh_initializer_before_optimizers_hostQR_zeroUP_router_cri
     runtime, config = runtime_fixture(), config_fixture()
     cache, _rows = cache_fixture(tmp_path, runtime, config)
     forbid_teachers(monkeypatch)
-    initialize, game = policy.initialize, training.ConditionalPG09
+    initialize, game = policy.initialize, training.ConditionalParticleGAN
     seen = {}
     frozen = [(p, p.detach().clone()) for p in runtime.model.parameters()]
 
@@ -152,7 +152,7 @@ def test_new_cached_fresh_initializer_before_optimizers_hostQR_zeroUP_router_cri
         return game(backend, prepared, critic, **kwargs)
 
     monkeypatch.setattr(policy, "initialize", init_spy)
-    monkeypatch.setattr(training, "ConditionalPG09", game_spy)
+    monkeypatch.setattr(training, "ConditionalParticleGAN", game_spy)
     owner = open_training(
         runtime,
         cache,
@@ -278,7 +278,7 @@ def test_new_one_original_update_strict_whole_FULL_resume_and_RAW_native_respons
     finally:
         resumed.close()
     # RAW route never reads a prepared cache or constructs a critic/game.
-    import qwen_image_sliders.fresh95.cache as cache_module
+    import qwen_image_sliders.scoped.cache as cache_module
 
     monkeypatch.setattr(cache_module, "load_cache", forbidden)
     inference = open_inference(runtime_fixture(), raw=raw, owner_admission=admitted)

@@ -14,9 +14,9 @@ from qwen_image_sliders.tiny import TinyRuntime
 def test_native_export_load_without_any_training_construction(monkeypatch):
     from qwen_image_sliders import teachers, train
 
-    with BACKEND.open(config(ema_decay=0.9)) as training:
+    with BACKEND.open(config(ema_decay=None)) as training:
         training.train(stop_after=1)
-        packet = training.export_inference(selection="ema")
+        packet = training.export_inference(selection="raw")
         assert "rows" not in packet["specification"]["configuration"]
         assert "game_signature" not in packet["specification"]["identity"]
         assert packet["specification"]["response"] is False
@@ -26,7 +26,7 @@ def test_native_export_load_without_any_training_construction(monkeypatch):
 
     monkeypatch.setattr(teachers, "paired_records", forbidden)
     monkeypatch.setattr(train, "build_game", forbidden)
-    monkeypatch.setattr(train.ConditionalPG09, "__init__", forbidden)
+    monkeypatch.setattr(train.ConditionalParticleGAN, "__init__", forbidden)
     monkeypatch.setattr(torch.optim.Optimizer, "__init__", forbidden)
     before = torch.get_rng_state().clone()
     runtime = TinyRuntime()

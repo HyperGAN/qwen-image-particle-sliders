@@ -1,4 +1,4 @@
-"""Keep the stable wheel limited to the canonical native PG095 runtime."""
+"""Keep the stable wheel limited to the canonical native runtime."""
 
 from pathlib import Path
 

@@ -91,7 +91,7 @@ def test_interrupt_after_attachment_cleans_hooks_and_checkpoint_settings(monkeyp
         assert any(module._forward_hooks for module in runtime.model.modules())
         raise KeyboardInterrupt("interrupted during game setup")
 
-    monkeypatch.setattr(train, "ConditionalPG09", interrupt)
+    monkeypatch.setattr(train, "ConditionalParticleGAN", interrupt)
     with pytest.raises(KeyboardInterrupt):
         BACKEND.open(config(gradient_checkpointing=True), runtime=runtime)
     assert runtime.pipe.scheduler is scheduler

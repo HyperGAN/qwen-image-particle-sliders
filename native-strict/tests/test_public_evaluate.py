@@ -55,7 +55,7 @@ def public_factory(monkeypatch):
 
 
 def test_actual_public_train_dev_indices_strengths_state_RNG_and_adapter_equivalence(public_factory):
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     from qwen_image_strict.native import observation
     make,_=public_factory
     runtime,session=make()
@@ -78,7 +78,7 @@ def test_actual_public_train_dev_indices_strengths_state_RNG_and_adapter_equival
 
 def test_actual_public_unknown_split_and_bad_indices_do_not_change_state(public_factory):
     from particle_sliders.lifecycle import UnsupportedOperation
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     make,_=public_factory;_,session=make()
     try:
         before=_hash(session.checkpoint());rng=torch.random.get_rng_state().clone()
@@ -91,7 +91,7 @@ def test_actual_public_unknown_split_and_bad_indices_do_not_change_state(public_
 
 def test_fresh_dev_seed_changes_resume_identity_and_cached_rows_snapshot(public_factory):
     from particle_sliders.lifecycle import CheckpointError
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     make,_=public_factory
     _,first=make();other=None
     try:
@@ -107,7 +107,7 @@ def test_fresh_dev_seed_changes_resume_identity_and_cached_rows_snapshot(public_
 
 
 def test_observation_pairs_are_snapshotted_and_prepared_rows_released_on_close(public_factory,monkeypatch):
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     import qwen_image_strict.cleanup as cleanup
     make,_=public_factory
     pairs=deepcopy(DEVELOPMENT);_,session=make(pairs)
@@ -159,9 +159,9 @@ def test_actual_raw_inference_callback_keeps_native_request_contract(public_fact
 
 def test_actual_public_read_open_response_seed_contract_state_RNG_and_no_training(public_factory,monkeypatch,tmp_path):
     from particle_sliders.inference import read_inference,open_inference
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     from qwen_image_strict import inference,native,cache,game,lifecycle,evaluation
-    from particle_sliders import pg09,pg09_readout_critic
+    from particle_sliders import engine,readout_critic
     # Explicit tiny native CPU fixture admission only. Public serialization,
     # factory, native readout, AdapterBank and observation transactions are real.
     monkeypatch.setattr(inference,'validate',lambda *a:None)
@@ -179,7 +179,7 @@ def test_actual_public_read_open_response_seed_contract_state_RNG_and_no_trainin
     fresh=runtime_factory();monkeypatch.setattr(native,'StrictRuntime',lambda *a,**k:fresh)
     def forbidden(*a,**k):raise AssertionError('public inference reached training construction')
     for module,name in [(cache,'capture'),(cache,'current_records'),(game,'build_game'),(lifecycle,'prepare'),(evaluation,'prepare'),
-        (pg09.ConditionalPG09,'__init__'),(pg09_readout_critic.ConditionalReadoutCritic,'__init__')]:
+        (engine.ConditionalParticleGAN,'__init__'),(readout_critic.ConditionalReadoutCritic,'__init__')]:
         monkeypatch.setattr(module,name,forbidden)
     calls=[];handle=fresh.model.register_forward_hook(lambda *a:calls.append(True))
     try:

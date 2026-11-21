@@ -1,4 +1,4 @@
-"""Run only the four cached-fresh95 cases against the genuine installed wheel.
+"""Run only the four cached-scoped cases against the genuine installed wheel.
 
 The preceding CI step builds and installs that wheel. This runner neither
 builds nor installs packages and never changes the original cohort guards.
@@ -63,11 +63,11 @@ def main():
         if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
     )
     if declared != NODES:
-        raise RuntimeError("exactly the four declared cached-fresh95 cases are required")
+        raise RuntimeError("exactly the four declared cached-scoped cases are required")
     work.mkdir(parents=True)
     reports = work / "reports"
     reports.mkdir()
-    copied = work / "test_cached_fresh95.py"
+    copied = work / "test_cached_scoped.py"
     shutil.copyfile(fixture, copied)
     configuration = work / "pytest.ini"
     configuration.write_text("[pytest]\naddopts =\n", encoding="utf-8")
@@ -90,7 +90,7 @@ def main():
         if direct_url and json.loads(direct_url).get("dir_info", {}).get("editable"):
             raise RuntimeError("the original editable distribution must be replaced by its wheel")
 
-        from qwen_image_sliders.fresh95 import ownership
+        from qwen_image_sliders.scoped import ownership
 
         # This is the unchanged full core577/PG68 and genuine namespace RECORD
         # guard. A mismatch fails before any added training components.
@@ -101,7 +101,7 @@ def main():
             {
                 "distribution": installed.metadata["Name"],
                 "version": installed.version,
-                "installed_namespace": str(root / "fresh95"),
+                "installed_namespace": str(root / "scoped"),
                 "original_cohort_and_installed_RECORD_guard_passed": True,
                 "guard_modified": False,
                 "source_overlay": False,
@@ -141,7 +141,7 @@ def main():
         write_json(
             reports / "result.json",
             {
-                "schema": "Qwen-cached-fresh95-installed-wheel-FOUR-CI-software-result-v1",
+                "schema": "Qwen-cached-scoped-installed-wheel-FOUR-CI-software-result-v1",
                 "complete": bool(complete),
                 "original_guards_passed": guard_verified,
                 "actual_pytest_exit": pytest_exit,

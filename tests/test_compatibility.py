@@ -1,4 +1,4 @@
-"""Installed source/profile contracts for the canonical PG095 environment."""
+"""Installed source/profile contracts for the current engine environment."""
 
 import importlib
 from importlib.metadata import distribution, version
@@ -12,13 +12,13 @@ from qwen_image_sliders.core_profile import require_current_core
 
 def test_installed_shared_sources_match_the_entire_locked_cohort():
     pins = lock()
-    assert version("particle-sliders-core") == pins["core"]["version"] == "0.13.0"
-    assert version("particlegan") == pins["particlegan"]["version"] == "0.9.5"
+    assert version("particle-sliders-core") == pins["core"]["version"] == "0.15.2"
+    assert version("particlegan") == pins["particlegan"]["version"] == "0.11.1"
     core = distribution("particle-sliders-core")
     for relative, expected in pins["core"]["source_sha256"].items():
         assert file_digest(core.locate_file(relative)) == expected, relative
-    assert len(pins["core"]["source_sha256"]) == 577
-    assert pins["particlegan"]["source_profile"] == "release-0.9.5"
+    assert len(pins["core"]["source_sha256"]) == 60
+    assert pins["particlegan"]["source_profile"] == "release-0.11.1"
     require_current_core()
 
 
@@ -46,7 +46,7 @@ def test_source_guard_refuses_changed_and_extra_core_data_before_native_use(tmp_
         "distribution",
         lambda name: CopiedCore() if name == "particle-sliders-core" else original_distribution(name),
     )
-    path = tmp_path / "particle_sliders/pg095_release.json"
+    path = tmp_path / "particle_sliders/engine_release.json"
     original = path.read_bytes()
     path.write_bytes(original + b"\n")
     with pytest.raises(RuntimeError, match="shared source differs"):

@@ -1,16 +1,14 @@
 # Source, model and license provenance
 
-Current canonical cohort: core 0.12.0 at `ddb41423bcefc1fe76cd94d0f9b367353b3ea137`,
-released ParticleGAN 0.9.4. Historical S081 sources and receipts are preserved in
-[the old lock](docs/cohorts/qwen-core081.lock.json); use the original product commit
-`eaa753d594c62afefd3337f3f82cb1adfe51b56e` in its isolated environment for old artifacts. The 2026-10-17 audit was an earlier core 0.6.0 stage.
-The separate [HyperGAN/HNDL candidate](docs/hypergan-hndl-candidate.md) does not retarget this cohort. `backend.lock.json` and its packaged
-copy are identical; full commits and all official snapshot hashes are authoritative.
+The canonical package uses core 0.15.2 and ParticleGAN 0.11.1. The
+[pre-rollout source and model provenance](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/PROVENANCE.md) records the
+original pins for older artifacts. The packaged and repository copies of
+`backend.lock.json` bind the current source and model snapshot.
 
 | Source | Pin | Role / license |
 |---|---|---|
-| HyperGAN/particle-sliders | `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` | Canonical shared core 0.12.0; MIT |
-| 255BITS/ParticleGAN | `330eb94ee748cdcad131b0275d8de75fd5a7f96f` | Released ParticleGAN 0.9.4; MIT |
+| HyperGAN/particle-sliders | `ec1161f5d74481be3540cb0dfa63d0e8f8b54e90` | Canonical shared core 0.15.2, MIT |
+| HyperGAN/ParticleGAN | `d5dec2fe005305082acf382f0939a4bdb51c7131` | Released ParticleGAN 0.11.1, MIT |
 | huggingface/diffusers | `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458` | Native pipeline/transformer/scheduler; Apache-2.0 |
 | QwenLM/Qwen-Image-2.1 | `1993c3a4821f977df0b6dd2661ff5b40239aa55a` | Official requirements and license reference |
 | Qwen/Qwen-Image-2.1 | `d26bb61231c349cf6b7896fa83353113880e1ba3` | Official model snapshot; Qwen research license |

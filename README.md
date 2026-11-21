@@ -1,12 +1,12 @@
 > **Calculated memory planning:** training **108 GiB VRAM / 32 GiB host RAM** (512×512, B=2, BF16 frozen; FP32 routed adapter/critic); sampling **52 GiB VRAM / 32 GiB host RAM** (512×512). See [MEMORY.md](MEMORY.md) for checkpointed/phase variants, attention fallback and exact limits. These are conservative calculated budgets, not measured peaks.
 
-> **Current source: core0.13.0 / published ParticleGAN0.9.5.** This is a fresh cohort; older versioned evidence below remains historical. See [adoption and compatibility](docs/pg095-adoption.md). No native PG0.9.5 result is claimed for this package's default cohort.
+> **Current source uses core 0.15.2 and ParticleGAN 0.11.1.** Native pretrained execution remains unqualified for this package's default cohort.
 
 For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
 The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
 is a distinct prerelease distribution for an isolated environment. Canonical wheels
-exclude candidate modules/lock; default installation uses core0.12.0/PG0.9.4. CI checks that lane;
-modern CPU qualification is a separate explicit test lane.
+exclude candidate modules and locks. CI checks the canonical package. The
+separate HNDL candidate has its own CPU tests.
 
 # Particle Sliders for Qwen-Image 2.1
 
@@ -21,24 +21,18 @@ research result, not a migration or new qualification of the default cohort.
 **Built with Qwen.** A separate HyperGAN product for the official
 [`Qwen/Qwen-Image-2.1`](https://huggingface.co/Qwen/Qwen-Image-2.1) checkpoint,
 using `QwenImage21Pipeline` and the pinned shared
-[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/ddb41423bcefc1fe76cd94d0f9b367353b3ea137/packages/particle-sliders-core).
+[`particle-sliders-core`](https://github.com/HyperGAN/particle-sliders/tree/ec1161f5d74481be3540cb0dfa63d0e8f8b54e90/packages/particle-sliders-core).
 
-The training CLI executes the installed shared `ConditionalPG09` game with released
-ParticleGAN **0.9.4** and the native `QwenImage21ResponseAdapter`. It trains the actual
+The training CLI uses the installed shared `ConditionalParticleGAN` game and the
+native `QwenImage21ResponseAdapter`. It trains the actual
 hooked routed maps and 128x4 particle bank on native spatial VAE velocity fields.
 Inference uses the same raw trained maps/particles and the native Qwen pipeline at strengths
 **0–1**; strength zero bypasses hooks exactly. There is no MSE training loop or
 copied GAN engine.
 
-**Status:** canonical PG0.9.4 adoption and bounded CPU checks are described in
-[the current audit](docs/pg094-adoption.md). The historical lifecycle receipt records **26 installed CPU checks**;
-see [qualification status](PUBLICATION-STATUS.md). No pretrained image quality is established;
-see [the core 0.8.1 adoption audit](docs/core081-adoption.md).
-The [prior PR1 audit](docs/pg09-final-core.md) qualifies its original exact core pin.
-Older CUDA smoke measurements in
-[VALIDATION.md](VALIDATION.md) belong to the previous gmix implementation and do not
-qualify this new objective. New pretrained/GPU, memory, sampler quality and convergence
-acceptance remain pending. No pretrained slider weights are released.
+The [published source archive](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/README.md) records the earlier CPU and CUDA
+qualifications. Pretrained image quality and convergence remain unqualified for
+the current source.
 This product targets base 2.1, not older Qwen-Image, Edit/Layered, or 2.1 Turbo.
 Image-conditioned training, other CFG values, ComfyUI and ordinary-LoRA distillation
 are outside this initial release.
@@ -194,7 +188,7 @@ ordinary LoRA and cannot be loaded through `pipe.load_lora_weights()`.
 The CI workflow installs pinned source dependencies on CPU, runs native/unit tests,
 builds a wheel, then installs and exercises the wheel outside the source tree.
 It never downloads base weights. Real-model acceptance checks remain in
-[docs/real-model-validation.md](docs/real-model-validation.md).
+[docs/real-model-validation.md](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/real-model-validation.md).
 
 Learning-rate controls and preserved defaults: [LEARNING-RATES.md](LEARNING-RATES.md).
 

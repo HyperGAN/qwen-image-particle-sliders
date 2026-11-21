@@ -38,7 +38,7 @@ def settings(options, evaluation_pairs):
 def prepare(runtime, adapter, options):
     """Prepare fresh native teachers and derive identity from actual tensor bytes."""
     from particle_sliders.lifecycle import EvaluationRows
-    from particle_sliders.pg09 import _hash
+    from particle_sliders.engine import _hash
     from qwen_image_sliders.train import response_rows
     from .cache import capture, capture_options, identity
     from .native import observation

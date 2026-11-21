@@ -2,9 +2,9 @@
 def build_game(runtime, records, stamp, declared, seed, *, steps, preset='bispf_optimized',
                lr=None, d_lr_mult=None, prior_lr_mult=None, critic_kind='readout'):
     import torch
-    from particle_sliders.pg09 import ConditionalPG09
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter, image_condition_features
-    from particle_sliders.pg09_readout_critic import ConditionalReadoutCritic
+    from particle_sliders.engine import ConditionalParticleGAN
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter, image_condition_features
+    from particle_sliders.readout_critic import ConditionalReadoutCritic
     from qwen_image_sliders.adapters import AdapterBank
     from qwen_image_sliders.learning_rates import resolve_alias
     from qwen_image_sliders.train import response_rows
@@ -30,11 +30,11 @@ def build_game(runtime, records, stamp, declared, seed, *, steps, preset='bispf_
             conditions=image_condition_features(prepared)
             critic_class=ConditionalReadoutCritic
             if critic_kind=='hndl':
-                from particle_sliders.pg09_hndl import HNDLConditionalReadoutCritic
+                from particle_sliders.hndl_critic import HNDLConditionalReadoutCritic
                 critic_class=HNDLConditionalReadoutCritic
             elif critic_kind!='readout':raise ValueError('unsupported critic')
             critic=critic_class(prepared[0].target.numel(),conditions.shape[1]).to(runtime.device)
-            game=ConditionalPG09(adapter,prepared,critic,conditions=conditions,particles=particles,
+            game=ConditionalParticleGAN(adapter,prepared,critic,conditions=conditions,particles=particles,
                 response_domain='continuous_field',response_scale=response_scale,preset=preset,
                 total_steps=steps,batch_size=int(declared['adv_batch']),seed=seed,
                 recipe_overrides=rates,sampling='balanced')

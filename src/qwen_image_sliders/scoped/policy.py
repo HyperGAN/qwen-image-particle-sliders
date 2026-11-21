@@ -1,6 +1,6 @@
 """Explicit Qwen-Image2.1 fresh-components policy; authored Source, not executed.
 
-Use the already admitted public PG0.9.5 API, not a runtime/core upgrade.
+Use the already admitted public PG0.11.1 API, not a runtime/core upgrade.
 Only down matrices receive host-scale QR; declared banks receive R2Normal.
 Every other owned parameter is explicitly KEEP.  Original model modules,
 Parameter objects, forward methods and optimizer ownership remain untouched.
@@ -20,8 +20,8 @@ from particlegan import init as pg_init
 from torch import nn
 
 INIT_SHA256 = "3534ff23efa413cdf8b4125b91e0d30671d873b3e2958547d4e744b750454b9b"
-SCHEMA = "product-owned-PG095-downQR-bankR2-KEEP-fresh-initialization-v1"
-MARKER = "_fresh_PG095_initialization_receipt_sha256"
+SCHEMA = "product-owned-ParticleGAN-downQR-bankR2-KEEP-fresh-initialization-v1"
+MARKER = "_fresh_engine_initialization_receipt_sha256"
 POLICIES = {"qwen": "qwen-image21-fresh-downQR-sqrt5-bankR2std002-router-readoutKEEP-v1"}
 
 
@@ -91,7 +91,7 @@ def policies(product, adapter, critic, *, particles=None, qwen_profile=None):
     """All actual added adapter/critic/bank trainables; never the native model."""
     if product != "qwen" or qwen_profile != "canonical-readout-v1":
         raise ValueError("separate canonical Qwen profile required; no HNDL/strict migration")
-    from particle_sliders.pg09_readout_critic import ConditionalReadoutCritic
+    from particle_sliders.readout_critic import ConditionalReadoutCritic
 
     from qwen_image_sliders.adapters import AdapterBank
 
@@ -192,8 +192,11 @@ def initialize(
         raise ValueError(
             "truthful fresh construction before optimizers required; resume/inference never initialize"
         )
-    if metadata.version("particlegan") != "0.9.5" or source_record(pg_init.__file__)["sha256"] != INIT_SHA256:
-        raise ValueError("exact already admitted PG0.9.5 initializer Source required")
+    if (
+        metadata.version("particlegan") != "0.11.1"
+        or source_record(pg_init.__file__)["sha256"] != INIT_SHA256
+    ):
+        raise ValueError("exact already admitted PG0.11.1 initializer Source required")
     rows = policies(product, adapter, critic, particles=particles, qwen_profile=qwen_profile)
     policy = POLICIES[product]
     before = [tensor_sha(row["parameter"]) for row in rows]

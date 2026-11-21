@@ -13,10 +13,10 @@ from .util import source_record
 def require():
     from qwen_image_sliders.core_profile import require_current_core
 
-    require_current_core()  # Unchanged complete core577/PG68 Source verification.
+    require_current_core()  # Verify the complete core and engine source closures.
     dist = distribution("qwen-image-particle-sliders")
     root = Path(dist.locate_file("qwen_image_sliders")).absolute()
-    if dist.version != "0.3.0" or Path(__file__).absolute().parent != root / "fresh95":
+    if dist.version != "0.3.0" or Path(__file__).absolute().parent != root / "scoped":
         raise RuntimeError("new namespace must belong to the original installed product distribution")
     for name, pin in ORIGINAL.items():
         raw = (root / name).read_bytes()
@@ -25,11 +25,11 @@ def require():
     expected = {
         str(p): p
         for p in (dist.files or ())
-        if str(p).startswith("qwen_image_sliders/fresh95/") and p.suffix == ".py"
+        if str(p).startswith("qwen_image_sliders/scoped/") and p.suffix == ".py"
     }
     actual = {
         str(p.relative_to(root.parent)): p
-        for p in (root / "fresh95").rglob("*.py")
+        for p in (root / "scoped").rglob("*.py")
         if "__pycache__" not in p.parts
     }
     if set(expected) != set(actual):
@@ -39,8 +39,8 @@ def require():
         digest = base64.urlsafe_b64encode(hashlib.sha256(path.read_bytes()).digest()).rstrip(b"=").decode()
         if pin is None or pin.mode != "sha256" or pin.value != digest:
             raise RuntimeError("new namespace differs from genuine installed RECORD")
-    spec = importlib.util.find_spec("qwen_image_sliders.fresh95")
-    if spec is None or Path(spec.origin).absolute() != root / "fresh95/__init__.py":
+    spec = importlib.util.find_spec("qwen_image_sliders.scoped")
+    if spec is None or Path(spec.origin).absolute() != root / "scoped/__init__.py":
         raise RuntimeError("new namespace is shadowed")
 
 
@@ -48,15 +48,17 @@ def sources():
     import inspect
 
     from diffusers import QwenImage21Pipeline, QwenImage21Transformer2DModel
-    from particle_sliders import pg09, pg09_backends, pg09_images, pg09_readout_critic, qwen_native
+    from particle_sliders import backends, engine, readout_critic
     from particlegan import init
 
     from qwen_image_sliders import (
         adapters,
         contracts,
         core_profile,
+        image_bindings,
         learning_rates,
         lifecycle,
+        qwen_native,
         runtime,
         tiny,
         train,
@@ -71,12 +73,12 @@ def sources():
         ("contracts", contracts),
         ("core_profile", core_profile),
         ("learning_rates", learning_rates),
-        ("pg09", pg09),
-        ("pg09_images", pg09_images),
-        ("pg09_backends", pg09_backends),
-        ("readout_critic", pg09_readout_critic),
+        ("engine", engine),
+        ("image_bindings", image_bindings),
+        ("backends", backends),
+        ("readout_critic", readout_critic),
         ("qwen_native", qwen_native),
-        ("PG095_init", init),
+        ("engine_init", init),
     )
     original = {name: source_record(module.__file__) for name, module in modules}
     original.update(
