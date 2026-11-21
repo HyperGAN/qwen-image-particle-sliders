@@ -64,3 +64,144 @@ and constant outcomes and their matched OFFs passed the independent categorical
 integrity check. Realized dose varied across gates, so compare each row with its
 own constant. The measured early-heavy profile remains the recommended Warm
 Amber RAW192 profile. [Exact settings and per-case evidence](warm-amber-raw192-adaptive-study.json)
+
+## Replay the measured CFP plan
+
+The published study supplies the fitted direction, live threshold, nominal
+strength, native sigma grid, and per-case seeds. CFP calibrated at 40 of 80
+intervals. Its four-case gain over OFF was +0.003571, and its gain over the
+matched-dose constant was +0.000918. Both bicycle cases used the full
+strength throughout. Use the recipe with the saved Warm Amber RAW192 and
+the captured ParticleGAN 0.10.1 native owner. The strict
+`scoped.open_inference` loader serves typed new-profile RAW exports.
+[Published study](warm-amber-raw192-adaptive-study.json) ·
+[Reviewed core wheel build](../SCOPED.md#activation-dependent-strength)
+
+For the measured cases, supply the original BF16 prompt encoding. The
+historical owner accepts this encoding as `context`, and returns the native
+terminal latent to the original decoder. The public study contains the gate
+plan and results. The original checkpoint, native owner, and prompt encodings
+come from the archived run.
+
+| Cases | Original prompt |
+| --- | --- |
+| `dev0-seed204`, `dev0-seed205` | An editorial photograph of a blue bicycle beside a stone wall. |
+| `dev1-seed203`, `dev1-seed207` | An editorial photograph of a white porcelain teapot on a linen cloth. |
+
+Run the code from the repository root in the captured owner's environment.
+Pass the open archived owner, the archived RAW and encoding files, the local
+reviewed core wheel, and one measured case ID. The function checks the
+checkpoint, attached adapter tensors, base identity, and native profile.
+It returns the latent, exact gate receipt, and the case's equal-dose
+constant strength.
+
+```python
+import json
+from hashlib import file_digest
+from importlib.metadata import version
+from math import fsum, ulp
+from pathlib import Path
+
+import torch
+from qwen_image_sliders import adaptive_inference as adaptive
+
+
+ENCODING_SHA256 = {
+    "dev0": "ca3214f993ad2b23c40bfb1c5f7c2a367fdf8b5b1b89d0e0fcd50c4bb1b7f6ff",
+    "dev1": "0825463a674ab5d4ed97d7b87f925f7b597e74f0d09c1399d425bdfe5b102564",
+}
+
+
+def checked_tensor_file(path, expected_sha256):
+    with Path(path).open("rb") as source:
+        if file_digest(source, "sha256").hexdigest() != expected_sha256:
+            raise ValueError(f"Archived artifact hash differs for {path}")
+        source.seek(0)
+        return torch.load(source, map_location="cpu", weights_only=True)
+
+
+def measured_cfp_inputs(raw_path, encoding_path, core_wheel, case_id):
+    path = Path("docs/warm-amber-raw192-adaptive-study.json")
+    study = json.loads(path.read_text(encoding="utf-8"))
+    profile = study["profile"]
+    case, = (row for row in study["methods"]["cfp"]["cases"] if row["case"] == case_id)
+    raw = checked_tensor_file(raw_path, profile["checkpoint_sha256"])
+    metadata = raw["metadata"]
+    base = metadata["model_identity"]
+    if (
+        (base["model_id"], base["revision"]) != (profile["base"], profile["revision"])
+        or raw["completed_steps"] != profile["update_count"]
+        or raw["weights"] != "raw" or profile["weights"] != "raw"
+        or raw["ema_decay"] is not None or profile["ema_decay"] is not None
+        or metadata["true_cfg_scale"] != profile["true_cfg_scale"]
+        or metadata["kv_cache"] != profile["use_kv_cache"]
+        or (profile["height"], profile["width"], profile["steps"]) != (512, 512, 40)
+        or profile["true_cfg_scale"] != 1 or profile["use_kv_cache"]
+    ):
+        raise ValueError("The checkpoint and archived native sampling profile differ")
+    if (study["sources"]["core_commit"], study["sources"]["core_module_sha256"]) != (
+        adaptive.CORE_REVISION, adaptive.CORE_MEMBER_SHA256
+    ):
+        raise ValueError("Use the steering API with the reviewed core source")
+    adaptive.gate_core(core_wheel)
+    context_id = case_id.split("-seed", 1)[0]
+    context = checked_tensor_file(encoding_path, ENCODING_SHA256[context_id])
+    if context["prompt_embeds"].dtype != torch.bfloat16 or context["image_pad_mask"].any():
+        raise ValueError("Use the archived BF16 text-only encoding")
+    direction = torch.tensor(study["fit"]["direction"], dtype=torch.float32)
+    if direction.shape != (64,) or not torch.isclose(direction.norm(), direction.new_tensor(1.0)):
+        raise ValueError("The measured fit must be a 64-channel unit direction")
+    options = dict(
+        core_wheel=core_wheel, method="cfp", strength=profile["nominal_strength"],
+        steps=profile["steps"], parameter=study["calibration"]["cfp"]["parameter"],
+        direction=direction, evidence_ref=study["evidence_sha256"]["capture_report"],
+        seed=case["render_seed"], gate_seed=int(case["gate_seed_decimal"]),
+    )
+    return profile, case, raw, context, options
+
+
+def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
+    profile, case, raw, context, options = measured_cfp_inputs(
+        raw_path, encoding_path, core_wheel, case_id,
+    )
+    owner.require_open()
+    runtime = owner.runtime
+    if (
+        version("particlegan") != profile["particle_gan"]
+        or runtime.base_identity != raw["metadata"]["model_identity"]
+        or runtime.device.type != "cuda" or runtime.model.dtype != torch.bfloat16
+        or type(runtime.pipe.scheduler).__name__ != profile["sampler"]
+        or runtime.pipe.config.sample_sigmas is not None
+    ):
+        raise ValueError("Use the captured CUDA BF16 owner and Euler scheduler")
+    attached = owner.native.network.state_dict()
+    if attached.keys() != raw["network"].keys() or any(
+        attached[name].dtype != tensor.dtype or not torch.equal(attached[name].detach().cpu(), tensor)
+        for name, tensor in raw["network"].items()
+    ):
+        raise ValueError("The open owner must have the verified RAW192 adapter")
+    context = {key: value.to(runtime.device) if value is not None else None
+               for key, value in context.items()}
+    latent, receipt = adaptive.render(owner, context=context, **options)
+    expected_usage = {"fired": case["fired"], "eligible": case["eligible"]}
+    if (
+        receipt["sigmas"] != profile["sigmas"]
+        or receipt["effective_strengths"] != case["schedule"]
+        or receipt["gate"]["usage"] != expected_usage
+        or receipt["sigma_integrated_dose"] != case["sigma_integrated_dose"]
+    ):
+        raise RuntimeError("The render did not reproduce the measured CFP receipt")
+    sigma = receipt["sigmas"]
+    strength = receipt["sigma_integrated_dose"] / fsum(
+        start - end for start, end in zip(sigma[:-1], sigma[1:], strict=True)
+    )
+    expected = case["equal_dose_constant_strength"]
+    if abs(strength - expected) > ulp(expected):
+        raise RuntimeError("The dose-matched control differs from the measured case")
+    return latent, receipt, strength
+```
+
+To derive the API arguments without loading the native model, call
+`measured_cfp_inputs(raw_path, encoding_path, core_wheel, "dev1-seed203")`.
+The constant uses the realized sigma-weighted dose from that case. A constant
+pass would use the same context, seed, sigma grid and one unit gain per interval.
