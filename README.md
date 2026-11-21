@@ -3,6 +3,8 @@
 > **Current source uses core 0.15.2 and ParticleGAN 0.11.1.** Native pretrained execution remains unqualified for this package's default cohort.
 
 For the common session/CLI interface, see [LIFECYCLE.md](LIFECYCLE.md).
+The scoped RAW inference owner supports [scheduled strength](SCOPED.md#scheduled-strength)
+on the native Euler sampler.
 The separate [HyperGAN develop/HNDL 0.10 candidate API](docs/hypergan-hndl-candidate.md)
 is a distinct prerelease distribution for an isolated environment. Canonical wheels
 exclude candidate modules and locks. CI checks the canonical package. The
