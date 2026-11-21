@@ -90,5 +90,13 @@ images, receipt = render(inferred, prompt=prompt, seed=7, steps=4,
 
 Use the recorded native sigma intervals when constructing a matched-dose
 schedule. The tiny native fixture reproduces the original latent bytes at
-constant strength. Finished-image effect is pending a pretrained comparison.
+constant strength.
+
+On the archived Warm Amber RAW192 profile, early-heavy strength improved
+the four-case finished-image mean gain from +0.00367 to +0.00602 at nominal
+strength 2/3. Three cases improved over constant, and all eight new images
+passed independent integrity. The original 512-pixel CUDA route used 40
+Euler steps at CFG1. Late-heavy remains unmeasured after a live GPU floor stop.
+[Per-case evidence](docs/warm-amber-raw192-native-schedule-comparison.json)
+
 [Shared qualification guide](https://github.com/HyperGAN/particle-sliders/blob/main/docs/strength-schedules.md)
