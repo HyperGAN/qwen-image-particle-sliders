@@ -20,7 +20,7 @@ owned CUDA DiT and VAE. Keeping the VAE on CUDA preserves the native pipeline's
 execution-device selection, sampler and decoder. Source FP32 VAE weights are
 explicitly cast to the canonical CUDA BF16 precision.
 
-Current source pins are base `718f8d54e5f7ecffa5953f40604a1253d685b034`, core
+Current source pins are base `2238aee5f59d727d2a60cfc07c4f3aeab22cc4a0`, core
 `ec1161f5d74481be3540cb0dfa63d0e8f8b54e90`, official ParticleGAN 0.11.1, and
 Diffusers `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458`. The source and runtime
 closures refuse changed implementation bytes before native allocation.
@@ -116,3 +116,6 @@ when calling the response, after opening its runtime. The regression uses actual
 `InferenceSession.response` with training constructors poisoned. Earlier direct
 binding checks did not qualify this public path; the v0.1.3 refusal receipt is
 retained. Full pretrained/GPU public inference remains unqualified.
+
+See the [original strict response qualification](https://github.com/HyperGAN/qwen-image-particle-sliders/tree/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/native-strict/docs/cpu-readiness-v7-response.json)
+for the captured source and test receipt.
