@@ -10,8 +10,8 @@ ORIGINAL = {
         "sha256": "7878c9edb1780713503134bdf851ec7344f1a8c586a6bbcbfc9d5da7ab58a26b",
     },
     "backend.lock.json": {
-        "bytes": 31493,
-        "sha256": "2269fbe0ac1bdac48b5f8772a52ba20135e2454ce0732285845b83d0c6b3a3fa",
+        "bytes": 31492,
+        "sha256": "42c9ae743968e6fe4adb9e3919a254451963610b76c2b84b1bbde53b706f6c61",
     },
     "checkpoint.py": {
         "bytes": 4231,

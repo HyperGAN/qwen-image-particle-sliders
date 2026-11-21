@@ -42,6 +42,7 @@ def main():
         qualification="canonical native engine source cohort; CPU fixture qualification only",
     )
     release = json.loads(Path(core.locate_file("particle_sliders/engine_release.json")).read_text())
+    document["diffusers"]["qualification"] = "Installed CPU qualification on ParticleGAN 0.11.1"
     document["particlegan"].update(
         commit=release["source_commit"],
         version=release["version"],

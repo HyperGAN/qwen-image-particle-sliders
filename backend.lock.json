@@ -5,7 +5,7 @@
     "lifecycle": "particle_sliders.lifecycle.open_session",
     "native_adapter": "qwen_image_sliders.image_bindings.QwenImage21ResponseAdapter",
     "preserved_reference_milestone": "fd89e1c780ab5210cd1be98ec3b70977e6349379",
-    "qualification": "PG0.9.5 CPU source integration; native unqualified",
+    "qualification": "Installed CPU qualification on ParticleGAN 0.11.1",
     "repository": "https://github.com/HyperGAN/particle-sliders",
     "runner": "particle_sliders.engine.ConditionalParticleGAN",
     "source_map_scope": "all installed non-cache core package source/data files",

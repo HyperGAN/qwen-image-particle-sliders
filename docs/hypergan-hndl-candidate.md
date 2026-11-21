@@ -23,3 +23,6 @@ geometry. The shared engine owns the adversarial game and checkpoint state.
 Use the [captured candidate guide and source locks](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/hypergan-hndl-candidate.md)
 to reproduce earlier artifacts. Pretrained GPU execution needs its own
 qualification for the current source.
+
+The [closed HNDL cohort source and restore utility](https://github.com/HyperGAN/qwen-image-particle-sliders/tree/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/cohorts/pre-lr-hndl)
+remain available from that checkout.

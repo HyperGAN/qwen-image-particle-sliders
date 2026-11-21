@@ -62,24 +62,3 @@ def test_rates_bind_current_cli_game_resume(tmp_path):
             d_lr_mult=3,
             prior_lr_mult=4,
         )
-
-
-def test_closed_hndl_borrowed_runtime_bytes_are_preserved(tmp_path):
-    import hashlib
-    import importlib.util
-    import json
-    from pathlib import Path
-
-    root = Path(__file__).resolve().parents[1]
-    spec = importlib.util.spec_from_file_location(
-        "lr_archive_builder", root / "scripts/build_hypergan_hndl_candidate.py"
-    )
-    builder = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(builder)
-    manifest = json.loads((root / "cohorts/pre-lr-hndl/manifest.json").read_text())
-    for relative in manifest["files"]:
-        (tmp_path / relative).parent.mkdir(parents=True, exist_ok=True)
-    builder.restore_pre_lr_runtime(root, tmp_path)
-    for relative, expected in manifest["files"].items():
-        assert hashlib.sha256((tmp_path / relative).read_bytes()).hexdigest() == expected
-    assert not list(tmp_path.rglob("learning_rates.py"))
