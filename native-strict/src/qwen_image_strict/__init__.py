@@ -1,5 +1,5 @@
 """Opt-in QwenImage21 staged native source; release/historical cohorts remain separate."""
-BASE="5fc0d54a03b41721ab969f05e90ebb5b0e4a12e2"
+BASE="718f8d54e5f7ecffa5953f40604a1253d685b034"
 CORE="ec1161f5d74481be3540cb0dfa63d0e8f8b54e90"
 DIFFUSERS="1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458"
 BACKEND_NAME="qwen-image-native-strict"
