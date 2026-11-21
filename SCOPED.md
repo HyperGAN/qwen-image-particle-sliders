@@ -96,7 +96,10 @@ On the archived Warm Amber RAW192 profile, early-heavy strength improved
 the four-case finished-image mean gain from +0.00367 to +0.00602 at nominal
 strength 2/3. Three cases improved over constant, and all eight new images
 passed independent integrity. The original 512-pixel CUDA route used 40
-Euler steps at CFG1. Late-heavy remains unmeasured after a live GPU floor stop.
+Euler steps at CFG1. The two finished late-heavy cases averaged +0.00125,
+compared with +0.00246 constant and +0.00405 early-heavy on those same
+cases. Both late-heavy outputs passed integrity. Two late-heavy cases are
+unresolved after GPU floor stops.
 [Per-case evidence](docs/warm-amber-raw192-native-schedule-comparison.json)
 
 [Shared qualification guide](https://github.com/HyperGAN/particle-sliders/blob/main/docs/strength-schedules.md)

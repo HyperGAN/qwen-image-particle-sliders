@@ -55,7 +55,7 @@
   ],
   "measure": "Mean matched Warm Amber intensity ON minus exact OFF",
   "observed_winner": "early",
-  "late": "No finished effect, the original denoise crossed the live both-GPU floor.",
+  "late": "Two qualified matched cases. The four-case late mean remains unmeasured.",
   "profiles": {
     "constant": {
       "mean_effect_gain": 0.0036702977182964487,
@@ -227,5 +227,85 @@
     }
   },
   "new_optimizer_updates": 0,
-  "ema_decay": null
+  "ema_decay": null,
+  "late_matched_subset": {
+    "matched_cases": 2,
+    "effective_strengths": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.4424121553246024,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "mean_effect_gain": {
+      "constant": 0.002463414954642455,
+      "early": 0.0040529199565450345,
+      "late": 0.0012529740730921426
+    },
+    "cases": [
+      {
+        "case": "dev0-seed204",
+        "seed": 204,
+        "effect_gains": {
+          "late": 0.00012095334629217813,
+          "constant": 0.0001834010084470119,
+          "early": -0.0009801052510738364
+        },
+        "on_sha256": "a73e7974f78942f2a2added7ab96c6c561b9e9fdaba1948fc3b8e56d36073ae7",
+        "off_sha256": "a4b1fd96c84cc44c77146b988ab2ad4ac4beae944936ee10dd576d94dea4c843",
+        "on_integrity": "pass"
+      },
+      {
+        "case": "dev1-seed207",
+        "seed": 207,
+        "effect_gains": {
+          "late": 0.002384994799892107,
+          "constant": 0.004743428900837898,
+          "early": 0.009085945164163906
+        },
+        "on_sha256": "6e2597165a22415eacd321fdc0258a96a94e349dfe7ee342197bdbea7602fcfd",
+        "off_sha256": "258f20e240606f328cfdacfc1b385953346f81cca35665914f00aea74e542ccd",
+        "on_integrity": "pass"
+      }
+    ],
+    "unresolved_late_cases": [
+      "dev0-seed205",
+      "dev1-seed203"
+    ]
+  }
 }
