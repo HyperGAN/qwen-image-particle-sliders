@@ -153,7 +153,8 @@ the same readout as the hook. Reserve the four RAW192 output cases (seeds 203,
 204, 205, and 207) from fitting or calibration. The capture also records teacher
 velocities for diagnostic checks. Active closed-loop threshold or bias
 calibration requires separate rollouts, followed by matched OFF, constant, and
-adaptive finished-output measurements and an independent integrity check. No
-fitted Warm Amber probe or qualified adaptive gain has been published.
-[Capture and control provenance](docs/warm-amber-adaptive-inputs.md) ·
+adaptive finished-output measurements and an independent integrity check. The
+archived Warm Amber RAW192 pilot publishes its fitted direction, measured gate
+settings, and per-case results.
+[Capture, controls, and measured CFP replay](docs/warm-amber-adaptive-inputs.md#replay-the-measured-cfp-plan) ·
 [Shared calibration equations](https://github.com/HyperGAN/particle-sliders/blob/b1f780decc516808cfd3019d5e5b674457161f86/docs/strength-schedules.md#activation-dependent-steering)
