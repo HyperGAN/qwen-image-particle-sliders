@@ -79,7 +79,7 @@ def prepare(options,spec):
     import torch
     from qwen_image_sliders.adapters import AdapterBank
     from qwen_image_sliders.contracts import formulation
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
     from .native import StrictRuntime,observation
     from .execution import initialization
     validate(options,spec)

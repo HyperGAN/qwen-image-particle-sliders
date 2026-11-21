@@ -1,5 +1,3 @@
-> Current source candidate: released PG0.9.5/core0.13.0, fresh cohort. Original PG0.9.4 loader/conditioning/control receipts remain historical; no PG0.9.5 pretrained qualification is claimed.
-
 # Qwen-Image 2.1 strict native candidate
 
 This separate opt-in package prepares current native learning-rate experiments.
@@ -22,8 +20,8 @@ owned CUDA DiT and VAE. Keeping the VAE on CUDA preserves the native pipeline's
 execution-device selection, sampler and decoder. Source FP32 VAE weights are
 explicitly cast to the canonical CUDA BF16 precision.
 
-Current source pins are base `a0090e51a819adaae2890038767dd39c9a231928`, core
-`3dd672a7f9b8c169daef90fd63e4bb42b9ddc423`, official ParticleGAN 0.9.5, and
+Current source pins are base `5fc0d54a03b41721ab969f05e90ebb5b0e4a12e2`, core
+`ec1161f5d74481be3540cb0dfa63d0e8f8b54e90`, official ParticleGAN 0.11.1, and
 Diffusers `1d5d056ecff3a8c1d887a7dd1aa66ca4a0323458`. The source and runtime
 closures refuse changed implementation bytes before native allocation.
 

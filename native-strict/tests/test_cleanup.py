@@ -168,7 +168,7 @@ def test_original_checkpoint_function_and_absent_instance_attributes_restored():
 
 
 def test_recursive_owned_rows_preserve_aliases_and_do_not_traverse_foreign_objects():
-    from particle_sliders.pg09_backends import PreparedResponse,ResponseRow
+    from particle_sliders.backends import PreparedResponse,ResponseRow
     latent=torch.ones(1,2,1,2,2);value=torch.ones(2)
     row=PreparedResponse(ResponseRow({'embeds':value},{'embeds':value},None,latent),value,value)
     foreign=SimpleNamespace(value=torch.ones(4))
