@@ -109,8 +109,8 @@ unresolved after GPU floor stops.
 Use `qwen_image_sliders.adaptive_inference.render` with an open scoped RAW owner.
 The opt-in hook reads the FP32 channel mean across packed image tokens **before**
 the routed adapter runs. It makes one decision per native uncached, single-
-conditional Euler interval. If the gate fires, the original adapter runs at
-`strength`; otherwise it runs at zero. The original CFG1, KV-cache setting,
+conditional Euler interval. The original adapter runs at `strength` when
+the gate fires and at zero for an inactive interval. The original CFG1, KV-cache setting,
 Euler updates, and decoder are used. A second denoiser call at the same solver
 interval is rejected.
 
