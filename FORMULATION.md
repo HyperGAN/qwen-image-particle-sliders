@@ -1,4 +1,4 @@
-> Current adoption: [published PG0.9.5 / core0.13.0](docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
+> Current adoption: [published PG0.9.5 / core0.13.0](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
 
 # Shared PG0.9.4 game and native Qwen wiring
 

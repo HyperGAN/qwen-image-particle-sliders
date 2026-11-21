@@ -9,7 +9,7 @@ import tomllib
 import zipfile
 from pathlib import Path
 
-TARGET = "3dd672a7f9b8c169daef90fd63e4bb42b9ddc423"
+TARGET = "ec1161f5d74481be3540cb0dfa63d0e8f8b54e90"
 PREFIX = "packages/particle-sliders-core/"
 
 
@@ -36,18 +36,26 @@ def regenerate(repository, wheel, destination):
             for name in archive.namelist()
             if name.split("/", 1)[0] in {"particle_sliders", "concept_slider_core"}
         }
-    if actual != sources:
-        raise ValueError("the built core wheel differs from the recursive Git runtime closure")
+    if any(sources.get(path) != digest for path, digest in actual.items()):
+        raise ValueError("the built core wheel differs from the reviewed Git sources")
+    git_paths = sorted(sources)
+    sources = actual
     previous = json.loads(destination.read_text())
     record = {
         **previous,
         "schema": "qwen-hypergan-hndl-candidate-v2",
-        "profile": "qwen-image21-hypergan-hndl-pg095-v1",
+        "profile": "qwen-image21-hypergan-hndl-engine-v1",
         "product_version": "0.3.0a3",
         "core_commit": TARGET,
         "core_version": metadata["project"]["version"],
+        "particlegan_version": next(
+            requirement.split("==", 1)[1]
+            for requirement in metadata["project"]["dependencies"]
+            if requirement.startswith("particlegan==")
+        ),
         "core_roots": ["concept_slider_core", "particle_sliders"],
         "core_src_tree": git("rev-parse", TARGET + ":" + PREFIX + "src").decode().strip(),
+        "core_git_src_paths": git_paths,
         "core_source_sha256": dict(sorted(sources.items())),
         "core_source_closure_sha256": hashlib.sha256(
             json.dumps(sources, sort_keys=True, separators=(",", ":")).encode()

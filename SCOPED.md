@@ -1,10 +1,10 @@
 # Opt-in cached fresh initialization for Qwen-Image 2.1
 
-`qwen_image_sliders.fresh95` is an additional Python API for a deliberately new cohort. Four installed CPU software checks passed, including one tiny original-game update, strict FULL resume, RAW response inference and cleanup faults. They used random tiny native geometry and synthetic completed data. They do not qualify a pretrained model, CUDA execution, finished-image quality, public packaging or an available native completed-response cache. Existing CLIs, saved LR recommendations, defaults and old cohorts retain their original behavior.
+`qwen_image_sliders.scoped` is an additional Python API for a deliberately new cohort. Four installed CPU software checks passed, including one tiny original-game update, strict FULL resume, RAW response inference and cleanup faults. They used random tiny native geometry and synthetic completed data. They do not qualify a pretrained model, CUDA execution, finished-image quality, public packaging or an available native completed-response cache. Existing CLIs, saved LR recommendations, defaults and old cohorts retain their original behavior.
 
 ## Required inputs and ownership
 
-Use the exact original canonical `Runtime` (or the explicitly synthetic `TinyRuntime`) and original pinned core0.13.0/ParticleGAN0.9.5/native Source closure. The API keeps the complete core577/PG68 guards and requires a genuine owning `qwen-image-particle-sliders`0.3.0 installation whose generated RECORD owns all nine new namespace modules. A source overlay, a generic newer dependency set or handmade metadata is insufficient. No new command or registration is added; public build/install validation of this addition remains separate from the installed CPU result.
+Use the exact original canonical `Runtime` (or the explicitly synthetic `TinyRuntime`) and pinned core 0.15.2 and ParticleGAN 0.11.1 native source closure. The API keeps the complete core and ParticleGAN source checks and requires a genuine owning `qwen-image-particle-sliders`0.3.0 installation whose generated RECORD owns all nine new namespace modules. A source overlay, a generic newer dependency set or handmade metadata is insufficient. No new command or registration is added; public build/install validation of this addition remains separate from the installed CPU result.
 
 The caller loads and owns the native runtime under its own resource admission. `owner_admission(request)` must authenticate the requested operation and retained native/cache/Source provenance and return exactly `True` before any adapter/bank/critic attachment. It does not load or recover teachers. Do not replace that authentication with an unconditional approval for native work. The runtime is borrowed; closing restores only owned hooks/settings. An optional transferred `release()` callback runs after cleanup succeeds. A cleanup exception retains `cleanup_owner`; retry its `.close()` without replaying an update or inference.
 
@@ -15,8 +15,8 @@ The cache preserves full FP32 `[1,C,1,H/8,W/8]` VAE fields, raw time0..1000, tru
 For a separately retained cache binding:
 
 ```python
-from qwen_image_sliders.fresh95.cache import CacheBinding
-from qwen_image_sliders.fresh95.util import Checkpoint
+from qwen_image_sliders.scoped.cache import CacheBinding
+from qwen_image_sliders.scoped.util import Checkpoint
 
 completed_cache = CacheBinding(
     checkpoint=Checkpoint(
@@ -35,7 +35,7 @@ completed_cache = CacheBinding(
 Construct `config` with `configuration(**original_options)`. It accepts the original rows, fixed horizon, seed, batch, geometry, trajectory/record counts, checkpoint choice, preset and explicit rate overrides; set `ema_decay=None`. Keep those values and native runtime identity fixed across restore. Choose rates from the existing documented results when applicable; this initialization profile adds no LR search or new recommendation.
 
 ```python
-from qwen_image_sliders.fresh95 import configuration, open_training, open_inference
+from qwen_image_sliders.scoped import configuration, open_training, open_inference
 
 config = configuration(**dict(original_options, ema_decay=None))
 run = open_training(

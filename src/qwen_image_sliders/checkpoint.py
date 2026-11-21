@@ -14,14 +14,16 @@ from .contracts import FORMAT, PROTOCOL, canonical, digest, file_digest, formula
 
 def shared_api_identity():
     """Bind artifacts to the installed executable API, independent of checkout paths."""
-    from particle_sliders import pg09, pg09_backends, pg09_images, pg09_readout_critic, reference
+    from particle_sliders import backends, engine, readout_critic, reference
+
+    from qwen_image_sliders import image_bindings
 
     return {
         "package_version": importlib.metadata.version("particle-sliders-core"),
         "particlegan_version": importlib.metadata.version("particlegan"),
         "sources": {
             module.__name__: file_digest(inspect.getsourcefile(module))
-            for module in (pg09, pg09_backends, pg09_images, pg09_readout_critic, reference)
+            for module in (engine, backends, image_bindings, readout_critic, reference)
         },
     }
 

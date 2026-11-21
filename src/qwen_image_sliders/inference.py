@@ -107,7 +107,8 @@ def _model_identity(runtime):
 
 def prepare(options, spec):
     import torch
-    from particle_sliders.pg09_images import QwenImage21ResponseAdapter
+
+    from qwen_image_sliders.image_bindings import QwenImage21ResponseAdapter
 
     from .adapters import AdapterBank
     from .contracts import formulation

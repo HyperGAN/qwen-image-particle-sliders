@@ -2,8 +2,8 @@
 
 import pytest
 import torch
+from particle_sliders.engine import _hash
 from particle_sliders.lifecycle import SessionConfig, UnsupportedOperation, backend, open_session
-from particle_sliders.pg09 import _hash
 
 
 def test_common_factory_roundtrip(tmp_path):
@@ -13,7 +13,7 @@ def test_common_factory_roundtrip(tmp_path):
         "lifecycle-cpu-new-v1",
         dummy=True,
         steps=4,
-        ema_decay=0.9,
+        ema_decay=None,
         height=32,
         width=32,
         trajectory_steps=4,
@@ -38,10 +38,10 @@ def test_common_factory_roundtrip(tmp_path):
     with open_session(config, resume=tmp_path / "training.pt") as resumed:
         resumed.train()
         assert resumed.checkpoint()["sha256"] == expected["sha256"]
-        resumed.export(tmp_path / "adapter.pt", selection="ema")
-        ema = resumed.ema.values
+        resumed.export(tmp_path / "adapter.pt", selection="raw")
+        expected_live_hash = _hash(resumed.game.network.state_dict())
     with open_session(config, artifact=tmp_path / "adapter.pt", operation="evaluate") as inference:
-        assert _hash(inference.game.network.state_dict()) == _hash(ema)
+        assert _hash(inference.game.network.state_dict()) == expected_live_hash
         assert torch.isfinite(inference.evaluate()).all()
     assert torch.equal(before, torch.get_rng_state())
     assert not torch.cuda.is_initialized()

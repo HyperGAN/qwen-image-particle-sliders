@@ -8,7 +8,7 @@ import sys
 import pytest
 import torch
 
-if os.environ.get("QWEN_TEST_CORE013") != "1":
+if os.environ.get("QWEN_TEST_HNDL") != "1":
     pytest.skip("separate modern prerelease environment required", allow_module_level=True)
 
 from qwen_image_sliders.hypergan_hndl import QwenHNDLBank, _shared, build_game
@@ -16,9 +16,9 @@ from qwen_image_sliders.tiny import TinyRuntime
 
 
 def test_loaded_core_module_origin_is_checked_not_only_distribution_hashes(tmp_path, monkeypatch):
-    from particle_sliders import pg09
+    from particle_sliders import engine
 
-    monkeypatch.setattr(pg09, "__file__", str(tmp_path / "shadow.py"))
+    monkeypatch.setattr(engine, "__file__", str(tmp_path / "shadow.py"))
     with pytest.raises(RuntimeError, match="loaded module origin differs"):
         build_game(None, [])
 

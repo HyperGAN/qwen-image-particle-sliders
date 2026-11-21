@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 import torch
-from particle_sliders.pg09_readout_critic import ConditionalReadoutCritic
+from particle_sliders.readout_critic import ConditionalReadoutCritic
 
 from qwen_image_sliders.contracts import formulation
 from qwen_image_sliders.teachers import load_prompts, paired_records

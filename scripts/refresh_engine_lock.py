@@ -26,10 +26,10 @@ def main():
     args = parser.parse_args()
     core = metadata.distribution("particle-sliders-core")
     direct = json.loads(core.read_text("direct_url.json") or "{}")
-    if core.version != "0.13.0" or direct.get("vcs_info", {}).get("commit_id") != args.core_commit:
-        raise ValueError("install the exact reviewed public VCS core0.13.0 commit first")
-    if metadata.version("particlegan") != "0.9.5":
-        raise ValueError("install released ParticleGAN0.9.5 first")
+    if core.version != "0.15.2" or direct.get("vcs_info", {}).get("commit_id") != args.core_commit:
+        raise ValueError("install the exact reviewed public VCS core0.15.2 commit first")
+    if metadata.version("particlegan") != "0.11.1":
+        raise ValueError("install released ParticleGAN0.11.1 first")
     root = Path(__file__).resolve().parents[1]
     document = json.loads((root / "backend.lock.json").read_text())
     for key in ("wheel_sha256", "sdist_sha256", "canonical_receipt_sha256"):
@@ -39,9 +39,9 @@ def main():
         version=core.version,
         source_sha256=closure("particle_sliders") | closure("concept_slider_core"),
         source_map_scope="all installed non-cache core package source/data files",
-        qualification="canonical native PG095 source cohort; CPU fixture qualification only",
+        qualification="canonical native engine source cohort; CPU fixture qualification only",
     )
-    release = json.loads(Path(core.locate_file("particle_sliders/pg095_release.json")).read_text())
+    release = json.loads(Path(core.locate_file("particle_sliders/engine_release.json")).read_text())
     document["particlegan"].update(
         commit=release["source_commit"],
         version=release["version"],
@@ -50,7 +50,9 @@ def main():
         source_sha256=closure("particlegan"),
         role="exact released core dependency; native spatial image domain, no source overlay",
     )
-    document["historical_environment"] = "docs/cohorts/qwen-core081.lock.json; original product eaa753d"
+    document["historical_environment"] = (
+        "https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/cohorts/qwen-core081.lock.json"
+    )
     text = json.dumps(document, indent=2) + "\n"
     for path in (root / "backend.lock.json", root / "src/qwen_image_sliders/backend.lock.json"):
         path.write_text(text)

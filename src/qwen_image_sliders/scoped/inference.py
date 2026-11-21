@@ -3,8 +3,8 @@
 import math
 
 import torch
+from particle_sliders.backends import ResponseRow
 from particle_sliders.lifecycle import _network_observation
-from particle_sliders.pg09_backends import ResponseRow
 
 from qwen_image_sliders.lifecycle import _observation, _render_native, _validate_render
 

@@ -1,15 +1,12 @@
-> Current adoption: [published PG0.9.5 / core0.13.0](docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
-
 # Qwen Image 2.1 common lifecycle
 
 Current and new runs disable EMA explicitly with `ema_decay=None` and use RAW
 for training evaluation, export and inference. Do not create EMA comparisons.
 Historical EMA artifacts and their recorded tests keep their original loaders.
 
-Canonical shared pin: `ddb41423bcefc1fe76cd94d0f9b367353b3ea137` / core0.12.0 / ParticleGAN0.9.4.
-See [the current CPU adoption audit](docs/pg094-adoption.md). This is a fresh source
-cohort. The historical 26-check receipt and core0.8.1 adoption notes remain historical
-and do not qualify this pin. Old runs retain their original loaders and source locks.
+The canonical package uses core 0.15.2 and ParticleGAN 0.11.1. The
+[earlier lifecycle evidence](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/LIFECYCLE.md) belongs to its original source
+cohort. Use the original checkout to reproduce its artifacts.
 
 This derivative registers backend `qwen` for `particle_sliders.lifecycle`.
 The core owns preparation dispatch, updates, checkpoints, export,
@@ -21,7 +18,7 @@ the core owns the exact released GAN dependency.
 
 ```python
 from particle_sliders.lifecycle import SessionConfig, open_session
-config = SessionConfig('qwen', 'new-qwen-pg094-cpu-v1', dummy=True, steps=4,
+config = SessionConfig('qwen', 'new-qwen-engine-cpu-v1', dummy=True, steps=4,
     height=32, width=32, trajectory_steps=4, records_per_pair=2, ema_decay=None,
     rows=[dict(neutral='a red cup', positive='a shiny red cup'),
           dict(neutral='a blue bowl', positive='a shiny blue bowl')])

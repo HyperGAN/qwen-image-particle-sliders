@@ -5,7 +5,8 @@ from importlib.resources import files
 from pathlib import Path
 
 import torch
-from particle_sliders.qwen_native import with_encoding
+
+from qwen_image_sliders.qwen_native import with_encoding
 
 from .contracts import validate_shape
 from .projection import predict
