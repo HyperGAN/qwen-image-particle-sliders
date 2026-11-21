@@ -1,17 +1,15 @@
-> Current adoption: [published PG0.9.5 / core0.13.0](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/pg095-adoption.md). Versioned earlier receipts below retain their original source scope; none establishes a PG0.9.5 native result.
+# Shared game and native Qwen wiring
 
-# Shared PG0.9.4 game and native Qwen wiring
-
-The public training command executes `particle_sliders.pg09.ConditionalPG09`.
+The public training command executes `particle_sliders.engine.ConditionalParticleGAN`.
 `QwenImage21ResponseAdapter`, `ResponseRow`, `image_condition_features` and
-`ConditionalReadoutCritic` come from the installed shared core. There is no product
+`ConditionalReadoutCritic` come from the product's native bindings and the installed shared core. There is no product
 implementation of adversarial losses, penalties, prior regularization, optimizers,
 row sampling or checkpoint restoration.
 
 The architecture still uses `winning_formulation().bridge()` for each routed
 attention-output residual and its 128x4 particle bank. The architecture stamp's
 historical gmix training fields do not select the new game. The actual objective
-is the released ParticleGAN 0.9.4 `bispf_optimized` recipe, or explicitly selected
+is the released ParticleGAN 0.11.1 `bispf_optimized` recipe, or explicitly selected
 `bispf`. `--g-lr` overrides the public recipe's **base learning rate**, including
 its derived critic and prior rates. The resolved recipe is recorded in exports
 and bound in checkpoints. No reconstruction/MSE loss or legacy FormulationGame
@@ -57,8 +55,8 @@ native Qwen pipeline. Strength zero bypasses each hook exactly; positive strengt
 adds that fraction of the nonlinear residual. This is not an ordinary LoRA.
 
 The inference artifact/protocol remains v2; new raw-only training checkpoints use
-`qwen-native-pg09-training-v3`. Historical EMA/v2 training packets require their
+`qwen-native-engine-training-v1`. Historical EMA/v2 training packets require their
 original source checkout, as do old source-pinned inference artifacts. Older
 gmix/sketch artifacts and checkpoints are rejected rather than relabeled. Historical CUDA measurements in this repository
-belong to the former pinned implementation. New PG0.9.4 pretrained/GPU, full sampler,
+belong to the former pinned implementation. Current pretrained GPU execution, full sampler,
 quality and convergence acceptance remain unqualified.

@@ -1,6 +1,4 @@
-> Historical gmix validation: these receipts predate the native PG0.9.1 v2 objective.
-> Current CPU-only evidence and remaining gates are in [pg09-audit.md](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/pg09-audit.md).
-> These old CUDA results do not qualify the new path.
+> The historical gmix results apply to their original source. See the [archived CPU audit](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/7ea24d2072324bb707e0f7ceb6e5f30d048dff19/docs/pg09-audit.md) for that software qualification.
 
 # Validation evidence and limits
 

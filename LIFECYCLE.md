@@ -86,11 +86,6 @@ use different Diffusers Git revisions and are not a joint environment promise.
 Use CPU thread limits and offline mode for these fixtures. They do not qualify
 pretrained behavior, GPU memory, convergence or image quality.
 
-The modern candidate is documented in [hypergan-hndl-candidate.md](docs/hypergan-hndl-candidate.md).
-It is a distinct prerelease distribution, `qwen-image-particle-sliders-modern-candidate==0.3.0a2`,
-for a separate environment. The stable wheel excludes its modules/lock. The candidate
-registers `qwen-hndl` for shared sessions and native-only raw/EMA v2 export/inference.
-V2 records training geometry and both trajectory/training step budgets; incompatible
-render contexts refuse. Normal CI qualifies canonical PG094 only; modern CPU checks are an
-explicit manual lane. The active modern core pin is `a794e3b4a8813b012f2c4faa3da82b78d4a90214`; default promotion and
-pretrained/GPU qualification remain separate review decisions.
+The separate [HNDL candidate](docs/hypergan-hndl-candidate.md) registers
+`qwen-hndl` and supports RAW export and inference. The canonical wheel excludes
+the candidate modules and lock. Each distribution uses an isolated environment.
