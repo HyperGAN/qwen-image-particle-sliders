@@ -34,6 +34,7 @@ def test_stable_wheel_excludes_modern_runtime_and_dirty_build_artifacts(tmp_path
         names = archive.namelist()
         assert not any("hypergan_hndl" in name or name.endswith("hypergan-hndl.lock.json") for name in names)
         assert "qwen_image_sliders/train.py" in names
+        assert "qwen_image_sliders/adaptive_inference.py" in names
         assert "qwen_image_sliders/backend.lock.json" in names
         (meta,) = [name for name in names if name.endswith(".dist-info/METADATA")]
         metadata = BytesParser().parsebytes(archive.read(meta))

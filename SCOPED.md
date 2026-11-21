@@ -103,3 +103,57 @@ unresolved after GPU floor stops.
 [Per-case evidence](docs/warm-amber-raw192-native-schedule-comparison.json)
 
 [Shared qualification guide](https://github.com/HyperGAN/particle-sliders/blob/main/docs/strength-schedules.md)
+
+### Activation-dependent strength
+
+Use `qwen_image_sliders.adaptive_inference.render` with an open scoped RAW owner.
+The opt-in hook reads the FP32 channel mean across packed image tokens **before**
+the routed adapter runs. It makes one decision per native uncached, single-
+conditional Euler interval. The original adapter runs at `strength` when
+the gate fires and at zero for an inactive interval. The original CFG1, KV-cache setting,
+Euler updates, and decoder are used. A second denoiser call at the same solver
+interval is rejected.
+
+Build a local wheel for [the reviewed shared steering code](https://github.com/HyperGAN/particle-sliders/pull/269)
+and pass its path without installing it into the scoped runtime. The hook checks
+the source bytes before loading the standalone equations. The original installed
+core and the RAW/FULL source bindings remain byte-identical.
+
+```shell
+python -m pip wheel --no-deps --wheel-dir ./gate-wheel \
+  'particle-sliders-core @ git+https://github.com/HyperGAN/particle-sliders.git@b1f780decc516808cfd3019d5e5b674457161f86#subdirectory=packages/particle-sliders-core'
+```
+
+```python
+from qwen_image_sliders.adaptive_inference import render
+
+images, receipt = render(
+    inferred, prompt=prompt, seed=seed, steps=steps,
+    height=height, width=width, output_type="pil", strength=nominal_strength,
+    core_wheel=reviewed_core_wheel, method="cfp", parameter=calibrated_threshold,
+    direction=fitted_unit_direction, evidence_ref=fit_and_calibration_receipt,
+)
+```
+
+For CLABS, supply `method="clabs"`, the calibrated bias as `parameter`, the RNG
+seed as `gate_seed`, and all shared `CLABSParameters` fields as the `clabs`
+mapping. The matched random control takes `method="random"`, the target rate as
+`parameter`, and an explicit `gate_seed`. The receipt records decisions,
+projection, realized firing counts, applied strengths, native sigmas, and the
+realized integral `sum(strength_i * (sigma_i - sigma_(i+1)))`. Replay the
+recorded strengths through the fixed path by dividing by the nonzero nominal
+strength to obtain its `step_gains`.
+
+The Warm Amber native capture includes eight matched neutral and positive
+prompt pairs at 512 px, 40 steps, CFG1, with KV cache disabled. The collection
+manifest binds sixteen packed BF16 latent packets and their paired prompt
+contexts. Each packet includes two saved pre-denoiser teacher states plus the
+finished latent. Use the saved pre-denoiser states for direction fitting, with
+the same readout as the hook. Reserve the four RAW192 output cases (seeds 203,
+204, 205, and 207) from fitting or calibration. The capture also records teacher
+velocities for diagnostic checks. Active closed-loop threshold or bias
+calibration requires separate rollouts, followed by matched OFF, constant, and
+adaptive finished-output measurements and an independent integrity check. No
+fitted Warm Amber probe or qualified adaptive gain has been published.
+[Capture and control provenance](docs/warm-amber-adaptive-inputs.md) ·
+[Shared calibration equations](https://github.com/HyperGAN/particle-sliders/blob/b1f780decc516808cfd3019d5e5b674457161f86/docs/strength-schedules.md#activation-dependent-steering)
