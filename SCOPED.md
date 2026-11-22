@@ -157,4 +157,5 @@ adaptive finished-output measurements and an independent integrity check. The
 archived Warm Amber RAW192 pilot publishes its fitted direction, measured gate
 settings, and per-case results.
 [Capture, controls, and measured CFP replay](docs/warm-amber-adaptive-inputs.md#replay-the-measured-cfp-plan) ·
+[Measured CLABS replay](docs/warm-amber-adaptive-inputs.md#replay-the-measured-clabs-plan) ·
 [Shared calibration equations](https://github.com/HyperGAN/particle-sliders/blob/b1f780decc516808cfd3019d5e5b674457161f86/docs/strength-schedules.md#activation-dependent-steering)
