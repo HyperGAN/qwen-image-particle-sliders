@@ -120,11 +120,14 @@ def checked_tensor_file(path, expected_sha256):
         return torch.load(source, map_location="cpu", weights_only=True)
 
 
-def measured_cfp_inputs(raw_path, encoding_path, core_wheel, case_id):
+def measured_gate_inputs(raw_path, encoding_path, core_wheel, case_id, *, method):
+    if method not in {"cfp", "clabs"}:
+        raise ValueError("Choose a measured CFP or CLABS plan")
     path = Path("docs/warm-amber-raw192-adaptive-study.json")
     study = json.loads(path.read_text(encoding="utf-8"))
     profile = study["profile"]
-    case, = (row for row in study["methods"]["cfp"]["cases"] if row["case"] == case_id)
+    calibration = study["calibration"][method]
+    case, = (row for row in study["methods"][method]["cases"] if row["case"] == case_id)
     raw = checked_tensor_file(raw_path, profile["checkpoint_sha256"])
     metadata = raw["metadata"]
     base = metadata["model_identity"]
@@ -152,17 +155,23 @@ def measured_cfp_inputs(raw_path, encoding_path, core_wheel, case_id):
     if direction.shape != (64,) or not torch.isclose(direction.norm(), direction.new_tensor(1.0)):
         raise ValueError("The measured fit must be a 64-channel unit direction")
     options = dict(
-        core_wheel=core_wheel, method="cfp", strength=profile["nominal_strength"],
-        steps=profile["steps"], parameter=study["calibration"]["cfp"]["parameter"],
+        core_wheel=core_wheel, method=method, strength=profile["nominal_strength"],
+        steps=profile["steps"], parameter=calibration["parameter"],
         direction=direction, evidence_ref=study["evidence_sha256"]["capture_report"],
         seed=case["render_seed"], gate_seed=int(case["gate_seed_decimal"]),
     )
+    if method == "clabs":
+        options["clabs"] = calibration["clabs"]
     return profile, case, raw, context, options
 
 
-def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
-    profile, case, raw, context, options = measured_cfp_inputs(
-        raw_path, encoding_path, core_wheel, case_id,
+def measured_cfp_inputs(raw_path, encoding_path, core_wheel, case_id):
+    return measured_gate_inputs(raw_path, encoding_path, core_wheel, case_id, method="cfp")
+
+
+def replay_gate(owner, raw_path, encoding_path, core_wheel, case_id, *, method):
+    profile, case, raw, context, options = measured_gate_inputs(
+        raw_path, encoding_path, core_wheel, case_id, method=method,
     )
     owner.require_open()
     runtime = owner.runtime
@@ -184,13 +193,18 @@ def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
                for key, value in context.items()}
     latent, receipt = adaptive.render(owner, context=context, **options)
     expected_usage = {"fired": case["fired"], "eligible": case["eligible"]}
+    gate = receipt["gate"]
     if (
         receipt["sigmas"] != profile["sigmas"]
         or receipt["effective_strengths"] != case["schedule"]
-        or receipt["gate"]["usage"] != expected_usage
+        or gate["usage"] != expected_usage
+        or gate["method"] != method
+        or gate["parameter"] != options["parameter"]
+        or gate["seed"] != options["gate_seed"]
+        or gate["clabs"] != options.get("clabs")
         or receipt["sigma_integrated_dose"] != case["sigma_integrated_dose"]
     ):
-        raise RuntimeError("The render did not reproduce the measured CFP receipt")
+        raise RuntimeError(f"The render did not reproduce the measured {method.upper()} receipt")
     sigma = receipt["sigmas"]
     strength = receipt["sigma_integrated_dose"] / fsum(
         start - end for start, end in zip(sigma[:-1], sigma[1:], strict=True)
@@ -199,9 +213,32 @@ def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
     if abs(strength - expected) > ulp(expected):
         raise RuntimeError("The dose-matched control differs from the measured case")
     return latent, receipt, strength
+
+
+def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
+    return replay_gate(owner, raw_path, encoding_path, core_wheel, case_id, method="cfp")
 ```
 
 To derive the API arguments without loading the native model, call
 `measured_cfp_inputs(raw_path, encoding_path, core_wheel, "dev1-seed203")`.
 The constant uses the realized sigma-weighted dose from that case. A constant
 pass would use the same context, seed, sigma grid and one unit gain per interval.
+
+## Replay the measured CLABS plan
+
+Use `replay_gate(owner, raw_path, encoding_path, core_wheel, case_id, method="clabs")`
+with the same archived owner and per-case inputs. To inspect the exact API
+arguments on CPU, use `measured_gate_inputs(raw_path, encoding_path, core_wheel, case_id, method="clabs")`.
+The study supplies the calibrated bias, CLABS reference mean and standard
+deviation, the paper's feedback settings, and the original independent seed
+for each case. Keep the seed as an integer throughout. The helper returns
+the realized-strength receipt and the matching constant strength.
+
+The active calibration reached 41 of 80 firings. CLABS fired 138 times over
+160 held-out intervals and improved both teapot cases over their equal-dose
+constants. The bicycle cases tied at full strength. Mean intended effect
+increased by +0.003554 over OFF and +0.000761 over the equal-dose constant.
+CPU replay reproduced the saved probabilities and firing decisions from all
+560 calibration intervals and 160 held-out intervals. The original four
+matched constant strengths were recovered from the held-out sigma grid.
+[Exact settings and per-case evidence](warm-amber-raw192-adaptive-study.json)
