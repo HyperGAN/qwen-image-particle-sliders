@@ -45,11 +45,12 @@ calibration targeted the paper’s 50% intervention rate. CFP fired on 40 of
 80 calibration intervals. CLABS fired on 41 of 80, within one interval of
 the target. [Right Token, Right Time](https://arxiv.org/html/2611.18274v1#A2)
 
-Each held-out case used the archived OFF image and a constant control matched
-to the gate’s realized sigma-integrated strength. The reported gain is the
-equal-case mean of finished Warm Amber intensity ON minus matched OFF.
+Each held-out case used the archived OFF image and a constant control
+calculated from the gate’s realized sigma-integrated strength. The reported
+gain is the equal-case mean of finished Warm Amber intensity ON minus matched
+OFF. The table uses the original rendered constants.
 
-| Allocation | Gate gain | Matched constant gain | Wins | Held-out firing |
+| Allocation | Gate gain | Archived constant gain | Wins | Held-out firing |
 | --- | ---: | ---: | ---: | ---: |
 | CFP | +0.003571 | +0.002653 | 2/4 | 136/160 |
 | CLABS | +0.003554 | +0.002793 | 2/4 | 138/160 |
@@ -70,12 +71,22 @@ Amber RAW192 profile. [Exact settings and per-case evidence](warm-amber-raw192-a
 The published study supplies the fitted direction, live threshold, nominal
 strength, native sigma grid, and per-case seeds. CFP calibrated at 40 of 80
 intervals. Its four-case gain over OFF was +0.003571, and its gain over the
-matched-dose constant was +0.000918. Both bicycle cases used the full
+archived constant was +0.000918. Both bicycle cases used the full
 strength throughout. Use the recipe with the saved Warm Amber RAW192 and
 the captured ParticleGAN 0.10.1 native owner. The strict
 `scoped.open_inference` loader serves typed new-profile RAW exports.
 [Published study](warm-amber-raw192-adaptive-study.json) ·
 [Reviewed core wheel build](../SCOPED.md#activation-dependent-strength)
+
+The native CUDA multiply uses an FP32 scalar and rounds the residual product
+to BF16. On the saved 40-step sigma grid, the two bicycle controls exactly
+matched the gate's integrated scalar coefficient. Seed 203 used the nearest
+FP32 coefficient with a difference of −1.42 × 10⁻⁸. The seed 207 control
+used `0.3183354437351227`, one FP32 step below the closest constant,
+`0.31833547353744507`. The archived difference was −1.94 × 10⁻⁸. Finished
+outputs for the closest seed 207 control remain unmeasured. These differences
+refer to the integrated scalar before per-element rounding.
+[Native adapter](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/0294326f7ef1dee65ef24a44797b1a06476a4940/src/qwen_image_sliders/adapters.py#L65) · [Scalar multiply kernel](https://github.com/pytorch/pytorch/blob/5811a8d7da873dd699ff6687092c225caffcf1bb/aten/src/ATen/native/cuda/BinaryMulKernel.cu#L33-L42).
 
 For the measured cases, supply the original BF16 prompt encoding. The
 historical owner accepts this encoding as `context`, and returns the native
@@ -221,8 +232,9 @@ def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
 
 To derive the API arguments without loading the native model, call
 `measured_cfp_inputs(raw_path, encoding_path, core_wheel, "dev1-seed203")`.
-The constant uses the realized sigma-weighted dose from that case. A constant
-pass would use the same context, seed, sigma grid and one unit gain per interval.
+The helper returns the original constant argument calculated from that case's
+sigma-weighted dose. A constant pass uses the same context, seed, sigma grid
+and one unit gain per interval.
 
 ## Replay the measured CLABS plan
 
@@ -235,9 +247,13 @@ for each case. Keep the seed as an integer throughout. The helper returns
 the realized-strength receipt and the matching constant strength.
 
 The active calibration reached 41 of 80 firings. CLABS fired 138 times over
-160 held-out intervals and improved both teapot cases over their equal-dose
-constants. The bicycle cases tied at full strength. Mean intended effect
-increased by +0.003554 over OFF and +0.000761 over the equal-dose constant.
+160 held-out intervals and improved both teapot cases over their archived
+constants. The bicycle cases tied at full strength and had exact integrated
+scalar matches. Seed 203 used its nearest FP32 coefficient with a difference
+of −1.57 × 10⁻⁸. Seed 207 used the same gate schedule and archived control
+as CFP. Its closest FP32 constant remains unmeasured for both gates. Mean
+intended effect increased by +0.003554 over OFF and +0.000761 over the
+archived constant.
 CPU replay reproduced the saved probabilities and firing decisions from all
 560 calibration intervals and 160 held-out intervals. The original four
 matched constant strengths were recovered from the held-out sigma grid.
