@@ -48,7 +48,9 @@ the target. [Right Token, Right Time](https://arxiv.org/html/2611.18274v1#A2)
 Each held-out case used the archived OFF image and a constant control
 calculated from the gate’s realized sigma-integrated strength. The reported
 gain is the equal-case mean of finished Warm Amber intensity ON minus matched
-OFF. The table uses the original rendered constants.
+OFF. The original table is retained below. The nearest-FP32 follow-up
+verified the same finished results for CFP and CLABS.
+[Native control receipts](warm-amber-raw192-nearest-fp32-controls.json)
 
 | Allocation | Gate gain | Archived constant gain | Wins | Held-out firing |
 | --- | ---: | ---: | ---: | ---: |
@@ -71,7 +73,7 @@ Amber RAW192 profile. [Exact settings and per-case evidence](warm-amber-raw192-a
 The published study supplies the fitted direction, live threshold, nominal
 strength, native sigma grid, and per-case seeds. CFP calibrated at 40 of 80
 intervals. Its four-case gain over OFF was +0.003571, and its gain over the
-archived constant was +0.000918. Both bicycle cases used the full
+nearest FP32 constants was +0.000918. Both bicycle cases used the full
 strength throughout. Use the recipe with the saved Warm Amber RAW192 and
 the captured ParticleGAN 0.10.1 native owner. The strict
 `scoped.open_inference` loader serves typed new-profile RAW exports.
@@ -83,9 +85,14 @@ to BF16. On the saved 40-step sigma grid, the two bicycle controls exactly
 matched the gate's integrated scalar coefficient. Seed 203 used the nearest
 FP32 coefficient with a difference of −1.42 × 10⁻⁸. The seed 207 control
 used `0.3183354437351227`, one FP32 step below the closest constant,
-`0.31833547353744507`. The archived difference was −1.94 × 10⁻⁸. Finished
-outputs for the closest seed 207 control remain unmeasured. These differences
-refer to the integrated scalar before per-element rounding.
+`0.31833547353744507`. The original sampler reran seed 207 at the closest
+coefficient and produced a byte-identical terminal latent. The finished image,
+independent integrity judgment, and effect score were reused. The corrected
+integrated scalar dose is +1.04 × 10⁻⁸ from the gate dose before BF16 product
+rounding. Use the recorded coefficients for replay. For a new run, use the
+shared `match_binary32_interval_dose` with the native FP32 coefficients and
+the actual sigma grid.
+[Native control receipts](warm-amber-raw192-nearest-fp32-controls.json) · [Shared dose matcher](https://github.com/HyperGAN/particle-sliders/commit/07dbd331c3a548709949032c01ce19e7c64a2520).
 [Native adapter](https://github.com/HyperGAN/qwen-image-particle-sliders/blob/0294326f7ef1dee65ef24a44797b1a06476a4940/src/qwen_image_sliders/adapters.py#L65) · [Scalar multiply kernel](https://github.com/pytorch/pytorch/blob/5811a8d7da873dd699ff6687092c225caffcf1bb/aten/src/ATen/native/cuda/BinaryMulKernel.cu#L33-L42).
 
 For the measured cases, supply the original BF16 prompt encoding. The
@@ -103,7 +110,7 @@ Run the code from the repository root in the captured owner's environment.
 Pass the open archived owner, the archived RAW and encoding files, the local
 reviewed core wheel, and one measured case ID. The function checks the
 checkpoint, attached adapter tensors, base identity, and native profile.
-It returns the latent, exact gate receipt, and the case's equal-dose
+It returns the latent, exact gate receipt, and the case's pre-rounding
 constant strength.
 
 ```python
@@ -232,9 +239,9 @@ def replay_cfp(owner, raw_path, encoding_path, core_wheel, case_id):
 
 To derive the API arguments without loading the native model, call
 `measured_cfp_inputs(raw_path, encoding_path, core_wheel, "dev1-seed203")`.
-The helper returns the original constant argument calculated from that case's
-sigma-weighted dose. A constant pass uses the same context, seed, sigma grid
-and one unit gain per interval.
+A native constant pass uses the recorded FP32 coefficient for that case, the
+same context, seed and sigma grid, and one unit gain per interval.
+[Native control receipts](warm-amber-raw192-nearest-fp32-controls.json)
 
 ## Replay the measured CLABS plan
 
@@ -244,17 +251,17 @@ arguments on CPU, use `measured_gate_inputs(raw_path, encoding_path, core_wheel,
 The study supplies the calibrated bias, CLABS reference mean and standard
 deviation, the paper's feedback settings, and the original independent seed
 for each case. Keep the seed as an integer throughout. The helper returns
-the realized-strength receipt and the matching constant strength.
+the realized-strength receipt and the pre-rounding constant strength.
 
 The active calibration reached 41 of 80 firings. CLABS fired 138 times over
-160 held-out intervals and improved both teapot cases over their archived
+160 held-out intervals and improved both teapot cases over their nearest FP32
 constants. The bicycle cases tied at full strength and had exact integrated
 scalar matches. Seed 203 used its nearest FP32 coefficient with a difference
-of −1.57 × 10⁻⁸. Seed 207 used the same gate schedule and archived control
-as CFP. Its closest FP32 constant remains unmeasured for both gates. Mean
+of −1.57 × 10⁻⁸. Seed 207 used the same gate schedule and verified closest
+FP32 constant as CFP. Mean
 intended effect increased by +0.003554 over OFF and +0.000761 over the
-archived constant.
+nearest FP32 constants.
 CPU replay reproduced the saved probabilities and firing decisions from all
 560 calibration intervals and 160 held-out intervals. The original four
 matched constant strengths were recovered from the held-out sigma grid.
-[Exact settings and per-case evidence](warm-amber-raw192-adaptive-study.json)
+[Original per-case evidence](warm-amber-raw192-adaptive-study.json) · [Native control receipts](warm-amber-raw192-nearest-fp32-controls.json)

@@ -1,0 +1,105 @@
+{
+  "study": "Warm Amber RAW192 native FP32 constant follow-up",
+  "original_study": "warm-amber-raw192-adaptive-study.json",
+  "checkpoint_sha256": "3132d426e96f94e358b9ff4efa2c2c08abed51be93e997c9a223877cfba39c1e",
+  "weights": "raw",
+  "ema_decay": null,
+  "scope": {
+    "sampler": "FlowMatchEulerDiscreteScheduler",
+    "steps": 40,
+    "height": 512,
+    "width": 512,
+    "true_cfg_scale": 1,
+    "use_kv_cache": false
+  },
+  "arithmetic": {
+    "core_revision": "07dbd331c3a548709949032c01ce19e7c64a2520",
+    "function": "match_binary32_interval_dose",
+    "scope": "FP32 coefficient before elementwise BF16 product rounding"
+  },
+  "seed207": {
+    "case": "dev1-seed207",
+    "archived_native_coefficient": 0.3183354437351227,
+    "closest_native_coefficient": 0.31833547353744507,
+    "latent_sha256": "7f7b645c431d5be6593f010c33f8d2339f5840d3624f4c426ce0337296b8ba84",
+    "archive_latent_byte_identical": true,
+    "reused_independent_integrity": "pass",
+    "reused_finished_score": true,
+    "new_native_denoise_calls": 1,
+    "new_VAE_decode_calls": 0,
+    "new_observer_calls": 0,
+    "new_effect_calls": 0
+  },
+  "methods": {
+    "cfp": {
+      "cases": [
+        {
+          "case": "dev0-seed205",
+          "coefficient": 0.6666666865348816,
+          "binary32_bits": "0x3f2aaaab",
+          "integrated_scalar_dose_residual": "0",
+          "gate_minus_constant": 0.0
+        },
+        {
+          "case": "dev0-seed204",
+          "coefficient": 0.6666666865348816,
+          "binary32_bits": "0x3f2aaaab",
+          "integrated_scalar_dose_residual": "0",
+          "gate_minus_constant": 0.0
+        },
+        {
+          "case": "dev1-seed203",
+          "coefficient": 0.4774712324142456,
+          "binary32_bits": "0x3ef4771c",
+          "integrated_scalar_dose_residual": "-4005319/281474976710656",
+          "gate_minus_constant": 0.0017509746054808302
+        },
+        {
+          "case": "dev1-seed207",
+          "coefficient": 0.31833547353744507,
+          "binary32_bits": "0x3ea2fcde",
+          "integrated_scalar_dose_residual": "1461007/140737488355328",
+          "gate_minus_constant": 0.0019211048881212882
+        }
+      ],
+      "mean_gate_minus_OFF": 0.0035708371239403887,
+      "mean_gate_minus_nearest_FP32_constant": 0.0009180198734005296,
+      "cases_ahead_of_constant": 2
+    },
+    "clabs": {
+      "cases": [
+        {
+          "case": "dev0-seed205",
+          "coefficient": 0.6666666865348816,
+          "binary32_bits": "0x3f2aaaab",
+          "integrated_scalar_dose_residual": "0",
+          "gate_minus_constant": 0.0
+        },
+        {
+          "case": "dev0-seed204",
+          "coefficient": 0.6666666865348816,
+          "binary32_bits": "0x3f2aaaab",
+          "integrated_scalar_dose_residual": "0",
+          "gate_minus_constant": 0.0
+        },
+        {
+          "case": "dev1-seed203",
+          "coefficient": 0.5251696109771729,
+          "binary32_bits": "0x3f067184",
+          "integrated_scalar_dose_residual": "-2202721/140737488355328",
+          "gate_minus_constant": 0.0011225243409474688
+        },
+        {
+          "case": "dev1-seed207",
+          "coefficient": 0.31833547353744507,
+          "binary32_bits": "0x3ea2fcde",
+          "integrated_scalar_dose_residual": "1461007/140737488355328",
+          "gate_minus_constant": 0.0019211048881212882
+        }
+      ],
+      "mean_gate_minus_OFF": 0.003554100015511116,
+      "mean_gate_minus_nearest_FP32_constant": 0.0007609073072671892,
+      "cases_ahead_of_constant": 2
+    }
+  }
+}
